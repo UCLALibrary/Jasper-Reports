@@ -8,3 +8,6 @@ bin
 # Exclude data adapter as it has db user/password info
 *DataAdapter.xml
 
+# Exclude compiled .jasper files, we only want the source .jrxml
+.jasper
+
