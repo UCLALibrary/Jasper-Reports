@@ -1,0 +1,10 @@
+# Studio creates a bin directory, we don't need it
+bin
+
+# Studio creates these, not wanted in repo
+.classpath
+.project
+
+# Exclude data adapter as it has db user/password info
+*DataAdapter.xml
+
