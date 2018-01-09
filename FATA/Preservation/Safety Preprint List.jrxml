@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Safety Preprint List" pageWidth="1440" pageHeight="595" orientation="Landscape" columnWidth="1440" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="4cd0b6c7-0af3-4349-acd5-f5257bcc4a8c">
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<queryString>
+		<![CDATA[select
+  bt.bib_id
+, vger_support.unifix(bt.title) as title
+, substr(mm.field_007, 12, 1) as generation -- 007/11
+, substr(mm.field_007, 13, 1) as base -- 007/12
+, filmntvdb.GetMfhdSubfield(mm.mfhd_id, '905', 'c') as donor_code
+, filmntvdb.GetMfhdTag(mm.mfhd_id, '866') as physical_description
+, mm.mfhd_id
+, l.location_code as loc_code
+, mm.display_call_no as call_number
+, filmntvdb.GetMfhdSubfield(mm.mfhd_id, '905', 'd') as piece_count
+from filmntvdb.mfhd_master mm
+inner join filmntvdb.location l on mm.location_id = l.location_id
+inner join filmntvdb.bib_mfhd bm on mm.mfhd_id = bm.mfhd_id
+inner join filmntvdb.bib_text bt on bm.bib_id = bt.bib_id
+where substr(mm.field_007, 12, 1) <> 'r'
+and substr(mm.field_007, 13, 1) <> 'i'
+]]>
+	</queryString>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="GENERATION" class="java.lang.String"/>
+	<field name="BASE" class="java.lang.String"/>
+	<field name="DONOR_CODE" class="java.lang.String"/>
+	<field name="PHYSICAL_DESCRIPTION" class="java.lang.String"/>
+	<field name="MFHD_ID" class="java.math.BigDecimal"/>
+	<field name="LOC_CODE" class="java.lang.String"/>
+	<field name="CALL_NUMBER" class="java.lang.String"/>
+	<field name="PIECE_COUNT" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="40" height="30" uuid="fe6539a7-0dd5-486b-bbdf-465058e03f87"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="0" width="310" height="30" uuid="ee7f4550-36bc-4338-a1b7-3c1de4f8b870"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="82" height="30" uuid="903694ad-66e5-4076-b48a-57b680a7a7e6"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[GENERATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="432" y="0" width="48" height="30" uuid="35b38aaf-e0dc-4432-89c7-e26bae1bee4d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BASE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="70" height="30" uuid="655eb039-c17b-485e-ba0e-69e71f1a5366"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[DONOR CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="550" y="0" width="575" height="30" uuid="fbae0998-9ee6-4df7-84d7-015f2cfc9622"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[PHYSICAL_DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1126" y="0" width="68" height="30" uuid="c3b083f7-8dd5-4a62-aa5b-6f10c18ddf17"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MFHD_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1196" y="0" width="74" height="30" uuid="3f3e3646-729a-471e-95bb-d7f03899f342"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOC_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1270" y="0" width="110" height="30" uuid="58feacd5-9e22-4b08-9661-daeff8b71ec8"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CALL_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1380" y="0" width="60" height="30" uuid="476ee4e9-1966-4174-b49d-a73adb895df0"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[PIECE COUNT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="40" height="30" uuid="b07459c6-ec02-4e1f-a127-4501eafdbed1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="40" y="0" width="310" height="30" uuid="83612e6d-afe2-4bf4-9901-07f7a51bba5e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="350" y="0" width="82" height="30" uuid="5fdb6ea7-db66-41c8-9e8e-fa9359d86085">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{GENERATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="432" y="0" width="48" height="30" uuid="d7c31fb0-44dc-4e27-bf7c-9d7a7b7d7d68">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BASE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="480" y="0" width="70" height="30" uuid="bfead5aa-bfc0-4d67-b954-5e2074495ac6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DONOR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="550" y="0" width="575" height="30" uuid="b7e39d1b-00ef-4b7e-8bfa-519c4dbf9714">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PHYSICAL_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1126" y="0" width="68" height="30" uuid="325e11de-4945-4361-87a6-efe2a9762488">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MFHD_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1196" y="0" width="74" height="30" uuid="3ea996ab-96a7-45be-9af4-2cf94cd1c27f">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOC_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1270" y="0" width="110" height="30" uuid="852ca987-a8a0-4e9a-a6e2-aefc15d49d41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1380" y="0" width="60" height="30" uuid="01b811c6-8b2d-46dd-85eb-f24aab3fd3ce">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PIECE_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

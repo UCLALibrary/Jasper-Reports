@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Hearst in Voyager List" pageWidth="1000" pageHeight="595" orientation="Landscape" columnWidth="1000" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="804f6b6d-70e6-4509-bed5-2db0a967e0b8">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/FATA/Preservation/Hearst_in_Voyager_List_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/FATA/Preservation/Hearst_in_Voyager_List"/>
+	<queryString>
+		<![CDATA[select
+  f905c.subfield as donor_code
+, vger_support.unifix(bt.title) as title
+, bt.bib_id
+, f901a.subfield as spac_code
+, mm.mfhd_id
+, l.location_code as location
+, mm.display_call_no as inventory_no
+, substr(mm.field_007, 1, 1) as film_only
+from filmntvdb.mfhd_master mm
+inner join filmntvdb.location l on mm.location_id = l.location_id
+inner join filmntvdb.bib_mfhd bm on mm.mfhd_id = bm.mfhd_id
+inner join filmntvdb.bib_text bt on bm.bib_id = bt.bib_id
+inner join vger_subfields.filmntvdb_mfhd_subfield f901a
+  on mm.mfhd_id = f901a.record_id
+  and f901a.tag = '901a'
+inner join vger_subfields.filmntvdb_mfhd_subfield f905c
+  on mm.mfhd_id = f905c.record_id
+  and f905c.tag = '905c'
+where f901a.subfield = 'HEA'
+order by bt.bib_id]]>
+	</queryString>
+	<field name="DONOR_CODE" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="SPAC_CODE" class="java.lang.String"/>
+	<field name="MFHD_ID" class="java.math.BigDecimal"/>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="INVENTORY_NO" class="java.lang.String"/>
+	<field name="FILM_ONLY" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="30" uuid="8e6dd4b0-d822-4dbf-9b28-ebbd21fd7bb9">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[DONOR CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="560" height="30" uuid="02a4e415-4eb8-48e5-aa25-0369503ef183"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="630" y="0" width="48" height="30" uuid="6e35622e-6737-4fd2-b65f-e1a38fd2468f"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="678" y="0" width="60" height="30" uuid="3c71b2c1-f308-464a-a746-9095f8ac1865"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SPAC CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="738" y="0" width="48" height="30" uuid="5ad863a8-4f19-476a-83e2-b55f23e76469"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MFHD ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="786" y="0" width="60" height="30" uuid="b49f85f2-d1f5-4874-b871-9b0c968552e7"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOC CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="846" y="0" width="105" height="30" uuid="1c4d851c-f0c6-4ef6-b9b4-1cc782830dba"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INVENTORY_NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="951" y="0" width="43" height="30" uuid="cb9b4324-fba5-4889-b64b-119b43cdb87d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FILM ONLY]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="70" height="30" uuid="33c27060-77be-4f7f-ada8-aabbe03501f0">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DONOR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="70" y="0" width="560" height="30" uuid="695af1e9-1165-4ca1-9272-09e1559178af">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="630" y="0" width="48" height="30" uuid="9527188a-ff7e-491c-aeab-70e25e41ea71">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="678" y="0" width="60" height="30" uuid="329034de-93cd-4dad-9610-1fad76f8a7f2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SPAC_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="738" y="0" width="48" height="30" uuid="29567ef4-359f-49e5-affc-5d3e47c1f46c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MFHD_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="786" y="0" width="60" height="30" uuid="eafb6cc8-bda6-4011-9d7e-fea1bdcff06c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="846" y="0" width="105" height="30" uuid="14f1430d-2e1f-4092-a494-0c1924909696">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVENTORY_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="951" y="0" width="43" height="30" uuid="55ef4ec1-997a-4e6a-9852-ba96014afa53">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FILM_ONLY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

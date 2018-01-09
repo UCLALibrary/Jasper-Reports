@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Location List" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="83f0f038-9052-40ec-86d6-20dcb2619c23">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Location_List_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Location_List"/>
+	<queryString>
+		<![CDATA[select 
+	location_id as id
+,	location_code as code
+,	location_name as staff_name
+,	location_display_name as opac_name
+,	location_spine_label as spine_label
+,	suppress_in_opac as suppressed
+from location
+order by location_code]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="CODE" class="java.lang.String"/>
+	<field name="STAFF_NAME" class="java.lang.String"/>
+	<field name="OPAC_NAME" class="java.lang.String"/>
+	<field name="SPINE_LABEL" class="java.lang.String"/>
+	<field name="SUPPRESSED" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="60" height="30" uuid="21a5795e-a643-4720-9380-9bd508a8ef8d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="61" y="0" width="99" height="30" uuid="f8af3cf6-7316-4928-a1b3-b5ef90633308"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[STAFF_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="0" width="280" height="30" uuid="97011948-ff46-4235-9d00-28b275010d20"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[OPAC_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="0" width="80" height="30" uuid="da8ca308-0077-4923-8865-d4f4bd9df8e0"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SPINE_LABEL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="0" width="75" height="30" uuid="211660dc-b774-4d40-926d-66ec8c6aec3e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SUPPRESS?]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="0" width="60" height="30" uuid="8ecb318d-c4cb-4ab5-8baf-f7217bc45e16">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="61" y="0" width="99" height="30" uuid="6fecc00e-bb34-4d84-b758-d3e83692c447">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{STAFF_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="0" width="280" height="30" uuid="f5860af7-6494-4bd7-81b7-55444b21ae50">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{OPAC_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="440" y="0" width="80" height="30" uuid="234deaa8-f2b3-484d-af2c-4c512f86a320">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{SPINE_LABEL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="520" y="0" width="75" height="30" uuid="fa8970e2-7b21-427a-910d-754ea97e8ca1">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{SUPPRESSED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

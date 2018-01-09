@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Bib 856 new to file (monthly)" pageWidth="1542" pageHeight="595" orientation="Landscape" columnWidth="1542" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="bf7e2cb6-dd58-4c56-99a0-99e62a1e56e2">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Bib_856_new_to_file__monthly__files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Bib_856_new_to_file__monthly_"/>
+	<queryString>
+		<![CDATA[WITH bibs AS (
+	SELECT bib_id
+	FROM ucladb.bib_history
+	WHERE action_type_id = 1 --create
+  -- last_month is derived from today: go to start of this month, go back one day, truncate to month.
+  and trunc(action_date, 'month') = trunc(trunc(sysdate, 'month') - 1, 'month')
+)
+, tmp_urls as (
+SELECT /*+ ORDERED */
+	s.record_id
+,	s.record_id || ':' || s.field_seq AS handle
+,	SubStr(s.indicators, 1, 1) AS ind1
+,	s.tag
+,	s.field_seq
+,	Upper(s.subfield) AS subfield
+FROM vger_subfields.ucladb_bib_subfield s
+WHERE s.tag LIKE '856%'
+AND EXISTS (SELECT * FROM bibs WHERE bib_id = s.record_id)
+)
+, good_856 as (
+  select record_id, field_seq, ind1, handle from tmp_urls
+  minus
+  select record_id, field_seq, ind1, handle from tmp_urls
+    where tag = '856x'
+    and subfield in ('CDL', 'UCLA LAW')
+  minus
+  select record_id, field_seq, ind1, handle from tmp_urls
+    where tag = '856z'
+    and subfield = 'UCLA LAW SCHOOL USE ONLY'
+  minus
+  select record_id, field_seq, ind1, handle from tmp_urls
+    where tag = '856u'
+    AND (	subfield LIKE '%BIBPURL.OCLC.ORG%'
+      OR	subfield LIKE '%PURL.FDLP.GOV%'
+      OR	subfield LIKE '%HDL.LOC.GOV%'
+      OR	subfield LIKE '%OPENURL.CDLIB.ORG%'
+      OR	subfield LIKE '%PURL.ACCESS.GPO.GOV%'
+      OR	subfield LIKE '%REPOSITORIES.CDL.ORG%'
+      OR	subfield LIKE '%UCLIBS.ORG%'
+    ) -- 856u subfield
+  minus
+  select record_id, field_seq, ind1, handle from tmp_urls
+    where tag = '8563'
+    AND (	subfield LIKE '%BIBLIOGRAPHIC DESCRIPTION%'
+      OR	subfield LIKE '%BOOK REVIEW%'
+      OR	subfield LIKE '%CONTRIBUTOR BIOGRAPHICAL INFORMATION%'
+      OR	subfield LIKE '%FINDING AID%'
+      OR	subfield LIKE '%OFFICIAL GOVERNMENT WEBSITE%'
+      OR	subfield LIKE '%PUBLISHER DESCRIPTION%'
+      OR	subfield LIKE '%REPORT ON WHICH THIS OPINION IS BASED%'
+      OR	subfield LIKE '%SAMPLE TEXT%'
+      OR	subfield LIKE '%TABLE OF CONTENTS%'
+      OR	subfield	= 'TOC' -- table of contents, in Casalini records
+    ) -- 8563 subfield
+)
+select
+	case
+		when SubStr(bt.bib_format, 2, 1) in ('i', 's') then 'serial'
+		else 'mono'
+	end as format
+,	ind1
+,	bt.bib_id
+,	(SELECT subfield FROM vger_subfields.ucladb_bib_subfield WHERE record_id = bt.bib_id AND tag = '035a' AND subfield LIKE '(OCoLC)%' AND ROWNUM < 2) AS oclc_number
+,	vger_support.UniFix(bt.title_brief) AS title_brief
+,	vger_subfields.GetFieldFromSubfields(tmp.record_id, tmp.field_seq) AS F856
+,	(SELECT subfield FROM vger_subfields.ucladb_bib_subfield WHERE record_id = bt.bib_id AND tag = '910a' AND ROWNUM < 2) AS F910a
+from good_856 tmp
+inner join ucladb.bib_text bt on tmp.record_id = bt.bib_id
+order by format, ind1, bib_id
+]]>
+	</queryString>
+	<field name="FORMAT" class="java.lang.String"/>
+	<field name="IND1" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="OCLC_NUMBER" class="java.lang.String"/>
+	<field name="TITLE_BRIEF" class="java.lang.String"/>
+	<field name="F856" class="java.lang.String"/>
+	<field name="F910A" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="85" height="30" uuid="c3598aec-d28c-4e54-8615-dc92ebbfa693"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FORMAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="85" y="0" width="85" height="30" uuid="94aae51a-afb3-4124-bfec-f7aa165eeddb"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[IND1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="0" width="85" height="30" uuid="1e4e0d41-f4d0-43dc-bb27-8afe049aa294"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="255" y="0" width="150" height="30" uuid="878828db-0bfc-428b-9249-176a11c639f5"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[OCLC_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="405" y="0" width="314" height="30" uuid="5ea5c892-a408-4682-be77-e2b90e6ef4f8"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE_BRIEF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="719" y="0" width="714" height="30" uuid="fe0be9da-3cbb-4cbd-85e7-deb610e5af05">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[F856]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1433" y="0" width="109" height="30" uuid="901361b2-5f47-4987-82b2-eb559be2c52c">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[F910A]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="85" height="30" uuid="a7489c7a-e0bc-4acd-82c3-e2cf81e50217">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FORMAT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="85" y="0" width="85" height="30" uuid="7f44c608-146f-46a6-bece-52df78d7ab16">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{IND1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="0" width="85" height="30" uuid="d9f9d09a-2ee5-4f88-b577-207e893b74a7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="255" y="0" width="150" height="30" uuid="a425357b-f875-4f08-9f14-dc91791e1ee4">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OCLC_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="405" y="0" width="314" height="30" uuid="ebcddb9c-0c2a-48d9-aa91-12d59bc344dc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE_BRIEF}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="719" y="0" width="714" height="30" uuid="fdab31dc-e639-4d47-8719-ef8b78c84be2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{F856}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1433" y="0" width="109" height="30" uuid="7bed5ce3-849e-4fb9-acd8-152c882b658e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{F910A}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

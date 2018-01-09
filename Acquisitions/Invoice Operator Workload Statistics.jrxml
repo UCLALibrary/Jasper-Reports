@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoices by User" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="aa0f9811-b7ad-4e91-94e4-9f28cf581083">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="348"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="641"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Invoice_operator_workload_statistics_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Invoice_operator_workload_statistics"/>
+	<template><![CDATA["Common_Styles.jrtx"]]></template>
+	<parameter name="operator_id" class="java.lang.String"/>
+	<parameter name="start_date" class="java.util.Date">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<parameter name="end_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="p_start_date" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new java.text.SimpleDateFormat("MM/dd/yyyy").format($P{start_date})]]></defaultValueExpression>
+	</parameter>
+	<parameter name="p_end_date" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new java.text.SimpleDateFormat("MM/dd/yyyy").format($P{end_date})]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+Trunc(INVOICE_line_item.CREATE_DATE) AS CREATE_DATE,
+INVOICE_line_item.create_opid, 
+Count (*) AS num
+FROM INVOICE_line_item
+WHERE INVOICE_line_item.CREATE_OPID = $P{operator_id}
+AND CREATE_date BETWEEN to_date($P{p_start_date} , 'MM/DD/YYYY HH:MI AM') AND to_date($P{p_end_date}, 'MM/DD/YYYY HH:MI AM') 
+GROUP BY Trunc(INVOICE_line_item.create_DATE), INVOICE_line_item.create_OPID
+ORDER BY create_DATE, INVOICE_line_item.create_OPID]]>
+	</queryString>
+	<field name="CREATE_DATE" class="java.sql.Date"/>
+	<field name="CREATE_OPID" class="java.lang.String"/>
+	<field name="NUM" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="199" height="30" uuid="6c0f8719-0876-480b-9ead-a8cb574d9d8d"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[CREATE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="0" width="198" height="30" uuid="7e64987a-b8f9-45a2-8363-1d134c4a80a7"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[CREATE_OPID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="397" y="0" width="198" height="30" uuid="45bcc495-8283-48df-bd18-a92f6a3dd3e6"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[NUM]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement style="Dates" x="0" y="0" width="199" height="30" uuid="ab3c674d-0265-4b39-9fd1-5786e7cc5ce5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<font fontName="comic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREATE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="199" y="0" width="198" height="30" uuid="dc269b09-8dbb-4406-b791-fa3a4d447084">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<font fontName="comic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREATE_OPID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="397" y="0" width="198" height="30" uuid="70b678df-666d-4f03-8bbd-1b5999ace1ce">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<font fontName="comic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

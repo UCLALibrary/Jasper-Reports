@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Monthly Data for Clark Library" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="17958863-64f3-43c2-b562-2d3cc3a5aa70">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Monthly_Data_for_Clark_Library_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Monthly_Data_for_Clark_Library"/>
+	<parameter name="p_yyyymm" class="java.lang.String">
+		<parameterDescription><![CDATA[Month & year for data]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[with last_month as (
+  select to_char(trunc(trunc(sysdate, 'month') - 1, 'month'), 'YYYYMM') as last_month from dual
+)
+select distinct
+  b.bib_id
+, sf.field_seq
+, substr(sf.tag, 1, 3) as tag
+-- Get fields with no subfield delimiters or codes
+, vger_subfields.GetFieldFromSubfields(b.bib_id, sf.field_seq, 'bib', 'ucladb', '') as field
+-- Derived table apparently needs to be listed before alias & joins
+from last_month, vger_report.cat_948_base_rpt b
+left outer join vger_subfields.ucladb_bib_subfield sf
+  on b.bib_id = sf.record_id
+where b.s948a like 'clk%'
+-- Use last month (the one before the current one...) by default, otherwise use what the user selected
+and b.s948c like coalesce($P{p_yyyymm}, last_month.last_month) || '%'
+-- Fields: 001, 090, 1xx, 245, 245, 26x, 300, 5xx, 910, 948
+and regexp_like(sf.tag, '^001|^049|^090|^099|^1..|^245|^246|^26.|^300|^5..|^910|^948')
+order by b.bib_id, sf.field_seq
+]]>
+	</queryString>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="FIELD_SEQ" class="java.math.BigDecimal"/>
+	<field name="TAG" class="java.lang.String"/>
+	<field name="FIELD" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="80" height="30" uuid="aea7cff8-0837-4cdb-b7f9-630362e5960e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="0" width="65" height="30" uuid="95d69369-5878-41eb-9051-151267cd5044"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TAG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="145" y="0" width="696" height="30" uuid="2dcc35dd-a5c8-4bd6-8a4d-9b2941b5f5e5"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FIELD]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="60" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField>
+				<reportElement x="0" y="0" width="80" height="60" uuid="911f7146-8135-4b16-bfc9-d9345f004a44">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="0" width="65" height="60" uuid="6e5cfeef-88ff-48c8-b799-7ece704ce3f7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TAG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="0" width="696" height="60" uuid="4570a98e-da7e-495a-b1e1-2077a8ebb9d9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FIELD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

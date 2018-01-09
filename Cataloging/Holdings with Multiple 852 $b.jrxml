@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Holdings with Multiple 852 $b" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="d7b71bd8-01d6-4b14-9e9a-24b3c80bddfd">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Holdings_with_Multiple_852__b_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Holdings_with_Multiple_852__b"/>
+	<queryString>
+		<![CDATA[with multiple_852b as (
+  select
+    record_id as mfhd_id
+  , field_seq
+  , subfield_seq
+  , vger_subfields.GetFieldFromSubfields(record_id, field_seq, 'mfhd', 'ucladb') as f852
+  from vger_subfields.ucladb_mfhd_subfield 
+  where tag = '852b' 
+  and record_id in (  
+    select 
+      record_id
+    from vger_subfields.ucladb_mfhd_subfield 
+    where tag = '852b' 
+    group by record_id
+    having count(*) > 1
+  )
+)
+select distinct
+  l.location_code
+, substr(bt.bib_format, 2, 1) as format
+, m.mfhd_id
+, m.f852
+from multiple_852b m
+inner join mfhd_master mm on m.mfhd_id = mm.mfhd_id
+inner join location l on mm.location_id = l.location_id
+inner join bib_mfhd bm on m.mfhd_id = bm.mfhd_id
+inner join bib_text bt on bm.bib_id = bt.bib_id
+order by location_code, format, mfhd_id
+]]>
+	</queryString>
+	<field name="LOCATION_CODE" class="java.lang.String"/>
+	<field name="FORMAT" class="java.lang.String"/>
+	<field name="MFHD_ID" class="java.math.BigDecimal"/>
+	<field name="F852" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="120" height="30" uuid="05a6b997-d01f-4244-9ff3-30c6deff7776"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOCATION_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="68" height="30" uuid="bd1416d3-7997-4e3d-9d1f-449404e8cb01"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FORMAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="0" width="68" height="30" uuid="d6cbd312-e52c-4ba4-acc7-8d91b279115b"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MFHD_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="256" y="0" width="586" height="30" uuid="07503090-4624-4643-b5b2-76523d5f2e7e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[F852]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="120" height="30" uuid="9cb73639-4acb-4fcd-a24c-e60de29cdc58">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="120" y="0" width="68" height="30" uuid="815b193c-b8e3-4523-80da-c4139b672800">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FORMAT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="0" width="68" height="30" uuid="fd78ade3-0776-4326-b429-31d3f808eea5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MFHD_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="256" y="0" width="586" height="30" uuid="f4646399-4577-4bfd-9fac-7d4055bc5f0b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{F852}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

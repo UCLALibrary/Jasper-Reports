@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Bib 856 fields with no $u" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="f7f1566f-9a7e-4f11-8fc3-b99e05ee69f0">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Bib_856_fields_with_no__u_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Bib_856_fields_with_no__u"/>
+	<queryString>
+		<![CDATA[with no_subfield as (
+  select record_id, field_seq from vger_subfields.ucladb_bib_subfield where tag like '856%'
+  minus
+  select record_id, field_seq from vger_subfields.ucladb_bib_subfield where tag = '856u'
+)
+select
+  record_id as bib_id
+, substr(bt.bib_format, 2, 1) as biblvl
+, l.location_code as loc
+, vger_subfields.getfieldfromsubfields(record_id, field_seq, 'bib', 'ucla') as field
+from no_subfield ns
+inner join ucladb.bib_text bt on ns.record_id = bt.bib_id
+inner join ucladb.bib_mfhd bm on bt.bib_id = bm.bib_id
+inner join ucladb.mfhd_master mm on bm.mfhd_id = mm.mfhd_id
+inner join location l on mm.location_id = l.location_id
+order by ns.record_id, ns.field_seq]]>
+	</queryString>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="BIBLVL" class="java.lang.String"/>
+	<field name="LOC" class="java.lang.String"/>
+	<field name="FIELD" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="30" uuid="f7779969-1a7a-4a58-9ea0-a53119aaf291">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="70" height="30" uuid="1394a97b-a107-4d22-9ec1-3e0792c9bc2c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIBLVL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="0" width="70" height="30" uuid="1a135f0e-98d9-478c-9467-9c03e5a9bf68"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="0" width="632" height="30" uuid="ba1efd5b-f1e1-4754-b917-a6ae5176f6dc"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[856 FIELD]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="70" height="30" uuid="303c0f74-3469-4209-b4c2-235c0d66ca92">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="70" y="0" width="70" height="30" uuid="19b81e44-e9f4-416d-b840-9783f40bc0e1">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIBLVL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="0" width="70" height="30" uuid="2bada4fd-ade5-49bc-8bd4-dfdd4c042cac">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="210" y="0" width="632" height="30" uuid="4c164a58-8477-4dc7-a9cb-25a2581e9a41">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FIELD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Preservation Holdings with Reproduction Information" pageWidth="1500" pageHeight="595" orientation="Landscape" columnWidth="1500" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="58cc295b-2a34-4154-acb0-11280a878fa9">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<queryString>
+		<![CDATA[select distinct
+  bt.bib_id
+, vger_support.unifix(filmntvdb.GetAllBibTag(bt.bib_id, '655', 2)) as all_655
+, vger_support.unifix(bt.title) as title
+, vger_support.unifix(filmntvdb.GetMfhdTag(bm.mfhd_id, '843')) as fld_843
+from filmntvdb.bib_index bi
+inner join filmntvdb.bib_text bt on bi.bib_id = bt.bib_id
+-- A few bibs don't have holdings...
+left outer join filmntvdb.bib_mfhd bm on bt.bib_id = bm.bib_id
+where bi.index_code = '655H'
+and bi.normal_heading = 'UCLA PRESERVATION'
+order by bt.bib_id
+]]>
+	</queryString>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="ALL_655" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="FLD_843" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="50" height="30" uuid="a7eec5ab-fa4e-4ac7-8bc3-3c16f7bbe009"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="0" width="390" height="30" uuid="0f3c6bf2-5085-4141-90a2-f0ea47b17006"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ALL_655]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="0" width="630" height="30" uuid="8e78c7e4-90a8-4564-bfdf-3effe5c5ac84"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1070" y="0" width="430" height="30" uuid="3422cab4-be71-4826-b6c4-393e4d21686f"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FLD_843]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="50" height="30" uuid="d7b46ebb-8bb8-4147-91e9-8574f09897c7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="50" y="0" width="390" height="30" uuid="95fed500-5709-4ce4-b2f4-3cea50ab7c85">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ALL_655}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="440" y="0" width="630" height="30" uuid="9e5763d3-219d-4f72-8ac3-afed70b6a6c4">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1070" y="0" width="430" height="30" uuid="15e6963f-63c4-4db5-96f8-4c9e5582573b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FLD_843}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

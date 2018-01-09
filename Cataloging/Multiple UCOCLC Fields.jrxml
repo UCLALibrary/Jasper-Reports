@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Multiple UCOCLC Fields" pageWidth="1242" pageHeight="595" orientation="Landscape" columnWidth="1242" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="4517c1ce-70a2-4ebf-acb9-cf4adfe745ed">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Multiple_UCOCLC_Fields_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Multiple_UCOCLC_Fields"/>
+	<parameter name="p_location_code" class="java.lang.String">
+		<parameterDescription><![CDATA[Location code; use % for wildcard]]></parameterDescription>
+	</parameter>
+	<parameter name="p_bib_level" class="java.lang.String">
+		<parameterDescription><![CDATA[Bib Level (optional)]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[select 
+  bt.bib_id
+, vger_support.unifix(bt.author) as author
+, vger_support.unifix(bt.title_brief) as title_brief
+, b.location_code as loc_code
+, mm.display_call_no as call_number
+, mm.normalized_call_no 
+, ( select subfield from vger_subfields.ucladb_bib_subfield 
+    where record_id = bt.bib_id
+    and tag = '910a'
+    and rownum < 2
+) as first_910a
+from vger_report.rpt_multiple_ucoclc b 
+inner join ucladb.bib_text bt on b.bib_id = bt.bib_id
+inner join ucladb.mfhd_master mm on b.mfhd_id = mm.mfhd_id
+-- Mandatory location_code, with wildcard support
+where b.location_code like $P{p_location_code}
+-- optional bib level
+and (b.bib_level = $P{p_bib_level} or $P{p_bib_level} is null)
+order by b.location_code, mm.normalized_call_no]]>
+	</queryString>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="TITLE_BRIEF" class="java.lang.String"/>
+	<field name="LOC_CODE" class="java.lang.String"/>
+	<field name="CALL_NUMBER" class="java.lang.String"/>
+	<field name="NORMALIZED_CALL_NO" class="java.lang.String"/>
+	<field name="FIRST_910A" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="30" uuid="107ffd9d-3d69-4c4a-ab91-f6adb4972c23">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="68" height="30" uuid="0b744a16-b0c4-4e91-b34d-628c0a43edf7"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOC_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="138" y="0" width="150" height="30" uuid="b32f2d31-8d1f-47ba-8c23-97318b312d54"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CALL_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="0" width="221" height="30" uuid="1b8d75d4-1323-49fd-8f39-398c6b824826"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="0" width="480" height="30" uuid="38d761d7-5d99-4d08-90fc-f65c162cb4c4"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE_BRIEF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="990" y="0" width="188" height="30" uuid="9a4a9262-5121-4666-864a-6cdee13828b0"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FIRST_910A]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="70" height="30" uuid="e12f017d-d233-490e-a999-94d5510d5f8b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="70" y="0" width="68" height="30" uuid="93acc248-20db-4b74-970c-ffd4eab6dc2c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOC_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="138" y="0" width="150" height="30" uuid="0202ae56-e810-43bf-9a86-ba92b5836c5b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="288" y="0" width="221" height="30" uuid="1fb3f123-70fa-4cad-ad08-9bd84b8a50ea">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="510" y="0" width="480" height="30" uuid="603be523-29b6-4e59-9231-ed5fa6295dbc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE_BRIEF}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="990" y="0" width="188" height="30" uuid="a77d8e92-f00a-46c3-8958-841a7731bbe5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FIRST_910A}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

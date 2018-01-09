@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Duplicate Item Barcodes" pageWidth="1242" pageHeight="595" orientation="Landscape" columnWidth="1242" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="74d75adf-a1a4-4d38-9bda-bc03ae585dd9">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Duplicate_Item_Barcodes_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Duplicate_Item_Barcodes"/>
+	<queryString>
+		<![CDATA[with dups as (
+  select * 
+  from item_barcode
+  where item_barcode in
+    (select item_barcode from item_barcode group by item_barcode having count(*) > 1)
+)
+select 
+  d.item_barcode
+, ibs.barcode_status_desc as status
+, d.barcode_status_date
+, bm.bib_id
+, bm.mfhd_id
+, d.item_id
+, substr(bt.bib_format, 2, 1) as format
+, mi.item_enum
+, l.location_code
+, mm.display_call_no
+, vger_support.unifix(bt.author) as author
+, vger_support.unifix(bt.title_brief) as title_brief
+from dups d
+inner join mfhd_item mi on d.item_id = mi.item_id
+inner join item_barcode_status ibs on d.barcode_status = ibs.barcode_status_type
+inner join mfhd_master mm on mi.mfhd_id = mm.mfhd_id
+inner join location l on mm.location_id = l.location_id
+inner join bib_mfhd bm on mm.mfhd_id = bm.mfhd_id
+inner join bib_text bt on bm.bib_id = bt.bib_id
+order by d.item_barcode, d.barcode_status_date]]>
+	</queryString>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="BARCODE_STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="MFHD_ID" class="java.math.BigDecimal"/>
+	<field name="ITEM_ID" class="java.math.BigDecimal"/>
+	<field name="FORMAT" class="java.lang.String"/>
+	<field name="ITEM_ENUM" class="java.lang.String"/>
+	<field name="LOCATION_CODE" class="java.lang.String"/>
+	<field name="DISPLAY_CALL_NO" class="java.lang.String"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="TITLE_BRIEF" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="109" height="30" uuid="d18fec28-0679-4b37-be42-d721735bf6b6"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ITEM_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="109" y="0" width="60" height="30" uuid="d98a6227-5bce-40f1-893f-5702e05b1f65"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="0" width="103" height="30" uuid="81b73d78-dbf9-4199-a0c5-3a197fcff7ab"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[STATUS_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="273" y="0" width="63" height="30" uuid="76bfa1d9-63e6-4211-87a2-03800a2bbe7f"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="336" y="0" width="63" height="30" uuid="868e7f07-e2a2-4769-b359-4ec74551c238"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MFHD_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="399" y="0" width="63" height="30" uuid="e661baeb-e767-4669-bc30-be7383eef45c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ITEM_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="462" y="0" width="58" height="30" uuid="6628243e-98a3-44b5-843f-33dd5e2627c6"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FORMAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="0" width="110" height="30" uuid="3b186f2f-6cde-461e-9c6f-fcfeffc4c47e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ITEM_ENUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="630" y="0" width="69" height="30" uuid="ac7d3e81-a547-4827-9df6-b354809fd480"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOC_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="700" y="0" width="103" height="30" uuid="6c298d86-5693-4941-b2cf-9cd1f7b58ee1"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CALL_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="803" y="0" width="185" height="30" uuid="90a21211-5879-4c6e-8099-bb624728f685"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="989" y="0" width="251" height="30" uuid="abd043e2-b390-4eee-903e-4c6799add895"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE_BRIEF]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="109" height="30" uuid="db50a13a-8f99-4f5c-834e-1603c2ae0cbd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="109" y="0" width="60" height="30" uuid="748005d3-a471-4b83-8304-daf64a6321a8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="0" width="103" height="30" uuid="a8d7dcbc-0b24-4ad9-a3c8-95b98375cf5c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE_STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="273" y="0" width="63" height="30" uuid="e464c00d-11f1-4bd2-96ab-e394d04712a6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="336" y="0" width="63" height="30" uuid="b26c2562-11d5-47da-9fab-69055271cf78">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MFHD_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="399" y="0" width="63" height="30" uuid="47a8114f-0d13-45e5-9492-ea6202d79b17">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="462" y="0" width="58" height="30" uuid="3e91450b-7666-4a5f-adf4-1eca08dcd2a7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FORMAT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="520" y="0" width="110" height="30" uuid="a7af1b10-eb27-4bf7-be98-ce4e83c443bb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_ENUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="630" y="0" width="69" height="30" uuid="06095a5b-de28-4c0c-b2e9-94b7b532b308">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="700" y="0" width="103" height="30" uuid="dc10fb95-b893-4372-90b6-b5ba6988a49f">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DISPLAY_CALL_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="803" y="0" width="185" height="30" uuid="f8d4917b-15aa-47de-bf9e-a7321cd28ed7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="989" y="0" width="251" height="30" uuid="4f4692b9-fca8-4173-81ae-f58b0616219c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE_BRIEF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Voyager Indexing Definitions" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="9897d3b4-c5ca-4f76-a910-35d7371aa24d">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Voyager_Indexing_Definitions_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Voyager_Indexing_Definitions"/>
+	<queryString>
+		<![CDATA[select
+  case
+    when p.indexrules like 'IX=A%' then 'Authority left-anchored'
+    when p.indexrules like 'IX=B%' then 'Bib left-anchored'
+    when p.indexrules like 'IX=C%' then 'Bib composite left-anchored'
+    when p.indexrules like 'IX=E%' then 'Name/Title headings'
+    when p.indexrules like 'IX=K%' then 'Bib keyword'
+    when p.indexrules like 'IX=M%' then 'Geospatial'
+    when p.indexrules like 'IX=N%' then 'Name headings'
+    when p.indexrules like 'IX=Q%' then 'MFHD keyword'
+    when p.indexrules like 'IX=S%' then 'Subject headings'
+    when p.indexrules like 'IX=T%' then 'Title headings'
+    when p.indexrules like 'IX=U%' then 'Call number'
+    else 'UNKNOWN'
+  end as index_type
+, p.searchcode as search_code
+, p.searchname as index_name
+, p.opacsuppress as opac_suppress
+, p.staffsuppress as staff_suppress
+, p.indexrules as index_rules
+, f.fieldcode as subfield
+from searchparm p
+left outer join searchfields f
+  on p.searchcode = f.searchcode
+  and p.indexrules like 'IX=K%'
+order by index_type, search_code, subfield
+]]>
+	</queryString>
+	<field name="INDEX_TYPE" class="java.lang.String"/>
+	<field name="SEARCH_CODE" class="java.lang.String"/>
+	<field name="INDEX_NAME" class="java.lang.String"/>
+	<field name="OPAC_SUPPRESS" class="java.lang.String"/>
+	<field name="STAFF_SUPPRESS" class="java.lang.String"/>
+	<field name="INDEX_RULES" class="java.lang.String"/>
+	<field name="SUBFIELD" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="290" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="802" height="290" uuid="e5d8da62-08f2-4339-9fc6-126a0470bd78">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<text><![CDATA[This information is pulled directly from the Voyager database tables.  As such, it can be a little hard to interpret, especially the index rules.
+
+Left-anchored indexes have two types: basic (one field only) and composite.  The composite indexes consist of multiple basic left-anchored indexes.
+
+* IX= : The index type, already translated.
+* AL= : The single field in this left-anchored index.
+* S+= : The subfield(s) included in this index.
+* S-= : The subfield(s) excluded from this index.
+* SR= : The single subfield in this index.  Each occurrence will be a separate index entry.
+* NM= : The normalization rules.  See searchparm_maker document in the Voyager documentation for details.
+* NF= : The non-filing indicators used in this index.
+* 1+= : Indicators in the first position to include.
+* 1-= : Indicators in the first position to exclude.
+* 2+= : Indicators in the second position to include.
+* 2+- : Indicators in the second position to exclude.
+* HL=TYPE=?S : Hard Limit of serials (bib LDR/07 = s).
+* FS= : Fixed field (e.g. 008).
+* FO= : Field offset for data from fixed fields (e.g. 15 starts at 0-based position 15).
+* FL= : Field length for data from fixed fields (e.g. 3 means take 3 bytes starting at FO position).
+* CS= : For composite indexes, a list of the basic left-anchored indexes which comprise it.
+
+If you need more information, please contact the helpdesk.
+]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="122" height="30" uuid="87cd8cdf-87f0-4606-8191-8c5f69009326"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INDEX TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="122" y="0" width="100" height="30" uuid="f59456f0-a6da-4189-94cd-98818a1000d0">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SEARCH CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="0" width="140" height="30" uuid="7a313cf5-6771-4102-8317-c39826b77f70"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INDEX NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="362" y="0" width="68" height="30" uuid="d42e1fe3-98df-43a1-be1e-a5b5969ff382"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[OPAC SUPP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="430" y="0" width="70" height="30" uuid="a1db016c-61f5-49f7-a5d9-b91487a9ea49"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[STAFF SUPP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="0" width="222" height="30" uuid="d2222ae4-d1cb-452d-b78f-d9063e277b09"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INDEX RULES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="722" y="0" width="110" height="30" uuid="0ad7593d-4ba7-4384-b6e2-43e9ca2a0d2c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SUBFIELD]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="122" height="30" uuid="92d8139a-6d38-443d-930f-ad063ad51a5a">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{INDEX_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="122" y="0" width="100" height="30" uuid="a04adcec-206d-4981-8ab9-4d37b337805e">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{SEARCH_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="222" y="0" width="140" height="30" uuid="fe78c5df-692c-4269-95f6-3f3b10542953">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{INDEX_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="362" y="0" width="68" height="30" uuid="ace9a7b7-0cbf-4341-80f6-9224c832b901">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{OPAC_SUPPRESS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="430" y="0" width="70" height="30" uuid="dc6661c6-00cf-4dc6-9634-a93d2bb74e95">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{STAFF_SUPPRESS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="500" y="0" width="222" height="30" uuid="ab601343-2fdb-4df5-8164-f47ab53e5720">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{INDEX_RULES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="722" y="0" width="110" height="30" uuid="18d7e41b-8e1c-46cf-9b30-64c534710cd8">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{SUBFIELD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

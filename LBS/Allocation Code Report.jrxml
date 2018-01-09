@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Allocation Code Report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="ad976326-bd43-42ce-a89f-9bac672b66c4">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/LBS/Allocation_Code_Report"/>
+	<parameter name="fiscal_period" class="java.lang.String"/>
+	<parameter name="allocation_code" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+fund_code,
+fund_name,
+fund_category,
+original_allocation,
+current_allocation,
+commitments,
+commit_pending,
+expenditures,
+expend_pending,
+cash_balance,
+free_balance,
+CASE current_allocation
+  WHEN 0 THEN 000000
+  ELSE (commitments+expenditures) / current_allocation * 100
+END AS Percentage_Spent
+FROM UCLA_FUNDLEDGER_VW
+WHERE fundline LIKE (
+  SELECT fundline || '%' FROM UCLA_FUNDLEDGER_VW
+  WHERE fiscal_period_name = $P{fiscal_period} AND FUND_CODE = $P{allocation_code}
+  )]]>
+	</queryString>
+	<field name="FUND_CODE" class="java.lang.String"/>
+	<field name="FUND_NAME" class="java.lang.String"/>
+	<field name="FUND_CATEGORY" class="java.lang.String"/>
+	<field name="ORIGINAL_ALLOCATION" class="java.math.BigDecimal"/>
+	<field name="CURRENT_ALLOCATION" class="java.math.BigDecimal"/>
+	<field name="COMMITMENTS" class="java.math.BigDecimal"/>
+	<field name="COMMIT_PENDING" class="java.math.BigDecimal"/>
+	<field name="EXPENDITURES" class="java.math.BigDecimal"/>
+	<field name="EXPEND_PENDING" class="java.math.BigDecimal"/>
+	<field name="CASH_BALANCE" class="java.math.BigDecimal"/>
+	<field name="FREE_BALANCE" class="java.math.BigDecimal"/>
+	<field name="PERCENTAGE_SPENT" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="71" height="36" uuid="a3020ecd-5c6a-40dd-ac78-760259d0eb5c"/>
+				<text><![CDATA[FUND_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="0" width="71" height="36" uuid="059ae21a-d743-4128-909f-beebaee373bb"/>
+				<text><![CDATA[FUND_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="142" y="0" width="70" height="36" uuid="a5026c63-bfcd-4536-96e9-563bf1855051"/>
+				<text><![CDATA[FUND_CATEGORY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="212" y="0" width="70" height="36" uuid="55f61cf1-8459-47fe-8a10-96a43f02b03e"/>
+				<text><![CDATA[ORIGINAL_ALLOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="70" height="36" uuid="4567f876-e145-4c98-be04-c3a00d7fd452"/>
+				<text><![CDATA[CURRENT_ALLOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="352" y="0" width="70" height="36" uuid="c241f898-ac38-4569-a427-41eb0acc5305"/>
+				<text><![CDATA[COMMITMENTS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="0" width="70" height="36" uuid="07c6487d-5284-4f23-a248-6cfb69f2381c"/>
+				<text><![CDATA[COMMIT_PENDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="492" y="0" width="70" height="36" uuid="c6300e4e-5f41-4755-a1c5-125cb91df937"/>
+				<text><![CDATA[EXPENDITURES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="562" y="0" width="70" height="36" uuid="91150a1e-8e9a-434e-9c44-4e17da725470"/>
+				<text><![CDATA[EXPEND_PENDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="632" y="0" width="70" height="36" uuid="042e2b90-7fec-4fd3-b771-a87532518c3d"/>
+				<text><![CDATA[CASH_BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="702" y="0" width="70" height="36" uuid="8e6c3b12-9374-4804-987e-aae5f4b3872c"/>
+				<text><![CDATA[FREE_BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="772" y="0" width="70" height="36" uuid="a94b1839-349b-4412-92c5-d0b79466f5b1"/>
+				<text><![CDATA[PERCENTAGE_SPENT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="57" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="71" height="57" uuid="93ed8be5-9155-40f8-9287-35281816e40a"/>
+				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="0" width="71" height="57" uuid="8985fc41-9ee3-465d-ac0c-723bd24903e9"/>
+				<textFieldExpression><![CDATA[$F{FUND_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="142" y="0" width="70" height="57" uuid="9db081c6-8f97-41f5-95e5-e8eb177c443a"/>
+				<textFieldExpression><![CDATA[$F{FUND_CATEGORY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="212" y="0" width="70" height="57" uuid="8675294a-2368-435a-a050-fbaf7ef9bf01"/>
+				<textFieldExpression><![CDATA[$F{ORIGINAL_ALLOCATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="282" y="0" width="70" height="57" uuid="0a00302f-5af4-4425-ba03-ed32cd32560d"/>
+				<textFieldExpression><![CDATA[$F{CURRENT_ALLOCATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="352" y="0" width="70" height="57" uuid="a74d2b63-7c3a-44ac-aca3-d46cddbb8052"/>
+				<textFieldExpression><![CDATA[$F{COMMITMENTS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="422" y="0" width="70" height="57" uuid="a7f00f13-ff10-455b-950e-d8437c795833"/>
+				<textFieldExpression><![CDATA[$F{COMMIT_PENDING}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="492" y="0" width="70" height="57" uuid="61330f3d-7120-4e5c-b271-3f502810644a"/>
+				<textFieldExpression><![CDATA[$F{EXPENDITURES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="562" y="0" width="70" height="57" uuid="f623ccd9-6248-4b4b-8b0c-b9ea15b734e8"/>
+				<textFieldExpression><![CDATA[$F{EXPEND_PENDING}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="632" y="0" width="70" height="57" uuid="a0d4cd51-3562-48ab-ba82-7dbc5dae6998"/>
+				<textFieldExpression><![CDATA[$F{CASH_BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="702" y="0" width="70" height="57" uuid="0a7cc518-e153-4b6c-a8fe-24f0511adf59"/>
+				<textFieldExpression><![CDATA[$F{FREE_BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="772" y="0" width="70" height="57" uuid="bc69485c-81cd-458f-8a7b-337747efae95"/>
+				<textFieldExpression><![CDATA[$F{PERCENTAGE_SPENT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

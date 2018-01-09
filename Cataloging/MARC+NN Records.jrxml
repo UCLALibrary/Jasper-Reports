@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MARC+NN Records" pageWidth="1600" pageHeight="595" orientation="Landscape" columnWidth="1600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="3fcae10f-74c1-4873-b412-be55a478f3fb">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/MARC_NN_Records_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/MARC_NN_Records"/>
+	<parameter name="MARC_NN" class="java.lang.String">
+		<parameterDescription><![CDATA[[MARC+NN] value; fill in NN]]></parameterDescription>
+	</parameter>
+	<parameter name="HAS_SCP" class="java.lang.String">
+		<parameterDescription><![CDATA[Y / N; leave blank for ALL]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+  marcval
+, bib_id
+, tag
+, subfield
+, scp
+from vger_report.rpt_bad_marc_data
+where (marcval = $P{MARC_NN} or $P{MARC_NN} is null)
+and (scp = $P{HAS_SCP} or $P{HAS_SCP} is null)
+order by marcval, bib_id, tag
+]]>
+	</queryString>
+	<field name="MARCVAL" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="TAG" class="java.lang.String"/>
+	<field name="SUBFIELD" class="java.lang.String"/>
+	<field name="SCP" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="67" height="30" uuid="292419ca-2525-44f4-8669-0cda7ea775ba"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MARCVAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="0" width="61" height="30" uuid="da372a2f-5694-44a4-892d-231f4d48c0d7"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="0" width="30" height="30" uuid="9af988ed-c77c-4523-ab4e-022b2564994f"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SCP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="158" y="0" width="42" height="30" uuid="5860b2c4-ba16-45af-b164-9f3bcf6498e0"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TAG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="0" width="1400" height="30" uuid="0b19db23-0916-451b-bd4d-42d2710ca292"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SUBFIELD]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="60" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="67" height="60" uuid="535da541-3806-4d50-b91d-71c886efc210">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MARCVAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="97" y="0" width="61" height="60" uuid="ea863aab-77b1-476d-b8b3-c19720cd23e6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="67" y="0" width="30" height="60" uuid="3eeda422-10dd-4071-be42-b1aaace94b26">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SCP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="158" y="0" width="42" height="60" uuid="813745c1-955e-442e-9da9-ed8163f020d8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TAG}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="200" y="0" width="1400" height="60" uuid="7b2b7aa6-5bb5-47f5-9fcb-366617d1d807">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SUBFIELD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Treasures Silent Film Report" pageWidth="1842" pageHeight="595" orientation="Landscape" columnWidth="1842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="df3e8e04-4f10-4da0-921f-5f04a8324735">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/FATA/Acquisitions/Treasures_Silent_Film_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/FATA/Acquisitions/Treasures_Silent_Film_Report"/>
+	<parameter name="Start_Date" class="java.util.Date"/>
+	<parameter name="End_Date" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select 
+  to_char(br.create_date, 'MON DD, YYYY') as "Create Date"
+, filmntvdb.GetAllBibTag(br.bib_id, '655', 2) as "Genre"
+, vger_support.unifix(bt.uniform_title) as "Uniform Title"
+, vger_support.unifix(bt.title) as "Title"
+, filmntvdb.GetAllBibTag(br.bib_id, '562', 2) as "Version"
+, filmntvdb.GetAllBibTag(br.bib_id, '257', 2) as "Country of Origin"
+, bt.publisher_date as "Year of Production"
+, vger_support.unifix(bt.series) as "Series"
+, filmntvdb.GetAllBibTag(br.bib_id, '511', 2) as "Cast Credits"
+, filmntvdb.GetAllBibTag(br.bib_id, '508', 2) as "Production Credits"
+, l.location_display_name as "Location Display Name"
+, mm.display_call_no as "Display Call No"
+, filmntvdb.GetMfhdSubfield(mm.mfhd_id, '866', 'a') as "Physical Description"
+from filmntvdb.bib_master br
+inner join filmntvdb.bib_text bt on br.bib_id = bt.bib_id
+inner join filmntvdb.bib_mfhd bm on bt.bib_id = bm.bib_id
+inner join filmntvdb.mfhd_master mm on bm.mfhd_id = mm.mfhd_id
+inner join filmntvdb.location l on mm.location_id = l.location_id
+where instr(filmntvdb.GetAllBibTag(br.bib_id, '655', 2), 'Silent films') >= 1
+and br.create_date between $P{Start_Date} and $P{End_Date}
+order by br.create_date, mm.mfhd_id
+]]>
+	</queryString>
+	<field name="Create Date" class="java.lang.String"/>
+	<field name="Genre" class="java.lang.String"/>
+	<field name="Uniform Title" class="java.lang.String"/>
+	<field name="Title" class="java.lang.String"/>
+	<field name="Version" class="java.lang.String"/>
+	<field name="Country of Origin" class="java.lang.String"/>
+	<field name="Year of Production" class="java.lang.String"/>
+	<field name="Series" class="java.lang.String"/>
+	<field name="Cast Credits" class="java.lang.String"/>
+	<field name="Production Credits" class="java.lang.String"/>
+	<field name="Location Display Name" class="java.lang.String"/>
+	<field name="Display Call No" class="java.lang.String"/>
+	<field name="Physical Description" class="java.lang.String"/>
+	<variable name="v_title_count" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{Title}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="30" uuid="115227a5-af11-4c27-a48c-d81c79e32b56"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Create Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="210" height="30" uuid="c9d08f9f-2c83-4233-a85f-f920536530df"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Genre]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="0" width="141" height="30" uuid="a31075f0-02cf-446f-a995-95cb313942ee"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Uniform Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="421" y="0" width="228" height="30" uuid="3058bc6a-8c8d-4fdf-8267-1257991779b3"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="649" y="0" width="67" height="30" uuid="2c6d7928-8e0b-46bf-a8fd-e95ba49ac598"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Version]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="716" y="0" width="76" height="30" uuid="f091c4ca-2379-41cb-b0de-f806b32ca80e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Country of Origin]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="792" y="0" width="58" height="30" uuid="8f689efa-a843-4ca7-9326-ae6a72a33f46"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Year of Production]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="850" y="0" width="93" height="30" uuid="44b75a52-cd90-4ad4-bea4-d66896acff04"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Series]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="943" y="0" width="257" height="30" uuid="a9fa53b4-03ff-47ba-ac32-fc609d4c156a"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Cast Credits]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1200" y="0" width="259" height="30" uuid="53420670-b25b-4f2c-bca1-0d9bee6e2839"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Production Credits]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1459" y="0" width="129" height="30" uuid="1c514d8d-f257-48dc-ac4f-d226451cf48e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Location Display Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1588" y="0" width="90" height="30" uuid="234cea01-bbce-49a8-9eaf-f40f7122a581"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Display Call No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1678" y="0" width="164" height="30" uuid="b9720f56-cde6-408d-9489-07d6f0203e7c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Physical Description]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="90" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="70" height="90" uuid="45ac21e6-4423-41ba-906e-1779d331eb92">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Create Date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="70" y="0" width="210" height="90" uuid="b6ba533e-dfa4-41ce-8ecb-83cb97a14573">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Genre}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="280" y="0" width="141" height="90" uuid="298d8bcf-21d8-4477-852c-6c645342c0fb">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Uniform Title}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="421" y="0" width="228" height="90" uuid="3ab90984-53da-4f2f-a2fe-4184ab0ee2bb">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Title}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="649" y="0" width="67" height="90" uuid="9284846a-66d2-455d-bc41-aba96e736555">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Version}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="716" y="0" width="76" height="90" uuid="94e9d253-d4ac-4e92-8c72-953e1ec49ac1">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Country of Origin}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="792" y="0" width="58" height="90" uuid="d06dee57-de4b-4a2e-99df-ff8ad7976816">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Year of Production}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="850" y="0" width="93" height="90" uuid="6b9ffc68-a254-4631-9dfa-1d0d79e1e1ae">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Series}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="943" y="0" width="257" height="90" uuid="92f901a2-ce63-4944-b6d1-818633bb5695">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Cast Credits}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1200" y="0" width="259" height="90" uuid="89c4f5a7-44b3-4652-95c0-0abdf0a4ad4c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Production Credits}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1459" y="0" width="129" height="90" uuid="9686c7db-d948-4b6d-b4bf-4dca7952e483">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Location Display Name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1588" y="0" width="90" height="90" uuid="be7c2f2e-5b07-4b90-91d2-b3b679f90c67">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Display Call No}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1678" y="0" width="164" height="90" uuid="0c82d1f2-f0c3-42b0-a282-390a5e7c2a10">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Physical Description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="59" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="20" width="1842" height="30" uuid="1697e438-c681-4e02-bf8d-c8a78ee07a4f"/>
+				<textElement>
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Summary: ".concat($V{v_title_count}.toString()).concat(" distinct titles.")]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

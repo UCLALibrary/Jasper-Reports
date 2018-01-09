@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operator Permissions" pageWidth="1242" pageHeight="595" orientation="Landscape" columnWidth="1242" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="6d76342a-bc86-4b42-9eef-a4d5a3d8c7a0">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Sysadmin/Operator_Permissions_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Sysadmin/Operator_Permissions"/>
+	<queryString>
+		<![CDATA[SELECT
+  Upper(SubStr(o.last_name, 1, 1)) as sort_char
+, Trim(o.last_name || ', ' || o.first_name || ' ' || o.middle_initial) AS name
+, o.operator_id
+, acqp.acq_profile_name
+, catp.cat_profile_name
+, circp.circ_profile_name
+, gdcp.gdc_profile_name
+, mp.master_profile_name
+FROM OPERATOR o
+LEFT OUTER JOIN acq_operator acq ON o.operator_id = acq.operator_id
+LEFT OUTER JOIN acq_profile acqp ON acq.acq_profile_id = acqp.acq_profile_id
+LEFT OUTER JOIN cat_operator cat ON o.operator_id = cat.operator_id
+LEFT OUTER JOIN cat_profile catp ON cat.cat_profile_id = catp.cat_profile_id
+LEFT OUTER JOIN circ_operator circ ON o.operator_id = circ.operator_id
+LEFT OUTER JOIN circ_profile circp ON circ.circ_profile_id = circp.circ_profile_id
+left outer join gdc_operator gdc on o.operator_id = gdc.operator_id
+left outer join gdc_profile gdcp on gdc.gdc_profile_id = gdcp.gdc_profile_id
+LEFT OUTER JOIN master_operator m ON o.operator_id = m.operator_id
+LEFT OUTER JOIN master_profile mp ON m.master_profile_id = mp.master_profile_id
+-- filter out users with no login rights
+WHERE Coalesce(acq_profile_name, cat_profile_name, circ_profile_name, gdc_profile_name, master_profile_name) IS NOT NULL
+-- Filter out users who haven't logged in (or had account updated) in the last year)
+-- Requires that vger_report.operator_audit table be kept up to date.....
+and exists (
+  select *
+  from vger_report.operator_audit
+  where operator_id = o.operator_id
+)
+ORDER BY sort_char, ucladb.norm2(name)
+]]>
+	</queryString>
+	<field name="SORT_CHAR" class="java.lang.String"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="OPERATOR_ID" class="java.lang.String"/>
+	<field name="ACQ_PROFILE_NAME" class="java.lang.String"/>
+	<field name="CAT_PROFILE_NAME" class="java.lang.String"/>
+	<field name="CIRC_PROFILE_NAME" class="java.lang.String"/>
+	<field name="GDC_PROFILE_NAME" class="java.lang.String"/>
+	<field name="MASTER_PROFILE_NAME" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="180" height="30" uuid="c540fd3f-61c8-443d-9f7f-e3bbd69e9f83"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="177" height="30" uuid="72d70f56-326a-42f3-b6e2-c42768c05573"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[OPERATOR_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="357" y="0" width="177" height="30" uuid="fae4ed01-555b-4b00-aed7-625b5e234381"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ACQ_PROFILE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="534" y="0" width="177" height="30" uuid="c290dd97-69b8-45af-971f-2e9ad497bae8"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CAT_PROFILE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="711" y="0" width="177" height="30" uuid="07a17f5f-5109-4dfd-8fa1-5d890ba6e4ea"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CIRC_PROFILE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="888" y="0" width="177" height="30" uuid="a1e38da7-2ccf-4566-90a8-2a1846906945"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[GDC_PROFILE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1065" y="0" width="177" height="30" uuid="a97e97d3-ee7a-47c6-a419-ea201f958036"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MASTER_PROFILE_NAME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="180" height="30" uuid="86097274-21d2-4c9c-86d6-1bfe348c8312">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="180" y="0" width="177" height="30" uuid="b24f86b3-8d4d-4df9-ac1e-945d261ed704">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OPERATOR_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="357" y="0" width="177" height="30" uuid="4071b334-6fb5-40c3-88aa-f11313ff7fe0">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ACQ_PROFILE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="534" y="0" width="177" height="30" uuid="50e529f9-7209-4362-95ad-c2822485b032">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CAT_PROFILE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="711" y="0" width="177" height="30" uuid="74ee667a-9eca-42bd-89d2-71dcaf7d4e7c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CIRC_PROFILE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="888" y="0" width="177" height="30" uuid="f1c08084-d3ee-4402-b8a1-85c4106527c1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{GDC_PROFILE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1065" y="0" width="177" height="30" uuid="15ac99de-466a-4961-a9ec-b3be39f72af7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MASTER_PROFILE_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

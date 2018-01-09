@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invalid LC Call Numbers" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="2a57407a-3cb2-4cf1-b812-e7c7011e4330">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Invalid_LC_Call_Numbers_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Invalid_LC_Call_Numbers"/>
+	<parameter name="LOCATION_CODE" class="java.lang.String">
+		<parameterDescription><![CDATA[Location code; use % for wildcard]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+	l.location_code as loc_code
+,	mm.mfhd_id
+,	mm.display_call_no as call_number
+,	mm.normalized_call_no
+FROM mfhd_master mm
+INNER JOIN location l ON mm.location_id = l.location_id
+WHERE call_no_type = '0'
+AND	(
+		normalized_call_no < 'A'
+	OR	normalized_call_no LIKE 'I%'
+	OR	normalized_call_no LIKE 'O%'
+	OR	normalized_call_no LIKE 'W%'
+	OR	normalized_call_no LIKE 'X%'
+	OR	normalized_call_no LIKE 'Y%'
+	OR	normalized_call_no > 'ZZZZ'
+)
+-- Optional location code, with wildcard support
+and (l.location_code like $P{LOCATION_CODE} or $P{LOCATION_CODE} is null)
+ORDER BY l.location_code, normalized_call_no]]>
+	</queryString>
+	<field name="LOC_CODE" class="java.lang.String"/>
+	<field name="MFHD_ID" class="java.math.BigDecimal"/>
+	<field name="CALL_NUMBER" class="java.lang.String"/>
+	<field name="NORMALIZED_CALL_NO" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="110" y="0" width="100" height="30" uuid="4e46bf89-9512-4133-945a-fe401a83b093"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MFHD_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="0" width="100" height="30" uuid="82903594-8673-41a2-8b62-cc49206a1193"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOC_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="0" width="376" height="30" uuid="8865f8b8-88d5-4ff2-957c-3e53b561cafa"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CALL_NUMBER]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="0" width="100" height="30" uuid="1a310ba1-1af8-479e-92f9-90139815532b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MFHD_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="0" width="100" height="30" uuid="2b872348-d92e-4f64-ab59-1489df8c5bb8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOC_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="210" y="0" width="376" height="30" uuid="6be8b0b8-f838-4e5b-b020-fb0d530250cb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

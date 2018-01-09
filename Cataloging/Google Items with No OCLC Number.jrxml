@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Google Items with No OCLC Number" pageWidth="1500" pageHeight="595" orientation="Landscape" columnWidth="1500" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="6e5cc10e-4c25-4b41-9adc-f8abd76a670b">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Google_Items_with_No_OCLC_Number_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Google_Items_with_No_OCLC_Number"/>
+	<parameter name="p_shipment_number" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select *
+from vger_report.rpt_gbs_no_oclc 
+where shipment_number = $P{p_shipment_number} 
+order by cart_id, bib_id, mfhd_id, item_enum]]>
+	</queryString>
+	<field name="SHIPMENT_NUMBER" class="java.lang.Integer"/>
+	<field name="SHIPMENT_DATE" class="java.util.Date"/>
+	<field name="CART_ID" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="MFHD_ID" class="java.math.BigDecimal"/>
+	<field name="LOCATION_CODE" class="java.lang.String"/>
+	<field name="CALL_NUMBER" class="java.lang.String"/>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="ITEM_ENUM" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="45" height="30" uuid="a60b0627-6498-4645-9438-d8708e93a88c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SHIP#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="45" y="0" width="75" height="30" uuid="0da7bf0f-97ff-4087-a22b-7e63ea99c0c3"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SHIP_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="63" height="30" uuid="2a327c62-533a-4942-a03b-ef745171c234"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CART_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="183" y="0" width="60" height="30" uuid="129fcd51-a6b9-40dd-81e9-1c577548c6dc"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="243" y="0" width="60" height="30" uuid="7784d1b1-7b03-4f9a-9a71-83bf19faf439"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MFHD_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="303" y="0" width="77" height="30" uuid="4ab2dd81-7981-4764-b20a-7c725b81f7af"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LOC_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="0" width="100" height="30" uuid="4744894a-7da0-49f6-b899-a6742e657c08"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CALL_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="100" height="30" uuid="2f4ecb4f-59db-4951-a15b-ec5cab865197"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ITEM_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="0" width="147" height="30" uuid="403e3510-3aba-4595-9278-75f74d26547c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ITEM_ENUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="727" y="0" width="773" height="30" uuid="249034c4-4301-478f-bd7b-0902e3173337"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="45" height="30" uuid="3701eddd-4781-46f0-b146-0c3b9ff4e811">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SHIPMENT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMM d, yyyy" isBlankWhenNull="true">
+				<reportElement x="45" y="0" width="75" height="30" uuid="6bc9b07a-2e35-4c56-90b0-141f03e10f88">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SHIPMENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="120" y="0" width="63" height="30" uuid="cbbf6584-f8b7-47ca-a8f7-b4eaa06ec75d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CART_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="183" y="0" width="60" height="30" uuid="a68842f0-c6c1-448d-b23c-66d6e5925fb4">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="243" y="0" width="60" height="30" uuid="f6fa71f8-81e2-4b6b-959b-5bf9cc9391e3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MFHD_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="303" y="0" width="77" height="30" uuid="40ef4434-e998-47f7-8e77-d6b13c21c7d2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="380" y="0" width="100" height="30" uuid="02cfc032-f587-4815-8154-7f4a49e56292">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="480" y="0" width="100" height="30" uuid="2f6130b4-a740-4d91-8982-73ee7257344e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="580" y="0" width="147" height="30" uuid="4ea1f323-54d4-4a36-adb0-85c1f4b7ad61">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_ENUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="727" y="0" width="773" height="30" uuid="d83d434d-335e-404c-a04c-c48530977808">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
