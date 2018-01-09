@@ -9,5 +9,5 @@ bin
 *DataAdapter.xml
 
 # Exclude compiled .jasper files, we only want the source .jrxml
-.jasper
+*.jasper
 
