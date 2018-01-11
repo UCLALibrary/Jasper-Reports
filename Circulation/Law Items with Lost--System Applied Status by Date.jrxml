@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Law Items with Lost--System Applied Status by Date" pageWidth="1080" pageHeight="612" orientation="Landscape" columnWidth="1080" leftMargin="0" rightMargin="0" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="fc7766cb-2e12-4d15-ad60-ad1c2ba54d46">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Law_Items_with_Lost__System_Applied_Status_by_Date_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Law_Items_with_Lost__System_Applied_Status_by_Date"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    l.location_display_name as perm_location,
+    iv.call_no,
+    bt.author,
+    vger_support.Unifix(bt.title) AS title,
+    iv.enumeration,
+    bi.bib_id as record_number,
+    iv.barcode,
+    pb.patron_barcode,
+    is_m.item_status_date as lost_date
+from
+    ucladb.item i
+    inner join ucladb.bib_item bi ON i.item_id = bi.item_id
+    inner join ucladb.bib_text bt ON bi.bib_id = bt.bib_id
+    inner join ucladb.item_vw iv ON bi.item_id = iv.item_id
+    inner join ucladb.location l on i.perm_location = l.location_id
+    inner join ucladb.item_status is_m ON i.item_id = is_m.item_id
+    inner join ucladb.circ_transactions ct on i.item_id = ct.item_id
+    inner join ucladb.patron_barcode pb on ct.patron_id = pb.patron_id and ct.patron_group_id = pb.patron_group_id 
+where
+    is_m.item_status = 14
+    and l.location_code like 'lw%'
+    AND is_m.item_status_date between trunc($P{startDate}) AND trunc($P{endDate})]]>
+	</queryString>
+	<field name="PERM_LOCATION" class="java.lang.String"/>
+	<field name="CALL_NO" class="java.lang.String"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="ENUMERATION" class="java.lang.String"/>
+	<field name="RECORD_NUMBER" class="java.math.BigDecimal"/>
+	<field name="BARCODE" class="java.lang.String"/>
+	<field name="PATRON_BARCODE" class="java.lang.String"/>
+	<field name="LOST_DATE" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="750" height="30" uuid="e80c2d73-ff92-46ae-a10e-7da1acc78d30">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Law Items with Lost--System Applied Status]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="88" height="30" uuid="58ebe0fc-c31d-4d84-9368-76410c8e15eb"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERM LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="0" width="122" height="30" uuid="78d3cab2-7a19-42a5-b134-c92ba7d464cb"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CALL NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="0" width="129" height="30" uuid="a55c2491-cf59-445f-9a11-2c2b08068aaa"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="339" y="0" width="176" height="30" uuid="52cd213d-0331-427a-bea9-e43dd2a73804"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="515" y="0" width="113" height="30" uuid="f463f028-b1cd-401e-938b-03b67a81e735"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ENUMERATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="628" y="0" width="83" height="30" uuid="e46d4f7d-ec0b-461b-9658-b7a366ca72cd"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RECORD NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="711" y="0" width="147" height="30" uuid="9a76de55-87c4-45c4-acdc-99b611b1bf52"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="858" y="0" width="124" height="30" uuid="d9c1f00d-5ac9-4ba2-b551-00214e2c608b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PATRON BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="982" y="0" width="83" height="30" uuid="75cd304d-02d7-4040-951d-9c5b8c787ed3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[LOST DATE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="88" height="30" uuid="91c084fb-3110-45df-bec7-27428517099e">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PERM_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="88" y="0" width="122" height="30" uuid="d4117eb0-3069-41cf-8743-ef872e5c907c">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CALL_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="210" y="0" width="129" height="30" uuid="8bca80c9-0ddb-4813-a7d7-83c623f08ba8">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="339" y="0" width="176" height="30" uuid="41422cac-feeb-4915-a34b-9bfd9a40b921">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="515" y="0" width="113" height="30" uuid="aca0ba04-fed7-44b6-9ac8-9113540f5f29">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ENUMERATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="628" y="0" width="83" height="30" uuid="1be44a9b-bdb7-4090-a357-80d222969516">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{RECORD_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="711" y="0" width="147" height="30" uuid="9c20e6fc-5a12-4d86-81ce-12854eded1ab">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="858" y="0" width="124" height="30" uuid="255c4d59-bda5-421c-b1e7-cf4f4b361b40">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PATRON_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="982" y="0" width="83" height="30" uuid="ad8bc9d6-2d25-4c48-ba5b-c09878581988">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{LOST_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

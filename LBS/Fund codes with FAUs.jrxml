@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Fund codes with FAUs" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="e6d3a7b3-7c27-4176-958f-b3da578c70cd">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Fund_codes_with_FAUs_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Fund_codes_with_FAUs"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT  DISTINCT
+	FUND.FUND_CODE,
+	FUNDLEDGER_VW.INSTITUTION_FUND_ID  AS FAU
+FROM 
+	FUNDLEDGER_VW
+	INNER JOIN FUND ON FUNDLEDGER_VW.FUND_ID = FUND.FUND_ID AND FUNDLEDGER_VW.LEDGER_ID = FUND.LEDGER_ID
+WHERE 
+	fund.fund_code IS NOT NULL   
+	AND FUNDLEDGER_VW.INSTITUTION_FUND_ID IS NOT NULL
+ORDER BY 
+	fund.fund_code]]>
+	</queryString>
+	<field name="FUND_CODE" class="java.lang.String"/>
+	<field name="FAU" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="376" height="30" uuid="42e18f58-7a56-4957-834f-686405d341c5"/>
+				<text><![CDATA[FUND_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="0" width="376" height="30" uuid="c0d04e12-65c4-4411-9163-488256eebc88"/>
+				<text><![CDATA[FAU]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="376" height="30" uuid="2fe05e44-2cbc-420f-a09d-b45b43b90b58">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="376" y="0" width="376" height="30" uuid="961ee33b-f792-479a-adb4-cbfd989c7acd"/>
+				<textFieldExpression><![CDATA[$F{FAU}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

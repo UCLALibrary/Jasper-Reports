@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operator Forgive History" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a4580f53-80a0-4dff-80a5-7fd9a23e10e2">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Operator_Forgive_History_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Operator_Forgive_History"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[new Date()]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	patron_barcode,
+	nvl(item_barcode, 'N/A') AS item_barcode,
+	nvl(normalized_call_no, 'N/A') AS call_no,
+	nvl(vger_support.get_latest_item_status(ff.item_id), 'N/A') AS current_status,
+	transaction_desc,
+	trans_amount/100 AS trans_amount,
+	fft.operator_id,
+	trans_note,
+	trans_date
+FROM
+	ucladb.fine_fee_transactions fft
+	INNER JOIN ucladb.fine_fee_trans_type fftt ON fft.trans_type = fftt.transaction_type
+	INNER JOIN ucladb.fine_fee ff ON fft.fine_fee_id = ff.fine_fee_id
+	INNER JOIN ucladb.patron_barcode pb  ON ff.patron_id = pb.patron_id
+	LEFT OUTER JOIN ucladb.item_barcode ib ON ff.item_id = ib.item_id
+	LEFT OUTER JOIN ucladb.mfhd_item mi ON ib.item_id = mi.item_id
+	LEFT OUTER JOIN ucladb.mfhd_master mm ON mi.mfhd_id = mm.mfhd_id
+WHERE
+	fft.operator_id  = $P{operator}
+	AND fft.trans_type not in (1,5,6,7,9)
+	AND trans_date BETWEEN trunc($P{startDate})
+  	    AND trunc($P{endDate})]]>
+	</queryString>
+	<field name="PATRON_BARCODE" class="java.lang.String"/>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="CALL_NO" class="java.lang.String"/>
+	<field name="CURRENT_STATUS" class="java.lang.String"/>
+	<field name="TRANSACTION_DESC" class="java.lang.String"/>
+	<field name="TRANS_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="OPERATOR_ID" class="java.lang.String"/>
+	<field name="TRANS_NOTE" class="java.lang.String"/>
+	<field name="TRANS_DATE" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="772" height="30" uuid="8f8f1f5e-1f07-48a6-8cf0-ed850381d49f">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Operator Forgive History]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="72" height="30" uuid="7792f7bd-49fa-43fb-ae07-8b1f3bfe93a3">
+					<property name="com.jaspersoft.studio.unit.width" value="inch"/>
+				</reportElement>
+				<text><![CDATA[PATRON_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="72" y="0" width="72" height="30" uuid="c2ac526b-2e75-42ba-850a-a345719af52f"/>
+				<text><![CDATA[ITEM_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="144" y="0" width="72" height="30" uuid="34a259b8-eb63-489d-af70-43d4bfc9d1c2"/>
+				<text><![CDATA[CALL_NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="0" width="72" height="30" uuid="02d487ea-9489-4d9b-927f-602095225891"/>
+				<text><![CDATA[CURRENT_STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="0" width="72" height="30" uuid="8c5caee0-fb55-4c3e-ae4b-5ed79d4223f8"/>
+				<text><![CDATA[TRANSACTION_DESC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="0" width="72" height="30" uuid="91793e33-e8e1-4368-ab66-955b926f4923"/>
+				<text><![CDATA[TRANS_AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="432" y="0" width="72" height="30" uuid="e0d77fab-9288-4e20-8aa6-f774bd78455d"/>
+				<text><![CDATA[OPERATOR_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="504" y="0" width="72" height="30" uuid="bc9712a1-e6d2-4628-97e4-7a4a7f6c5dd8"/>
+				<text><![CDATA[TRANS_NOTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="576" y="0" width="72" height="30" uuid="650ddc9d-ef61-4966-a8a2-1ac4c6850386"/>
+				<text><![CDATA[TRANS_DATE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="72" height="30" uuid="65629f94-f686-4e92-8466-302897469d76">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="com.jaspersoft.studio.unit.width" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="75"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="72" y="0" width="72" height="30" uuid="07072839-a770-4140-b70b-b7e26819e2a9">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="100"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="144" y="0" width="72" height="30" uuid="d6e3894a-0a47-46ef-aa05-932b5b0b7b9c">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="250"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="216" y="0" width="72" height="30" uuid="df58760d-427b-4517-8dc1-5def05a84803">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="275"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CURRENT_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="288" y="0" width="72" height="30" uuid="f668169a-8a40-4c64-93a2-cc87054f8730">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TRANSACTION_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="0" width="72" height="30" uuid="ce8f7376-9d26-4d3b-b1af-4b89c2d3b980">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{TRANS_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="432" y="0" width="72" height="30" uuid="444edebb-b8b1-4fe6-a0d8-c0f8f8ebe035">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OPERATOR_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="504" y="0" width="72" height="30" uuid="bc0b8804-86ba-49e3-bbbb-ba6d5e538a79">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="275"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TRANS_NOTE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="576" y="0" width="72" height="30" uuid="43037635-9d4b-49ed-a7ed-345e67d461cf">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="100"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TRANS_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

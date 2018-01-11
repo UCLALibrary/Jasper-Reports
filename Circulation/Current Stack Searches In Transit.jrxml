@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Current Stack Searches In Transit" pageWidth="1440" pageHeight="612" orientation="Landscape" columnWidth="1440" leftMargin="0" rightMargin="0" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="521704e5-1fd2-448a-a6a8-f53e801fda0f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Current_Stack_Searches_In_Transit_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Current_Stack_Searches_In_Transit"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+  ist.item_status_desc,
+  itst.item_status_date,
+  vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) as routed_from,
+  vger_support.routed_to(ist.item_status_desc, l_pickup.location_display_name, l_h.location_display_name) as routed_to,
+  vger_support.unifix(bt.author) as author,
+  vger_support.unifix(bt.title) as title, 
+  iv.perm_location, 
+  l_temp.location_name as temp_location,
+  cpg.circ_group_name,
+  iv.barcode, 
+  iv.call_no || ' ' || iv.enumeration AS call_num,
+  hr.create_opid
+from 
+-- We want some items from the bib_text table so we start with the bib_item table. This runs faster than starting with the item table.
+    ucladb.bib_item bi 
+-- Join with bib_text table so we get the fields we want.
+    inner join ucladb.bib_text bt on bi.bib_id = bt.bib_id
+-- Join with item_view so we get the item fields that we want.
+    inner join ucladb.item_vw iv on bi.item_id = iv.item_id
+-- Join with item table to get temp_location.
+    inner join ucladb.item i on bi.item_id = i.item_id
+-- Join with location so we can location_display_name of the temp_location.
+    left outer join ucladb.location l_temp on i.temp_location = l_temp.location_id
+    left outer join ucladb.circ_trans_archive cta on iv.item_id = cta.item_id
+-- Join with item_status to get item_status_desc in item_status_type.
+    inner join ucladb.item_status itst on iv.item_id = itst.item_id
+-- Join with item_status_type to get item_status_desc.
+    inner join ucladb.item_status_type ist on itst.item_status = ist.item_status_type
+-- Join with location so we can get location_id.
+    left outer join ucladb.location l on l.location_code = iv.perm_location_code
+-- Join with location so we can get location_display_name for discharge_location.
+    left outer join ucladb.location l_discharge on cta.discharge_location = l_discharge.location_id
+-- Join with hold_recall_items to get hold_recall_id.
+    left outer join ucladb.hold_recall_items hri on iv.item_id = hri.item_id
+-- Join with hold_recall_items to get pickup_location.
+    left outer join ucladb.hold_recall hr on hri.hold_recall_id = hr.hold_recall_id
+-- Join with location so we can get location_display_name for pickup_location.
+    left outer join ucladb.location l_pickup on hr.pickup_location = l_pickup.location_id
+-- Join with circ_policy_locs so we can get circ_group_name in circ_policy_group.
+    left outer join ucladb.circ_policy_locs cpl on l.location_id = cpl.location_id
+-- Join with circ_policy_group so we can get circ_group_name.
+    left outer join ucladb.circ_policy_group cpg on cpl.circ_group_id = cpg.circ_group_id 
+-- Join with circ_policy_locs again to get location_id of happening location.
+    left outer join ucladb.circ_policy_locs cpl_h on cpl.circ_group_id = cpl_h.circ_group_id
+-- Join with location so we can get location_display_name for happening location.
+    left outer join ucladb.location l_h on cpl_h.location_id = l_h.location_id
+WHERE 
+-- Pick out the date range we're interested in
+    trunc(item_status_date) between trunc(sysdate -42) and trunc(sysdate - 14)
+-- Pick out the transaction for the item with the latest discharge date.
+    and not exists
+    (
+        select * from ucladb.circ_trans_archive cta2
+        where item_id = cta.item_id
+        and cta.discharge_date < cta2.discharge_date
+    )
+-- The documentation states we want "queue position 1" which means the entry with the highest queue_position value so pick this out.
+    and not exists
+    (
+        select * from ucladb.hold_recall_items hri2
+        where hri.item_id = hri2.item_id
+        and hri2.queue_position > hri.queue_position
+    )
+-- Pick out items with 'In Transit Discharged' (9) and 'In Transit On Hold' (10) statuses.
+    and (itst.item_status = 9 or itst.item_status = 10)
+-- Pick out the happening location for the item.
+    and (cpl_h.circ_location = 'Y' and cpl_h.collect_fines = 'Y')
+    and (vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) like 'Powell%'
+         or vger_support.routed_to(ist.item_status_desc, l_pickup.location_display_name, l_h.location_display_name) like 'Powell%')
+    and (vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) <> 'YRL A-Level Map Cases'
+         and vger_support.routed_to(ist.item_status_desc, l_pickup.location_display_name, l_h.location_display_name) <> 'YRL A-Level Map Cases')
+union
+select 
+  ist.item_status_desc,
+  itst.item_status_date,
+  vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) as routed_from,
+  vger_support.routed_to(ist.item_status_desc, l_pickup.location_display_name, l_h.location_display_name) as routed_to,
+  vger_support.unifix(bt.author) as author,
+  vger_support.unifix(bt.title) as title, 
+  iv.perm_location, 
+  l_temp.location_name as temp_location,
+  cpg.circ_group_name,
+  iv.barcode, 
+  iv.call_no || ' ' || iv.enumeration AS call_num,
+  hr.create_opid
+from 
+-- We want some items from the bib_text table so we start with the bib_item table. This runs faster than starting with the item table.
+    ucladb.bib_item bi 
+-- Join with bib_text table so we get the fields we want.
+    inner join ucladb.bib_text bt on bi.bib_id = bt.bib_id
+-- Join with item_view so we get the item fields that we want.
+    inner join ucladb.item_vw iv on bi.item_id = iv.item_id
+-- Join with item table to get temp_location.
+    inner join ucladb.item i on bi.item_id = i.item_id
+-- Join with location so we can location_display_name of the temp_location.
+    left outer join ucladb.location l_temp on i.temp_location = l_temp.location_id
+    left outer join ucladb.circ_trans_archive cta on iv.item_id = cta.item_id
+-- Join with item_status to get item_status_desc in item_status_type.
+    inner join ucladb.item_status itst on iv.item_id = itst.item_id
+-- Join with item_status_type to get item_status_desc.
+    inner join ucladb.item_status_type ist on itst.item_status = ist.item_status_type
+-- Join with location so we can get location_id.
+    left outer join ucladb.location l on l.location_code = iv.perm_location_code
+-- Join with location so we can get location_display_name for discharge_location.
+    left outer join ucladb.location l_discharge on cta.discharge_location = l_discharge.location_id
+-- Join with hold_recall_items to get hold_recall_id.
+    left outer join ucladb.hold_recall_items hri on iv.item_id = hri.item_id
+-- Join with hold_recall_items to get pickup_location.
+    left outer join ucladb.hold_recall hr on hri.hold_recall_id = hr.hold_recall_id
+-- Join with location so we can get location_display_name for pickup_location.
+    left outer join ucladb.location l_pickup on hr.pickup_location = l_pickup.location_id
+-- Join with circ_policy_locs so we can get circ_group_name in circ_policy_group.
+    left outer join ucladb.circ_policy_locs cpl on l.location_id = cpl.location_id
+-- Join with circ_policy_group so we can get circ_group_name.
+    left outer join ucladb.circ_policy_group cpg on cpl.circ_group_id = cpg.circ_group_id 
+-- Join with circ_policy_locs again to get location_id of happening location.
+    left outer join ucladb.circ_policy_locs cpl_h on cpl.circ_group_id = cpl_h.circ_group_id
+-- Join with location so we can get location_display_name for happening location.
+    left outer join ucladb.location l_h on cpl_h.location_id = l_h.location_id
+WHERE 
+-- Pick out the date range we're interested in
+    trunc(item_status_date) between trunc(sysdate -42) and trunc(sysdate - 14)
+-- Pick out the transaction for the item with the latest discharge date.
+    and not exists
+    (
+        select * from ucladb.circ_trans_archive cta2
+        where item_id = cta.item_id
+        and cta.discharge_date < cta2.discharge_date
+    )
+-- The documentation states we want "queue position 1" which means the entry with the highest queue_position value so pick this out.
+    and not exists
+    (
+        select * from ucladb.hold_recall_items hri2
+        where hri.item_id = hri2.item_id
+        and hri2.queue_position > hri.queue_position
+    )
+-- Pick out items with 'In Transit Discharged' (9) and 'In Transit On Hold' (10) statuses.
+    and (itst.item_status = 9 or itst.item_status = 10)
+-- Pick out the happening location for the item.
+    and (cpl_h.circ_location = 'Y' and cpl_h.collect_fines = 'Y')
+    and lower(iv.perm_location_code) like 'cl%'
+    and (vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) is null
+         or vger_support.routed_to(ist.item_status_desc, l_pickup.location_display_name, l_h.location_display_name) is null)
+    and (vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) <> 'YRL A-Level Map Cases'
+         and vger_support.routed_to(ist.item_status_desc, l_pickup.location_display_name, l_h.location_display_name) <> 'YRL A-Level Map Cases')]]>
+	</queryString>
+	<field name="ITEM_STATUS_DESC" class="java.lang.String"/>
+	<field name="ITEM_STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="ROUTED_FROM" class="java.lang.String"/>
+	<field name="ROUTED_TO" class="java.lang.String"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="PERM_LOCATION" class="java.lang.String"/>
+	<field name="TEMP_LOCATION" class="java.lang.String"/>
+	<field name="CIRC_GROUP_NAME" class="java.lang.String"/>
+	<field name="BARCODE" class="java.lang.String"/>
+	<field name="CALL_NUM" class="java.lang.String"/>
+	<field name="CREATE_OPID" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="30" uuid="a424a4dc-d649-499e-873b-291ed6af9907"/>
+				<text><![CDATA[ITEM STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="62" height="30" uuid="38921221-8b72-4ae3-bf50-b530d3430293"/>
+				<text><![CDATA[STATUS DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="132" y="0" width="62" height="30" uuid="9809b73b-4978-42ca-88c7-6a27549247ed"/>
+				<text><![CDATA[ROUTED FROM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="194" y="0" width="62" height="30" uuid="050008dd-aa21-4450-b24f-611ce6265fea"/>
+				<text><![CDATA[ROUTED TO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="256" y="0" width="114" height="30" uuid="fdc04f74-f916-495f-8655-32eae6c160dd"/>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="0" width="160" height="30" uuid="8dcc326d-41ac-403f-baed-39e8e408d76c"/>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="530" y="0" width="150" height="30" uuid="8baa5cc6-6931-4c76-92f3-492b94a4ada2"/>
+				<text><![CDATA[PERM LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="680" y="0" width="138" height="30" uuid="0d7db022-762e-4a2e-9f4e-76a686a16d34"/>
+				<text><![CDATA[TEMP LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="818" y="0" width="176" height="30" uuid="47942308-a419-4ac6-871f-400cd31f87ba"/>
+				<text><![CDATA[CIRC GROUP NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="994" y="0" width="146" height="30" uuid="3ef76ae3-a3ec-4fdf-b59d-9fa27136ab25"/>
+				<text><![CDATA[BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1140" y="0" width="192" height="30" uuid="3837d52a-6718-4b2d-957c-415164d6d4dc"/>
+				<text><![CDATA[CALL NUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1332" y="0" width="90" height="30" uuid="ce9eb3a6-c759-4bb9-bcef-62142d71cc52"/>
+				<text><![CDATA[CREATE OPID]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="36" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="6" width="70" height="30" uuid="8e2f8ad3-3bc7-40ca-9af2-37eb1e4990e8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_STATUS_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="70" y="6" width="62" height="30" uuid="8b436dd9-5e41-48a7-a5bd-0c167671b172">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="132" y="6" width="62" height="30" uuid="f2c3c82f-c580-4c2f-bdbf-74ff57ca9414">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ROUTED_FROM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="194" y="6" width="62" height="30" uuid="0bf00ec7-1df2-43cc-b7fa-6ef94b5332c5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ROUTED_TO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="256" y="6" width="114" height="30" uuid="7f6f0c64-1d18-4b7d-aeb0-b4625a7ee0f6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="370" y="6" width="160" height="30" uuid="c7435f00-47ba-464e-99b2-90e1a3ae3752">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="530" y="6" width="150" height="30" uuid="294c746a-0425-4917-aa7d-0344fb261d57">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="680" y="6" width="138" height="30" uuid="56759cab-8b34-400f-a0a6-b53101e9a2ea">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TEMP_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="818" y="6" width="176" height="30" uuid="a61d7930-b18e-4acc-8b24-d96b53a12523">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CIRC_GROUP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="994" y="6" width="146" height="30" uuid="dcf360db-1575-4288-8ea7-6c74bfd24e9e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1140" y="6" width="192" height="30" uuid="bfd53599-9662-4ae1-8260-2efc3dc1077d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1332" y="6" width="90" height="30" uuid="2c67b7eb-3b33-4ba9-9934-c1ef46662c28">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CREATE_OPID}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

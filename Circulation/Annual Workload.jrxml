@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Annual Workload" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" isIgnorePagination="true" uuid="a02d066e-d760-44d7-8295-6af53997450f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<queryString language="SQL">
+		<![CDATA[WITH WORKLOAD_STATS AS
+(
+SELECT 
+-- CIRC_TRANS_ARCHIVE for Overdue
+to_char(cta.overdue_notice_date,   'YYYY-MM') AS
+MONTH,
+  cpg.circ_group_name AS location,
+  decode(cta.circ_transaction_id,   NULL,   0,   decode(cta.overdue_notice_date,   NULL,   0,   1)) AS
+overdue,
+  0 AS recall,
+  0 AS over_recall
+FROM ucladb.circ_trans_archive cta LEFT
+OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = cta.patron_group_id LEFT
+OUTER JOIN ucladb.circ_policy_locs cpl ON cta.charge_location = cpl.location_id LEFT
+OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+WHERE cta.overdue_notice_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+ AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANS_ARCHIVE for Recall
+SELECT to_char(cta.recall_date,   'YYYY-MM') AS
+MONTH,
+  cpg.circ_group_name AS location,
+  0 AS overdue,
+  decode(cta.circ_transaction_id,   NULL,   0,   decode(cta.recall_date,   NULL,   0,   1)) AS
+recall,
+  0 AS over_recall
+FROM ucladb.circ_trans_archive cta LEFT
+OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = cta.patron_group_id
+INNER JOIN ucladb.circ_policy_locs cpl ON cta.charge_location = cpl.location_id
+INNER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id
+WHERE cta.recall_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+ AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANS_ARCHIVE for Overdue Recall
+SELECT to_char(cta.over_recall_notice_date,   'YYYY-MM') AS
+MONTH,
+  cpg.circ_group_name AS location,
+  0 AS overdue,
+  0 AS recall,
+  decode(cta.circ_transaction_id,   NULL,   0,   decode(cta.over_recall_notice_date,   NULL,   0,   1)) AS
+over_recall
+FROM ucladb.circ_trans_archive cta LEFT
+OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = cta.patron_group_id
+INNER JOIN ucladb.circ_policy_locs cpl ON cta.charge_location = cpl.location_id
+INNER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id
+WHERE cta.over_recall_notice_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+ AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANSACTIONS for Overdue
+SELECT to_char(ct.overdue_notice_date,   'YYYY-MM') AS
+MONTH,
+  cpg.circ_group_name AS location,
+  decode(ct.circ_transaction_id,   NULL,   0,   decode(ct.overdue_notice_date,   NULL,   0,   1)) AS
+overdue,
+  0 AS recall,
+  0 AS over_recall
+FROM ucladb.circ_transactions ct LEFT
+OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = ct.patron_group_id
+INNER JOIN ucladb.circ_policy_locs cpl ON ct.charge_location = cpl.location_id
+INNER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id
+WHERE ct.overdue_notice_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+ AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANSACTIONS for Recall
+SELECT to_char(ct.recall_date,   'YYYY-MM') AS
+MONTH,
+  cpg.circ_group_name AS location,
+  0 AS overdue,
+  decode(ct.circ_transaction_id,   NULL,   0,   decode(ct.recall_date,   NULL,   0,   1)) AS
+recall,
+  0 AS over_recall
+FROM ucladb.circ_transactions ct LEFT
+OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = ct.patron_group_id
+INNER JOIN ucladb.circ_policy_locs cpl ON ct.charge_location = cpl.location_id
+INNER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id
+WHERE ct.recall_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+ AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANSACTIONS for Overdue Recall
+SELECT to_char(ct.over_recall_notice_date,   'YYYY-MM') AS
+MONTH,
+  cpg.circ_group_name AS location,
+  0 AS overdue,
+  0 AS recall,
+  decode(ct.circ_transaction_id,   NULL,   0,   decode(ct.over_recall_notice_date,   NULL,   0,   1)) AS
+over_recall
+FROM ucladb.circ_transactions ct LEFT
+OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = ct.patron_group_id
+INNER JOIN ucladb.circ_policy_locs cpl ON ct.charge_location = cpl.location_id
+INNER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id
+WHERE ct.over_recall_notice_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+ AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+)
+SELECT
+  location,
+  month,
+  sum(overdue) as overdue,
+  sum(recall) as recall,
+  sum(over_recall) as over_recall
+FROM
+  WORKLOAD_STATS
+GROUP BY
+  location,
+  month
+ORDER BY
+  location,
+  month]]>
+	</queryString>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="MONTH" class="java.lang.String"/>
+	<field name="OVERDUE" class="java.math.BigDecimal"/>
+	<field name="RECALL" class="java.math.BigDecimal"/>
+	<field name="OVER_RECALL" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="750" height="30" uuid="01dfb98d-7587-4eaa-b6b7-952a74282729">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Workload]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="152" height="30" uuid="744fc4c3-7b91-4dac-b123-d18b9b298f46"/>
+				<text><![CDATA[LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="152" y="0" width="150" height="30" uuid="0394b20d-a64b-4517-9ed9-5ce9b5b7a3c4"/>
+				<text><![CDATA[MONTH]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="0" width="150" height="30" uuid="ed9c0092-047f-466f-919a-c1a2e6455bb5"/>
+				<text><![CDATA[OVERDUE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="0" width="150" height="30" uuid="af17ad0b-50a7-4482-b00b-e3ba8d2b954c"/>
+				<text><![CDATA[RECALL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="602" y="0" width="150" height="30" uuid="96e28585-747e-4e11-9d9e-6668c2a0038d"/>
+				<text><![CDATA[OVER RECALL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="152" height="30" uuid="e2466b74-e6ea-4699-9d06-189084f9d0ff">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.5F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="152" y="0" width="150" height="30" uuid="53a88985-4018-416a-9614-11060ff94d67">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MONTH}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="302" y="0" width="150" height="30" uuid="58707edd-f608-4aa4-b5b5-2ddf32c7d478">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OVERDUE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="452" y="0" width="150" height="30" uuid="62df11a9-d944-4742-8f59-6ac7a1cd90f8">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{RECALL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="602" y="0" width="150" height="30" uuid="34d178f1-f95f-4646-b012-ce051c7e8699">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OVER_RECALL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="218" splitType="Stretch">
+			<break>
+				<reportElement x="0" y="8" width="100" height="1" uuid="a44b633c-e4d5-4fae-b3eb-bb70600eb6fd"/>
+			</break>
+			<subreport>
+				<reportElement x="0" y="18" width="750" height="200" uuid="c4cc03ea-26de-40bc-8908-1ceb90e2181f">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["Annual Lib Payments.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

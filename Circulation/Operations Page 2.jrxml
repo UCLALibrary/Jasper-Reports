@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operations Page 2" pageWidth="1440" pageHeight="612" orientation="Landscape" columnWidth="1400" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" isIgnorePagination="true" uuid="6b632905-39ed-4b1d-9348-efa9b76e42ac">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    sysdate AS report_run,
+    bi.bib_id,
+    ist.item_status_desc,
+    itst.item_status_date,
+    vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) AS routed_from,
+    vger_support.routed_to(ist.item_status_desc, l_pickup.location_display_name, l_h.location_display_name) AS routed_to,
+    vger_support.unifix(bt.author) AS author,
+    vger_support.unifix(bt.title) AS title, 
+    iv.perm_location, 
+    l_temp.location_display_name AS temp_location,
+    cpg.circ_group_name,
+    iv.call_no, 
+    iv.barcode, 
+    iv.enumeration,
+    hr.create_opid
+from 
+    ucladb.bib_item bi 
+    INNER JOIN ucladb.bib_text bt ON bi.bib_id = bt.bib_id
+    INNER JOIN ucladb.item_vw iv ON bi.item_id = iv.item_id
+    INNER JOIN ucladb.item i ON bi.item_id = i.item_id
+    LEFT OUTER JOIN ucladb.location l_temp ON i.temp_location = l_temp.location_id
+    LEFT OUTER JOIN ucladb.circ_trans_archive cta ON iv.item_id = cta.item_id
+    INNER JOIN ucladb.item_status itst ON iv.item_id = itst.item_id
+    INNER JOIN ucladb.item_status_type ist ON itst.item_status = ist.item_status_type
+    LEFT OUTER JOIN ucladb.location l ON l.location_code = iv.perm_location_code
+    LEFT OUTER JOIN ucladb.location l_discharge ON cta.discharge_location = l_discharge.location_id
+    LEFT OUTER JOIN ucladb.hold_recall_items hri ON iv.item_id = hri.item_id
+    LEFT OUTER JOIN ucladb.hold_recall hr ON hri.hold_recall_id = hr.hold_recall_id
+    LEFT OUTER JOIN ucladb.location l_pickup ON hr.pickup_location = l_pickup.location_id
+    LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON l.location_id = cpl.location_id
+    LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+    LEFT OUTER JOIN ucladb.circ_policy_locs cpl_h ON cpl.circ_group_id = cpl_h.circ_group_id
+    LEFT OUTER JOIN ucladb.location l_h ON cpl_h.location_id = l_h.location_id
+WHERE 
+-- Pick out the date range we're interested in
+    trunc(item_status_date) = trunc(sysdate - 1)
+-- Pick out the transaction for the item with the latest discharge date.
+    AND NOT EXISTS
+    (
+        SELECT * FROM ucladb.circ_trans_archive cta2
+        WHERE item_id = cta.item_id
+        AND cta.discharge_date < cta2.discharge_date
+    )
+-- The documentation states we want "queue position 1" which means the entry with the highest queue_position value so pick this out.
+    AND NOT EXISTS
+    (
+        SELECT * FROM ucladb.hold_recall_items hri2
+        WHERE hri.item_id = hri2.item_id
+        AND hri2.queue_position > hri.queue_position
+    )
+-- Pick out items with 'In Transit Discharged' (9) and 'In Transit On Hold' (10) statuses.
+    AND (itst.item_status = 8 or itst.item_status = 9 or itst.item_status = 10)
+-- Pick out the happening location for the item.
+    AND (cpl_h.circ_location = 'Y' AND cpl_h.collect_fines = 'Y')
+    AND (l.location_code like 'cl%' OR l_temp.location_code like 'cl%')
+    --and vger_support.routed_from(ist.item_status_desc, l_pickup.location_display_name, l_discharge.location_display_name) like 'Powell%'
+ORDER BY 
+    cpg.circ_group_name, 
+    iv.PERM_LOCATION, 
+    iv.CALL_NO]]>
+	</queryString>
+	<field name="REPORT_RUN" class="java.sql.Timestamp"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="ITEM_STATUS_DESC" class="java.lang.String"/>
+	<field name="ITEM_STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="ROUTED_FROM" class="java.lang.String"/>
+	<field name="ROUTED_TO" class="java.lang.String"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="PERM_LOCATION" class="java.lang.String"/>
+	<field name="TEMP_LOCATION" class="java.lang.String"/>
+	<field name="CIRC_GROUP_NAME" class="java.lang.String"/>
+	<field name="CALL_NO" class="java.lang.String"/>
+	<field name="BARCODE" class="java.lang.String"/>
+	<field name="ENUMERATION" class="java.lang.String"/>
+	<field name="CREATE_OPID" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="98" height="30" uuid="478da75a-3902-4cad-9235-682a9d7ac8cb"/>
+				<text><![CDATA[REPORT RUN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="98" y="0" width="93" height="30" uuid="736fbea9-5af1-4158-9224-759595d8c963"/>
+				<text><![CDATA[BIB ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="191" y="0" width="93" height="30" uuid="fa62861b-90b4-4354-8a62-7eefe2d15568"/>
+				<text><![CDATA[ITEM STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="0" width="93" height="30" uuid="b5253734-1466-4256-86d7-0d2eeaf291de"/>
+				<text><![CDATA[STATUS DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="0" width="93" height="30" uuid="5e1a4370-42e6-47ce-a1ce-92ce34f24a57"/>
+				<text><![CDATA[ROUTED FROM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="0" width="93" height="30" uuid="71df8d5c-4eca-4e82-afbd-e3a408dcf20b"/>
+				<text><![CDATA[ROUTED TO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="563" y="0" width="93" height="30" uuid="9a666aa0-acf9-4ede-89ce-d493d163bdf1"/>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="656" y="0" width="93" height="30" uuid="99fbb5cc-5e4a-4c42-839e-dec01e1bf105"/>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="749" y="0" width="93" height="30" uuid="c5798068-b4ed-44c7-8b63-1e9877c431a5"/>
+				<text><![CDATA[PERM LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="842" y="0" width="93" height="30" uuid="0c31bf44-e0d2-4f18-a465-08f849204837"/>
+				<text><![CDATA[TEMP LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="935" y="0" width="93" height="30" uuid="9feb9d3b-8c3c-4bea-b917-2616eb11abe6"/>
+				<text><![CDATA[CIRC GROUP NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1028" y="0" width="93" height="30" uuid="984582ce-082e-468a-a0e0-b256d4761a96"/>
+				<text><![CDATA[CALL NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1121" y="0" width="93" height="30" uuid="4363768a-2096-4f28-ad72-55161fc35d93"/>
+				<text><![CDATA[BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1214" y="0" width="93" height="30" uuid="027e0042-1e56-4ee6-bee8-8e109cf2cf60"/>
+				<text><![CDATA[ENUMERATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1307" y="0" width="93" height="30" uuid="16b06141-8233-48d4-b4d9-db3ef78a0779"/>
+				<text><![CDATA[CREATE OPID]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="98" height="30" uuid="e28bb2fb-2322-44f2-a027-961c568050f2"/>
+				<textFieldExpression><![CDATA[$F{REPORT_RUN}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="98" y="0" width="93" height="30" uuid="405a01c7-32cc-40b2-bbd6-9a494324799a"/>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="191" y="0" width="93" height="30" uuid="0cc3632b-0689-4963-9840-d80743bb63cd"/>
+				<textFieldExpression><![CDATA[$F{ITEM_STATUS_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="284" y="0" width="93" height="30" uuid="4e5042d3-f5cb-4aa3-9b9d-e3a42c57c377"/>
+				<textFieldExpression><![CDATA[$F{ITEM_STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="377" y="0" width="93" height="30" uuid="39142e2c-1b1f-4693-aba1-a1c993b8aaca">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ROUTED_FROM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="470" y="0" width="93" height="30" uuid="30b81b26-6626-4a3a-9e19-5f4a9bb26224"/>
+				<textFieldExpression><![CDATA[$F{ROUTED_TO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="563" y="0" width="93" height="30" uuid="0bff58ee-9966-4d70-8070-75a3b16aad11"/>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="656" y="0" width="93" height="30" uuid="79c79ccf-4214-4f98-b1af-4389d8411d44"/>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="749" y="0" width="93" height="30" uuid="c61d5d81-6f27-467e-bb56-e0fce0d15669"/>
+				<textFieldExpression><![CDATA[$F{PERM_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="842" y="0" width="93" height="30" uuid="cf1174f9-b6a2-4cbd-ba7c-6d642b19725b"/>
+				<textFieldExpression><![CDATA[$F{TEMP_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="935" y="0" width="93" height="30" uuid="99d4c339-8f53-4d25-818a-5248bfac4906"/>
+				<textFieldExpression><![CDATA[$F{CIRC_GROUP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1028" y="0" width="93" height="30" uuid="2e4c7845-e59a-4a1b-83a1-8021cd2b503a"/>
+				<textFieldExpression><![CDATA[$F{CALL_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1121" y="0" width="93" height="30" uuid="56d05ca9-084e-47ff-8f16-a10b1dcd5b32"/>
+				<textFieldExpression><![CDATA[$F{BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1214" y="0" width="93" height="30" uuid="89ac4aae-ec95-43e6-93c2-f4bbc0f527a0"/>
+				<textFieldExpression><![CDATA[$F{ENUMERATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1307" y="0" width="93" height="30" uuid="51b555d2-3e1c-45c1-ae9b-2325963a0b0f"/>
+				<textFieldExpression><![CDATA[$F{CREATE_OPID}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="223" splitType="Stretch">
+			<break>
+				<reportElement x="0" y="15" width="100" height="1" uuid="4f588938-ffc0-48c6-8ff9-61a86c245927"/>
+			</break>
+			<subreport>
+				<reportElement x="0" y="23" width="1400" height="200" uuid="08d40e69-fafb-46a1-935d-6d0ec8362add">
+					<property name="com.jaspersoft.studio.unit.x" value="inch"/>
+				</reportElement>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["Operations Page 3.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

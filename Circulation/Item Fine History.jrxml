@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Item Fine History" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="bf01deff-d61f-42fa-9567-57e2d2a513a8">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Item_Fine_History_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Item_Fine_History"/>
+	<parameter name="barcode" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+ffty.fine_fee_desc AS fine_type,
+ff.create_date AS fine_date,
+fftt.transaction_desc AS trans_type,
+fft.trans_date,
+fft.trans_note
+FROM
+ucladb.item_barcode ib
+LEFT OUTER JOIN ucladb.fine_fee ff ON ib.item_id = ff.item_id
+LEFT OUTER JOIN ucladb.fine_fee_transactions fft ON ff.fine_fee_id = fft.fine_fee_id
+LEFT OUTER JOIN ucladb.fine_fee_type ffty ON ff.fine_fee_type = ffty.fine_fee_type
+LEFT OUTER JOIN ucladb.fine_fee_trans_type fftt ON fft.trans_type = fftt.transaction_type
+WHERE
+ib.item_barcode = upper($P{barcode})
+ORDER BY
+ff.create_date,
+fft.trans_date]]>
+	</queryString>
+	<field name="FINE_TYPE" class="java.lang.String"/>
+	<field name="FINE_DATE" class="java.sql.Timestamp"/>
+	<field name="TRANS_TYPE" class="java.lang.String"/>
+	<field name="TRANS_DATE" class="java.sql.Timestamp"/>
+	<field name="TRANS_NOTE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="750" height="30" uuid="ba990273-0d7d-4dc8-aa12-6e45c7444331">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Item Fines/Fees History]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="152" height="30" uuid="818ec643-367a-4fc7-83f7-f6aef0ab1062"/>
+				<text><![CDATA[FINE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="152" y="0" width="150" height="30" uuid="d87a78d0-5774-44a5-bbf3-6f19aa555711"/>
+				<text><![CDATA[FINE_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="0" width="150" height="30" uuid="9111bed9-132b-4495-9362-b9adbcd5afe5"/>
+				<text><![CDATA[TRANS_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="0" width="150" height="30" uuid="ee108c66-468a-4468-b7f2-87cc4b2d0350"/>
+				<text><![CDATA[TRANS_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="602" y="0" width="150" height="30" uuid="f1c14e97-cc6b-4e67-8bec-71a4a990a12e"/>
+				<text><![CDATA[TRANS_NOTE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="152" height="30" uuid="4a459997-38df-4734-a89f-a42c0d034920">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FINE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="152" y="0" width="150" height="30" uuid="f1eb34f2-dd59-45ad-974e-ebb806a4f656">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FINE_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="302" y="0" width="150" height="30" uuid="86866af4-528f-47c5-b7e7-d2e2f5b8ea83">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TRANS_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="452" y="0" width="150" height="30" uuid="ec50ca20-1ea1-423e-949a-975bf7bb02d6">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TRANS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="602" y="0" width="150" height="30" uuid="518bfa96-edfb-4b54-b754-8f43028c5239">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TRANS_NOTE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Library Cards By Group FY Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="0a15aa0d-94f3-4a32-83a8-66daf892b34e">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Library_Cards_By_Group_FY_Year_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Library_Cards_By_Group_FY_Year"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+    CASE
+        WHEN pg.patron_group_id IN (20,24,28,56) THEN pg.patron_group_name
+        ELSE DECODE(pg.patron_group_id,0,'No Group',report_group_desc)
+    END AS patron_group,
+    CASE 
+        WHEN TRUNC(pb.barcode_status_date) BETWEEN vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE) AND ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 12) THEN 'issued'
+        WHEN TRUNC(p.expire_date) BETWEEN ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 12) AND ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 24) THEN 'renewed'
+        ELSE 'unknown'
+    END AS card_type,
+    COUNT(pb.patron_id) AS patrons
+FROM 
+    ucladb.patron p
+    INNER JOIN ucladb.patron_barcode pb ON p.patron_id = pb.patron_id
+    INNER JOIN ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+    LEFT OUTER JOIN vger_support.csc_patron_group_map pgm ON pg.patron_group_id = pgm.patron_group_id 
+    LEFT OUTER JOIN vger_support.csc_report_group rg ON pgm.report_group_id = rg.report_group_id 
+WHERE 
+    -- pick issed and renewed cards.
+    (
+        -- issued.
+        TRUNC(pb.barcode_status_date) BETWEEN vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE) AND ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 12)
+        OR
+        -- renewed (expires the following year).
+        TRUNC(p.expire_date) BETWEEN ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 12) AND ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 24)
+    )
+    -- pick out the active patron barcode, or the one with the lowest number status
+    -- if there isn't an active one.
+    AND NOT EXISTS
+    (
+        SELECT * FROM ucladb.patron_barcode pb2
+        WHERE pb.patron_id = pb2.patron_id
+        AND 
+        (
+            pb.barcode_status > pb2.barcode_status  OR 
+            (
+                pb.barcode_status = pb2.barcode_status AND pb2.patron_barcode_id < pb.patron_barcode_id
+            )
+        )
+    )
+GROUP BY
+    pg.patron_group_id,
+    pg.PATRON_GROUP_DISPLAY,
+    CASE
+        WHEN pg.patron_group_id IN (20,24,28,56) THEN pg.patron_group_name
+        ELSE DECODE(pg.patron_group_id,0,'No Group',report_group_desc)
+    END,
+    CASE 
+        WHEN TRUNC(pb.barcode_status_date) BETWEEN vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE) AND ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 12) THEN 'issued'
+        WHEN TRUNC(p.expire_date) BETWEEN ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 12) AND ADD_MONTHS(vger_support.lws_utility.prev_fiscal_yr_start(SYSDATE), 24) THEN 'renewed'
+        ELSE 'unknown'
+    END 
+ORDER BY
+    patron_group,
+    card_type]]>
+	</queryString>
+	<field name="PATRON_GROUP" class="java.lang.String"/>
+	<field name="CARD_TYPE" class="java.lang.String"/>
+	<field name="PATRONS" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="750" height="30" uuid="cdc4e5ff-3062-4403-96d7-a2c01ca9854c">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Library Cards By Group]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="252" height="30" uuid="9120776b-153d-49c8-a959-fcebf9c2d55c"/>
+				<text><![CDATA[PATRON_GROUP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="250" height="30" uuid="94cb14c2-d698-40d3-bf66-0f25d5b9b6ce"/>
+				<text><![CDATA[CARD_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="250" height="30" uuid="84044d8a-8cce-4762-a906-79c63fde18f4"/>
+				<text><![CDATA[PATRONS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="252" height="30" uuid="9687340a-8076-459f-8717-62bf6d54271f">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="252" y="0" width="250" height="30" uuid="645c2034-2d63-468a-a48c-e2ef069e2257">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CARD_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="502" y="0" width="250" height="30" uuid="412848d8-4a5a-4647-b6a0-a76f8ddc69f6">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRONS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

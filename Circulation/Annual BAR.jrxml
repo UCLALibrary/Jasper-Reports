@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Annual BAR" pageWidth="1080" pageHeight="612" orientation="Landscape" columnWidth="1040" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a94be050-d797-408b-bf1f-780c09f44c87">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<queryString language="SQL">
+		<![CDATA[WITH FINES AS
+(
+SELECT
+  cpg.circ_group_name AS location,
+  ff.fine_fee_id,
+  SUM(vger_support.LWS_CSC.BAR_OVERDUE_OUTSTANDING(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_overdue_outstanding,
+  SUM(vger_support.LWS_CSC.BAR_OVERDUE_PAYMENT(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_overdue_payment,
+  SUM(vger_support.LWS_CSC.BAR_OVERDUE_REFUND(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_overdue_refund,
+  SUM(vger_support.LWS_CSC.BAR_LOSTPROCESSING_OUTSTANDING(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_lost_proc_outstanding,
+  SUM(vger_support.LWS_CSC.BAR_LOSTPROCESSING_PAYMENT(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_lost_proc_payment,
+  SUM(vger_support.LWS_CSC.BAR_LOSTPROCESSING_REFUND(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_lost_proc_refund,
+  SUM(vger_support.LWS_CSC.BAR_LOST_OUTSTANDING(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_lost_item_rep_outstanding,
+  SUM(vger_support.LWS_CSC.BAR_LOST_PAYMENT(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_lost_item_rep_payment,
+  SUM(vger_support.LWS_CSC.BAR_LOST_REFUND(ff.fine_fee_type, fft.trans_type, fft.trans_note)) as bar_lost_item_rep_refund
+FROM 
+  ucladb.fine_fee ff 
+  INNER JOIN ucladb.fine_fee_transactions fft ON ff.fine_fee_id = fft.fine_fee_id 
+  LEFT OUTER JOIN ucladb.fine_fee_type fftp ON ff.fine_fee_type = fftp.fine_fee_type 
+  LEFT OUTER JOIN ucladb.item i ON ff.item_id = i.item_id 
+  LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON i.perm_location = cpl.location_id
+  LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id
+  LEFT OUTER JOIN vger_support.PSS_VOYUNIT vu on cpl.circ_group_id = vu.circ_group_id
+  LEFT OUTER JOIN ucladb.fine_fee_trans_type fftt ON fft.trans_type = fftt.transaction_type 
+  LEFT OUTER JOIN ucladb.fine_fee_trans_method fftm ON fft.trans_method = fftm.method_type
+WHERE 
+  ((fft.trans_type = 5 or fft.trans_type = 6) and length(fft.trans_note) = 53)
+  AND vger_support.lws_cb.get_date(fft.trans_note) BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE) AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+  -- Exclude BAR payments which have been reversed.
+  and not exists
+  (
+    select 
+      * 
+    from 
+    ucladb.fine_fee_transactions fft2
+      where 
+        fft.fine_fee_id = fft2.fine_fee_id
+        and fft.fine_fee_trans_id <> fft2.fine_fee_trans_id
+        and fft2.trans_type = 6 -- Bursar Refund
+  )
+  GROUP BY 
+  cpg.circ_group_name,
+  ff.fine_fee_id
+)
+SELECT
+  location,
+  sum(bar_overdue_outstanding) as bar_overdue_outstanding,
+  sum(bar_overdue_payment) as bar_overdue_payment,
+  sum(bar_overdue_refund) as bar_overdue_refund,
+  sum(bar_lost_proc_outstanding) as bar_lost_proc_outstanding,
+  sum(bar_lost_proc_payment) as bar_lost_proc_payment,
+  sum(bar_lost_proc_refund) as bar_lost_proc_refund,
+  sum(bar_lost_item_rep_outstanding) as bar_lost_item_rep_outstanding,
+  sum(bar_lost_item_rep_payment) as bar_lost_item_rep_payment,
+  sum(bar_lost_item_rep_refund) as bar_lost_item_rep_refund
+FROM
+  FINES
+GROUP BY
+  location]]>
+	</queryString>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="BAR_OVERDUE_OUTSTANDING" class="java.math.BigDecimal"/>
+	<field name="BAR_OVERDUE_PAYMENT" class="java.math.BigDecimal"/>
+	<field name="BAR_OVERDUE_REFUND" class="java.math.BigDecimal"/>
+	<field name="BAR_LOST_PROC_OUTSTANDING" class="java.math.BigDecimal"/>
+	<field name="BAR_LOST_PROC_PAYMENT" class="java.math.BigDecimal"/>
+	<field name="BAR_LOST_PROC_REFUND" class="java.math.BigDecimal"/>
+	<field name="BAR_LOST_ITEM_REP_OUTSTANDING" class="java.math.BigDecimal"/>
+	<field name="BAR_LOST_ITEM_REP_PAYMENT" class="java.math.BigDecimal"/>
+	<field name="BAR_LOST_ITEM_REP_REFUND" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="1040" height="30" uuid="e2dbb459-491f-4e76-aaa2-330f33e70394">
+					<property name="com.jaspersoft.studio.unit.x" value="inch"/>
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BAR Payments]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="104" height="30" uuid="bcf58846-acf7-483d-bfd7-03ce8e5e491b"/>
+				<text><![CDATA[LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="104" y="0" width="104" height="30" uuid="3b46bd48-84e6-4308-b50a-a62ce0e0878f"/>
+				<text><![CDATA[OVERDUE OUTSTANDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="208" y="0" width="104" height="30" uuid="e2b8eb7e-f413-43d5-b40f-130c54d04ec4"/>
+				<text><![CDATA[OVERDUE PAYMENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="0" width="104" height="30" uuid="90e992ef-4b87-473d-97a9-7cf954e0cd90"/>
+				<text><![CDATA[OVERDUE REFUND]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="416" y="0" width="104" height="30" uuid="394194ca-e039-42a0-ab9a-66ff713b8f2d"/>
+				<text><![CDATA[LOST PROCESSING OUTSTANDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="0" width="104" height="30" uuid="ab1e84c2-4306-49a2-ad7a-87301e1ab467"/>
+				<text><![CDATA[LOST PROCESSING PAYMENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="624" y="0" width="104" height="30" uuid="04844963-d08c-4fff-9e3a-99b4e500d794"/>
+				<text><![CDATA[LOST PROCESSING REFUND]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="728" y="0" width="104" height="30" uuid="78a6f71d-c119-4421-9b3a-0081fe26cba2"/>
+				<text><![CDATA[LOST REPLACEMENT OUTSTANDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="832" y="0" width="104" height="30" uuid="92720781-0b1b-4372-92e0-4716f33db2ba"/>
+				<text><![CDATA[LOST REPLACEMENT PAYMENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="936" y="0" width="104" height="30" uuid="5aa36a64-e3c3-421a-bf0e-bcc52cf78949"/>
+				<text><![CDATA[LOST REPLACEMENT REFUND]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="104" height="30" uuid="fe0be1fa-a264-4b2c-b5f2-b868382f15c2">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.5F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="104" y="0" width="104" height="30" uuid="f6c7820a-7682-4da9-b5b7-6bd1dedc8f32">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_OVERDUE_OUTSTANDING}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="208" y="0" width="104" height="30" uuid="dae919d6-eeda-4b21-aaa9-8f2691c534d9">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_OVERDUE_PAYMENT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="312" y="0" width="104" height="30" uuid="41ccf8b2-b878-4491-9a3b-b253cd308340">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_OVERDUE_REFUND}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="416" y="0" width="104" height="30" uuid="25c8dc35-d849-4c6f-ba92-e34da48f6612">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_LOST_PROC_OUTSTANDING}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="520" y="0" width="104" height="30" uuid="12349ae3-5163-49f3-90a6-e3fa9fd62c24">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_LOST_PROC_PAYMENT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="624" y="0" width="104" height="30" uuid="e821a90f-fe11-40bc-a3fb-f5dbea5970ce">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_LOST_PROC_REFUND}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="728" y="0" width="104" height="30" uuid="609b022f-96c4-4392-bb7d-0303db9431b0">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_LOST_ITEM_REP_OUTSTANDING}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="832" y="0" width="104" height="30" uuid="12d40237-5f65-4fde-896a-7144ac349b36">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_LOST_ITEM_REP_PAYMENT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="936" y="0" width="104" height="30" uuid="bc17852e-b727-4b3e-8810-c4315a689ea6">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BAR_LOST_ITEM_REP_REFUND}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

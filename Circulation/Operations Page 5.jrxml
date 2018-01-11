@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operations Page 5" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d41c6bd7-1d04-41ea-9b8a-99ba771238a5">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<queryString language="SQL">
+		<![CDATA[--charged missing
+SELECT DISTINCT
+    sysdate AS print_date,
+    pc.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_m ON i.item_id = is_m.item_id
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.circ_transactions ct ON i.item_id = ct.item_id
+    inner join ucladb.patron pc ON ct.patron_id = pc.patron_id
+    inner join ucladb.patron_barcode pb ON pc.patron_id = pb.patron_id AND pb.barcode_status = 1
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    is_m.item_status = 12
+    AND (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+UNION
+SELECT DISTINCT
+    sysdate AS print_date,
+    pc.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_m ON i.item_id = is_m.item_id
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.circ_transactions ct ON i.item_id = ct.item_id
+    inner join ucladb.patron pc ON ct.patron_id = pc.patron_id
+    inner join ucladb.patron_barcode pb ON pc.patron_id = pb.patron_id AND pb.barcode_status = 5
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    is_m.item_status = 12
+    AND (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+    AND pb.patron_barcode IN (SELECT pb2.patron_barcode FROM ucladb.patron_barcode pb2 WHERE pb2.patron_id = pc.patron_id AND pb2.barcode_status = 1)
+
+UNION
+
+--recall missing
+SELECT DISTINCT
+    sysdate AS print_date,
+    pr.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_m ON i.item_id = is_m.item_id
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.hold_recall_items hri ON i.item_id = hri.item_id
+    inner join ucladb.hold_recall hr ON hri.hold_recall_id = hr.hold_recall_id
+    inner join ucladb.patron pr ON hr.patron_id = pr.patron_id
+    inner join ucladb.patron_barcode pb ON pr.patron_id = pb.patron_id AND pb.barcode_status = 1
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    is_m.item_status = 12
+    AND (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+UNION
+SELECT DISTINCT
+    sysdate AS print_date,
+    pr.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_m ON i.item_id = is_m.item_id
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.hold_recall_items hri ON i.item_id = hri.item_id
+    inner join ucladb.hold_recall hr ON hri.hold_recall_id = hr.hold_recall_id
+    inner join ucladb.patron pr ON hr.patron_id = pr.patron_id
+    inner join ucladb.patron_barcode pb ON pr.patron_id = pb.patron_id AND pb.barcode_status = 5
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    is_m.item_status = 12
+    AND (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+    AND pb.patron_barcode IN (SELECT pb2.patron_barcode FROM ucladb.patron_barcode pb2 WHERE pb2.patron_id = pr.patron_id AND pb2.barcode_status = 1)
+
+UNION
+
+--charge not missing
+SELECT DISTINCT
+    sysdate AS print_date,
+    pc.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.circ_transactions ct ON i.item_id = ct.item_id
+    inner join ucladb.patron pc ON ct.patron_id = pc.patron_id
+    inner join ucladb.patron_barcode pb ON pc.patron_id = pb.patron_id AND pb.barcode_status = 1
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND NOT EXISTS
+    (
+     SELECT * FROM ucladb.item_status is_m WHERE is_m.item_id = i.item_id AND is_m.item_status = 12
+    )
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+UNION
+SELECT DISTINCT
+    sysdate AS print_date,
+    pc.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.circ_transactions ct ON i.item_id = ct.item_id
+    inner join ucladb.patron pc ON ct.patron_id = pc.patron_id
+    inner join ucladb.patron_barcode pb ON pc.patron_id = pb.patron_id AND pb.barcode_status = 5
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND NOT EXISTS
+    (
+     SELECT * FROM ucladb.item_status is_m WHERE is_m.item_id = i.item_id AND is_m.item_status = 12
+    )
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+    AND pb.patron_barcode IN (SELECT pb2.patron_barcode FROM ucladb.patron_barcode pb2 WHERE pb2.patron_id = pc.patron_id AND pb2.barcode_status = 1)
+
+UNION
+
+--recall not missing
+SELECT DISTINCT
+    sysdate AS print_date,
+    pr.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.hold_recall_items hri ON i.item_id = hri.item_id
+    inner join ucladb.hold_recall hr ON hri.hold_recall_id = hr.hold_recall_id
+    inner join ucladb.patron pr ON hr.patron_id = pr.patron_id
+    inner join ucladb.patron_barcode pb ON pr.patron_id = pb.patron_id AND pb.barcode_status = 1
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND NOT EXISTS
+    (
+     SELECT * FROM ucladb.item_status is_m WHERE is_m.item_id = i.item_id AND is_m.item_status = 12
+    )
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+UNION
+SELECT DISTINCT
+    sysdate AS print_date,
+    pr.institution_id,
+    pb.patron_barcode,
+    pg.patron_group_display AS patron_group,
+    pbs.barcode_status_desc AS barcode_status
+FROM
+    ucladb.item i 
+    inner join ucladb.item_status is_o ON i.item_id = is_o.item_id
+    inner join ucladb.hold_recall_items hri ON i.item_id = hri.item_id
+    inner join ucladb.hold_recall hr ON hri.hold_recall_id = hr.hold_recall_id
+    inner join ucladb.patron pr ON hr.patron_id = pr.patron_id
+    inner join ucladb.patron_barcode pb ON pr.patron_id = pb.patron_id AND pb.barcode_status = 5
+    inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+    inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+WHERE
+    (is_o.item_status = 6 OR is_o.item_status = 15)
+    AND NOT EXISTS
+    (
+     SELECT * FROM ucladb.item_status is_m WHERE is_m.item_id = i.item_id AND is_m.item_status = 12
+    )
+    AND ( i.perm_location IN (select location_id from ucladb.location where location_code like 'cl%') OR
+          i.temp_location IN (select location_id from ucladb.location where location_code like 'cl%') )
+
+    AND pb.patron_barcode IN (SELECT pb2.patron_barcode FROM ucladb.patron_barcode pb2 WHERE pb2.patron_id = pr.patron_id AND pb2.barcode_status = 1)]]>
+	</queryString>
+	<field name="PRINT_DATE" class="java.sql.Timestamp"/>
+	<field name="INSTITUTION_ID" class="java.lang.String"/>
+	<field name="PATRON_BARCODE" class="java.lang.String"/>
+	<field name="PATRON_GROUP" class="java.lang.String"/>
+	<field name="BARCODE_STATUS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="152" height="30" uuid="c364d699-d8de-4838-b40c-3dc08f087259"/>
+				<text><![CDATA[PRINT DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="152" y="0" width="150" height="30" uuid="ced9f1f1-87f7-48a5-8de0-b0faebfea163"/>
+				<text><![CDATA[INSTITUTION ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="0" width="150" height="30" uuid="2c4d8413-4bad-44b1-87a9-795395878713"/>
+				<text><![CDATA[PATRON BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="0" width="150" height="30" uuid="280783c9-d936-4cfd-8d05-63698a3f9015"/>
+				<text><![CDATA[PATRON GROUP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="602" y="0" width="150" height="30" uuid="c6674a39-7558-4a83-808b-1485bb114b37"/>
+				<text><![CDATA[BARCODE STATUS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="152" height="30" uuid="18c98063-074b-487d-9bc0-efa5c5129dc9">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PRINT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="152" y="0" width="150" height="30" uuid="dbc7d90f-147d-4787-bbc8-3009dd06f860"/>
+				<textFieldExpression><![CDATA[$F{INSTITUTION_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="302" y="0" width="150" height="30" uuid="66e10cc1-0eb3-42d0-8eef-115155bd8138"/>
+				<textFieldExpression><![CDATA[$F{PATRON_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="452" y="0" width="150" height="30" uuid="9dadd49e-e33d-4e30-bd7c-133ee33066d3"/>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="602" y="0" width="150" height="30" uuid="fed853ab-0a1a-4360-9d82-d2639d8b4442"/>
+				<textFieldExpression><![CDATA[$F{BARCODE_STATUS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

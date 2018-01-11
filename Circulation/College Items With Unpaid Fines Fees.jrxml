@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="College Items With Unpaid Fines Fees" pageWidth="1440" pageHeight="612" orientation="Landscape" columnWidth="1400" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="967acac9-5e7c-4e53-8e17-f80eed9eac8f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/College_Items_With_Unpaid_Fines_Fees_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/College_Items_With_Unpaid_Fines_Fees"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+    iv.call_no || ' '  || iv.enumeration AS call_num, 
+    iv.barcode AS item_barcode, 
+    vger_support.unifix(bt.TITLE) AS title, 
+    bi.bib_id,
+    il.location_name AS location,
+    t_l.location_name AS temp_location,
+    pg.patron_group_display AS patron_group, 
+    p.institution_id AS university_id,
+    ff.create_date AS fine_date,
+    (ff.fine_fee_amount/100) AS fine_fee_amount,
+    fft.fine_fee_desc AS fine_type
+FROM
+    ucladb.fine_fee ff
+    INNER JOIN ucladb.fine_fee_type fft ON ff.fine_fee_type = fft.fine_fee_type
+    INNER JOIN ucladb.patron p ON ff.patron_id = p.patron_id 
+    INNER JOIN ucladb.patron_barcode pb ON pb.patron_id = p.patron_id AND pb.barcode_status = 1 
+    INNER JOIN ucladb.patron_group pg ON pg.patron_group_id = pb.patron_group_id 
+    INNER JOIN ucladb.item i ON ff.item_id = i.item_id 
+    INNER JOIN ucladb.location il ON i.perm_location = il.location_id 
+    INNER JOIN ucladb.bib_item bi ON i.item_id = bi.item_id 
+    INNER JOIN ucladb.bib_text bt ON bi.bib_id = bt.bib_id 
+    INNER JOIN ucladb.item_vw iv ON bi.item_id = iv.item_id 
+    LEFT OUTER JOIN ucladb.location t_l ON i.temp_location = t_l.location_id 
+WHERE
+    --ff.fine_fee_balance > 0 AND 
+    TRUNC(ff.create_date) BETWEEN TRUNC(SYSDATE - 1) AND TRUNC(SYSDATE)
+    AND (il.location_code LIKE 'cl%' OR t_l.location_code LIKE 'cl%')]]>
+	</queryString>
+	<field name="CALL_NUM" class="java.lang.String"/>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="TEMP_LOCATION" class="java.lang.String"/>
+	<field name="PATRON_GROUP" class="java.lang.String"/>
+	<field name="UNIVERSITY_ID" class="java.lang.String"/>
+	<field name="FINE_DATE" class="java.sql.Timestamp"/>
+	<field name="FINE_FEE_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="FINE_TYPE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="4" width="741" height="30" uuid="c829ba74-8e82-45bc-a52f-81b6d028aab6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[College Items With Unpaid Fines/Fees]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="30" uuid="3f731f86-1557-4e00-9235-455b046db266"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[CALL NUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="88" height="30" uuid="4d1848e3-32ef-4faa-8b90-803463f5e868"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ITEM BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="0" width="190" height="30" uuid="079be5e1-fe7c-4db8-a3f5-db9458b0181c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="378" y="0" width="68" height="30" uuid="4fdc212c-5771-43e2-a5cd-df48eb0c976d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[BIB ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="446" y="0" width="224" height="30" uuid="0e6e0a60-77cc-4882-8a46-5f44afe08d77"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="670" y="0" width="150" height="30" uuid="c3f52b92-28ec-4dfb-8789-965f9d4d671b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[TEMP LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="820" y="0" width="155" height="30" uuid="712b1756-4456-47f3-aaa9-7766ee691386"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[PATRON GROUP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="975" y="0" width="115" height="30" uuid="0273c66f-293f-4ed0-a3e1-6d21c9d371b2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[UNIVERSITY ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1090" y="0" width="112" height="30" uuid="ccb75f93-32b8-41e3-9c07-d523409aa3f3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[FINE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1202" y="0" width="68" height="30" uuid="f5404718-c31d-401f-9ba3-0a60a1f07d25"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[FINE FEE AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1270" y="0" width="146" height="30" uuid="dd962de8-2ce3-4610-832f-018d36587bd4"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[FINE TYPE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="4" width="100" height="30" uuid="0e03a19f-271c-4669-a341-66491fc266dd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CALL_NUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="100" y="4" width="88" height="30" uuid="7c457082-fe0f-43a7-a6a5-31ae59805a24">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ITEM_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="4" width="190" height="30" uuid="6614d340-007a-46b8-b550-a523efbc9238">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="378" y="4" width="68" height="30" uuid="376f2446-3f5f-4069-89b8-455fa42369f9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="446" y="4" width="224" height="30" uuid="96e55f64-57cc-4379-bfd0-9b975d7d2f57">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="670" y="4" width="150" height="30" uuid="38eb15b9-d079-4dec-9026-5649ac211310">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TEMP_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="820" y="4" width="155" height="30" uuid="abde7563-7d87-4698-87de-87c8068cf360">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="975" y="4" width="115" height="30" uuid="be293aac-49eb-4c01-b2de-ea0258030db4">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{UNIVERSITY_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1090" y="4" width="112" height="30" uuid="21d523c3-9bfd-492d-97d8-9f1203cf9065">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FINE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1202" y="4" width="68" height="30" uuid="b58b7d5e-7f65-40da-9bbf-6d6fc6056552">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FINE_FEE_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1270" y="4" width="146" height="30" uuid="c7582ea3-9de5-4c20-b3aa-d4d006bf116e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FINE_TYPE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

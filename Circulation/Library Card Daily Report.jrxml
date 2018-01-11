@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Library Card Daily Report" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2a56d223-bb46-4b07-8d87-5422914162d4">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Library_Card_Daily_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Library_Card_Daily_Report"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	l.location_display_name AS entered_at,
+	pb.patron_barcode,
+	p.create_date AS p_create,
+	p.modify_date AS p_modify,
+	pb.barcode_status_date,
+	pg.patron_group_display,
+	pbs.barcode_status_desc,
+	vger_support.get_all_patron_stat_codes(p.patron_id,', ') AS stat_codes,
+	p.expire_date,
+	pb.modify_operator_id,
+	NULL AS ad_modify,
+	NULL AS ad_operator,
+	NULL AS address_desc,
+	NULL AS phone_modify,
+	NULL AS phone_operator,
+	NULL AS phone_desc
+FROM
+	ucladb.patron_barcode pb
+	inner join ucladb.patron p ON pb.patron_id = p.patron_id
+	left outer join ucladb.location l ON p.home_location = l.location_id
+	inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+	inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+WHERE
+	TRUNC(pb.barcode_status_date) >= TRUNC(SYSDATE - 1)
+	AND pb.modify_operator_id <> 'SYSTEM'
+	AND pb.modify_operator_id <> 'CONVERSION'
+	AND pb.modify_operator_id <> 'UPDATE'
+UNION
+SELECT
+	l.location_display_name AS entered_at,
+	pb.patron_barcode,
+	p.create_date AS p_create,
+	p.modify_date AS p_modify,
+	pb.barcode_status_date,
+	pg.patron_group_display,
+	pbs.barcode_status_desc,
+	vger_support.get_all_patron_stat_codes(p.patron_id,', ') AS stat_codes,
+	p.expire_date,
+	p.modify_operator_id,
+	NULL AS ad_modify,
+	NULL AS ad_operator,
+	NULL AS address_desc,
+	NULL AS phone_modify,
+	NULL AS phone_operator,
+	NULL AS phone_desc
+FROM
+	ucladb.patron_barcode pb
+	inner join ucladb.patron p ON pb.patron_id = p.patron_id
+	left outer join ucladb.location l ON p.home_location = l.location_id
+	inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+	inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+WHERE
+	TRUNC(p.modify_date) >= TRUNC(SYSDATE - 1) 
+	AND p.modify_operator_id <> 'SYSTEM'
+	AND p.modify_operator_id <> 'CONVERSION'
+	AND p.modify_operator_id <> 'UPDATE'
+UNION
+SELECT
+	l.location_display_name AS entered_at,
+	pb.patron_barcode,
+	p.create_date AS p_create,
+	p.modify_date AS p_modify,
+	pb.barcode_status_date,
+	pg.patron_group_display,
+	pbs.barcode_status_desc,
+	vger_support.get_all_patron_stat_codes(p.patron_id,', ') AS stat_codes,
+	p.expire_date,
+	p.create_operator_id,
+	NULL AS ad_modify,
+	NULL AS ad_operator,
+	NULL AS address_desc,
+	NULL AS phone_modify,
+	NULL AS phone_operator,
+	NULL AS phone_desc
+FROM
+	ucladb.patron_barcode pb
+	inner join ucladb.patron p ON pb.patron_id = p.patron_id
+	left outer join ucladb.location l ON p.home_location = l.location_id
+	inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+	inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+WHERE
+	TRUNC(p.create_date) >= TRUNC(SYSDATE - 1) 
+	AND p.create_operator_id <> 'SYSTEM'
+	AND p.create_operator_id <> 'CONVERSION'
+	AND p.create_operator_id <> 'UPDATE'
+UNION
+SELECT
+	l.location_display_name AS entered_at,
+	pb.patron_barcode,
+	p.create_date AS p_create,
+	p.modify_date AS p_modify,
+	pb.barcode_status_date,
+	pg.patron_group_display,
+	pbs.barcode_status_desc,
+	vger_support.get_all_patron_stat_codes(p.patron_id,', ') AS stat_codes,
+	p.expire_date,
+	p.create_operator_id,
+	pa.modify_date AS ad_modify,
+	pa.modify_operator_id AS ad_operator,
+	aty.address_desc,
+	NULL AS phone_modify,
+	NULL AS phone_operator,
+	NULL AS phone_desc
+FROM
+	ucladb.patron_barcode pb
+	inner join ucladb.patron p ON pb.patron_id = p.patron_id
+	left outer join ucladb.location l ON p.home_location = l.location_id
+	inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+	inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+	inner join ucladb.patron_address pa ON p.patron_id = pa.patron_id
+	inner join ucladb.address_type aty ON pa.address_type = aty.address_type
+WHERE
+	TRUNC(pa.modify_date) >= TRUNC(SYSDATE - 1) 
+	AND pa.modify_operator_id <> 'SYSTEM'
+	AND pa.modify_operator_id <> 'CONVERSION'
+	AND pa.modify_operator_id <> 'UPDATE'
+	AND (pa.address_type = 1 OR pa.address_type = 2)
+UNION
+SELECT
+	l.location_display_name AS entered_at,
+	pb.patron_barcode,
+	p.create_date AS p_create,
+	p.modify_date AS p_modify,
+	pb.barcode_status_date,
+	pg.patron_group_display,
+	pbs.barcode_status_desc,
+	vger_support.get_all_patron_stat_codes(p.patron_id,', ') AS stat_codes,
+	p.expire_date,
+	p.create_operator_id,
+	NULL AS ad_modify,
+	NULL AS ad_operator,
+	NULL AS address_desc,
+	pp.modify_date AS phone_modify,
+	pp.modify_operator_id AS phone_operator,
+	pt.phone_desc
+FROM
+	ucladb.patron_barcode pb
+	inner join ucladb.patron p ON pb.patron_id = p.patron_id
+	left outer join ucladb.location l ON p.home_location = l.location_id
+	inner join ucladb.patron_group pg ON pb.patron_group_id = pg.patron_group_id
+	inner join ucladb.patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+	inner join ucladb.patron_address pa ON p.patron_id = pa.patron_id
+	inner join ucladb.patron_phone pp ON pa.address_id = pp.address_id
+	inner join ucladb.phone_type pt ON pp.phone_type = pt.phone_type
+WHERE
+	TRUNC(pp.modify_date) >= TRUNC(SYSDATE - 1) 
+	AND pp.modify_operator_id <> 'SYSTEM'
+	AND pp.modify_operator_id <> 'CONVERSION'
+	AND pp.modify_operator_id <> 'UPDATE'
+	AND (pa.address_type = 1 OR pa.address_type = 2)
+ORDER BY
+	patron_barcode]]>
+	</queryString>
+	<field name="ENTERED_AT" class="java.lang.String"/>
+	<field name="PATRON_BARCODE" class="java.lang.String"/>
+	<field name="P_CREATE" class="java.sql.Timestamp"/>
+	<field name="P_MODIFY" class="java.sql.Timestamp"/>
+	<field name="BARCODE_STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="PATRON_GROUP_DISPLAY" class="java.lang.String"/>
+	<field name="BARCODE_STATUS_DESC" class="java.lang.String"/>
+	<field name="STAT_CODES" class="java.lang.String"/>
+	<field name="EXPIRE_DATE" class="java.sql.Timestamp"/>
+	<field name="MODIFY_OPERATOR_ID" class="java.lang.String"/>
+	<field name="AD_MODIFY" class="java.sql.Timestamp"/>
+	<field name="AD_OPERATOR" class="java.lang.String"/>
+	<field name="ADDRESS_DESC" class="java.lang.String"/>
+	<field name="PHONE_MODIFY" class="java.sql.Timestamp"/>
+	<field name="PHONE_OPERATOR" class="java.lang.String"/>
+	<field name="PHONE_DESC" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="746" height="30" uuid="af993630-6cfb-45fc-8fd1-46a08db8d3e1">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Library Card Daily Report]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="47" height="30" uuid="40205409-fd03-4483-b93d-8a6240003848"/>
+				<text><![CDATA[ENTERED_AT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="47" y="0" width="47" height="30" uuid="a425bfb7-e402-4046-8985-7be85cd77db9"/>
+				<text><![CDATA[PATRON_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="94" y="0" width="47" height="30" uuid="cd2f5ba4-449f-450e-8a79-5a996a241d91"/>
+				<text><![CDATA[P_CREATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="141" y="0" width="47" height="30" uuid="52266eaa-0ef3-47ef-bbce-cfc3fe09c799"/>
+				<text><![CDATA[P_MODIFY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="0" width="47" height="30" uuid="4f365504-dbf7-447a-924a-6457649212d8"/>
+				<text><![CDATA[BARCODE_STATUS_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="235" y="0" width="47" height="30" uuid="4a2deda1-75b2-4eb6-8538-daeff08404e3"/>
+				<text><![CDATA[PATRON_GROUP_DISPLAY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="47" height="30" uuid="54f1556b-96a1-4c85-993a-edf54154f019"/>
+				<text><![CDATA[BARCODE_STATUS_DESC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="329" y="0" width="47" height="30" uuid="0bd45437-eb2e-44b8-8f59-e01c5350ce26"/>
+				<text><![CDATA[STAT_CODES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="0" width="47" height="30" uuid="4079e3a3-e3c9-4759-8bde-1d03fbda5b78"/>
+				<text><![CDATA[EXPIRE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="423" y="0" width="47" height="30" uuid="2f2f25cf-a7c1-4e26-88c6-d24678f0e226"/>
+				<text><![CDATA[MODIFY_OPERATOR_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="0" width="47" height="30" uuid="afdcef68-9a0d-4dd1-b1bc-221db4fbc622"/>
+				<text><![CDATA[AD_MODIFY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="517" y="0" width="47" height="30" uuid="0fdacc7e-adf3-46a2-b3d7-6563f3898996"/>
+				<text><![CDATA[AD_OPERATOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="564" y="0" width="47" height="30" uuid="8a314841-e13a-48d4-8ba5-658c8502548b"/>
+				<text><![CDATA[ADDRESS_DESC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="611" y="0" width="47" height="30" uuid="2a74545c-91b0-4c98-ada7-9a1cbd450e1b"/>
+				<text><![CDATA[PHONE_MODIFY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="658" y="0" width="47" height="30" uuid="2fab0ebb-ff9f-4980-b10c-094d3f798eaa"/>
+				<text><![CDATA[PHONE_OPERATOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="705" y="0" width="47" height="30" uuid="3518829d-436a-4231-91f9-b8cc5f61733d"/>
+				<text><![CDATA[PHONE_DESC]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="47" height="30" uuid="cbe755e9-5392-49f0-9a83-7ab98d70e8b0">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ENTERED_AT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="47" y="0" width="47" height="30" uuid="183a17a4-a899-4f36-a1b3-87febf140833">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="94" y="0" width="47" height="30" uuid="c03286b5-0158-411c-a3b5-85f61dc67923">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{P_CREATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="141" y="0" width="47" height="30" uuid="5eeb92fe-28dc-4115-97cc-a1e8ec913c53">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{P_MODIFY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="0" width="47" height="30" uuid="e31d0345-0e34-4abf-8bce-d745055260e5">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE_STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="235" y="0" width="47" height="30" uuid="f6d560c9-a114-4dd3-b08f-fc187c1ab42b">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP_DISPLAY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="282" y="0" width="47" height="30" uuid="6858e259-948d-4ab6-9602-824b154ef692">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE_STATUS_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="329" y="0" width="47" height="30" uuid="1202ffa5-f0e3-49b1-a208-d7a2bb12f1d5">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{STAT_CODES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="376" y="0" width="47" height="30" uuid="17140cf2-ca84-4908-9e1f-a396fc4f4945">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EXPIRE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="423" y="0" width="47" height="30" uuid="53ec5c8c-df0a-4b45-ad4c-829a67a03b66">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MODIFY_OPERATOR_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="470" y="0" width="47" height="30" uuid="081fd732-7bcc-46c4-a83b-07c58859bcd0">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AD_MODIFY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="517" y="0" width="47" height="30" uuid="8198a6a1-4a82-473e-99b5-6fed09051e65">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AD_OPERATOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="564" y="0" width="47" height="30" uuid="e87af70e-af9f-4785-9147-77ef01083ed7">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="611" y="0" width="47" height="30" uuid="9a67cf0f-2a9c-4d32-8f61-b5ea55787ee3">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PHONE_MODIFY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="658" y="0" width="47" height="30" uuid="546167c4-90dc-4ffc-bb8e-14308555c337">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PHONE_OPERATOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="705" y="0" width="47" height="30" uuid="42a13787-6cbe-47e4-9cd6-e67a1b81a9c6">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PHONE_DESC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="0" width="100" height="30" uuid="bca1812a-86f5-40e1-b1df-4c8f1ebf7b46">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm">
+				<reportElement x="646" y="0" width="100" height="30" uuid="580bfd77-7d1b-4fbb-8087-1c5c88fa1dd0">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="316" y="0" width="100" height="30" uuid="53b0bccd-7d0f-4c6c-a216-478fae667d9e">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

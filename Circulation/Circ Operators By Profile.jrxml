@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Circ Operators By Profile" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="503748e6-b646-400f-8008-16f849005944">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Circ_Operators_By_Profile_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Circ_Operators_By_Profile"/>
+	<parameter name="profileID" class="java.util.Collection">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+	o.operator_id,
+	cp.circ_profile_name,
+	o.last_name || ', ' || o.first_name as oper_name
+FROM 
+	ucladb.operator o
+	INNER JOIN ucladb.circ_operator co ON o.operator_id = co.operator_id
+	INNER JOIN ucladb.circ_profile cp ON co.circ_profile_id = cp.circ_profile_id
+WHERE 
+	--cp.circ_profile_id IN $P!{profileID}
+	$X{IN, cp.circ_profile_id, profileID} 
+	AND manual_expire = 'N'
+ORDER BY
+	cp.circ_profile_name,
+	o.operator_id]]>
+	</queryString>
+	<field name="CIRC_PROFILE_NAME" class="java.lang.String"/>
+	<field name="OPERATOR_ID" class="java.lang.String"/>
+	<field name="OPER_NAME" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="750" height="30" uuid="39adfde2-ae5b-42b4-a732-7002e4759059">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Circ Operators By Profile]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="252" height="30" uuid="28dd928c-92c3-4f13-b6d4-47acfdcf4b95"/>
+				<text><![CDATA[CIRC_PROFILE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="250" height="30" uuid="4943d247-84db-4099-8284-20496e3cdb58"/>
+				<text><![CDATA[OPERATOR_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="250" height="30" uuid="b737a49d-0c59-4dac-aecf-efd67050736e"/>
+				<text><![CDATA[OPER_NAME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="252" height="30" uuid="08b437e5-2293-46fd-913f-7a7633434d38">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CIRC_PROFILE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="252" y="0" width="250" height="30" uuid="c222fffa-18aa-409e-980e-9610a0b6dae8">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OPERATOR_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="502" y="0" width="250" height="30" uuid="0ed2fad1-f52a-458c-a23f-006d670df35b">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OPER_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

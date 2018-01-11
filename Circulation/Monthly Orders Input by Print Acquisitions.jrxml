@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Monthly Orders Input by Print Acquisitions" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="1008" leftMargin="0" rightMargin="0" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="ae3a459c-cf9e-46b1-b18d-09b172695597">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Monthly_Orders_Input_by_Print_Acquisitions_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Monthly_Orders_Input_by_Print_Acquisitions"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+	vendor.vendor_name,
+	po_type.po_type_desc, 
+	Count (DISTINCT purchase_order.po_id) AS purchase_orders, 
+	Count(line_item.line_item_id) AS line_items, 
+	Sum(line_item.line_price/100) AS cost
+FROM 
+	LOCATION 
+	INNER JOIN PURCHASE_ORDER 
+	INNER JOIN LINE_ITEM ON PURCHASE_ORDER.PO_ID = LINE_ITEM.PO_ID
+	INNER JOIN VENDOR ON PURCHASE_ORDER.VENDOR_ID = VENDOR.VENDOR_ID
+	INNER JOIN PO_TYPE ON PURCHASE_ORDER.PO_TYPE = PO_TYPE.PO_TYPE
+	INNER JOIN PO_STATUS ON PURCHASE_ORDER.PO_STATUS = PO_STATUS.PO_STATUS ON LOCATION.LOCATION_ID = PURCHASE_ORDER.ORDER_LOCATION
+
+WHERE  
+	LINE_ITEM.update_DATE BETWEEN trunc($P{startDate}) and trunc($P{endDate})
+        AND (po_type.po_type_desc = 'Firm Order' OR po_type.po_type_desc = 'Continuation')
+        AND PO_STATUS.po_status_desc = 'Approved/Sent'
+        AND (PURCHASE_ORDER.po_number NOT LIKE 'DCS%'  OR PURCHASE_ORDER.po_number NOT LIKE 'CDL%')
+        AND (PURCHASE_ORDER.order_location = '550' OR PURCHASE_ORDER.order_location = '348' OR  PURCHASE_ORDER.order_location = '247')
+
+GROUP BY 
+	vendor.vendor_name,
+	po_type.po_type_desc
+]]>
+	</queryString>
+	<field name="VENDOR_NAME" class="java.lang.String"/>
+	<field name="PO_TYPE_DESC" class="java.lang.String"/>
+	<field name="PURCHASE_ORDERS" class="java.math.BigDecimal"/>
+	<field name="LINE_ITEMS" class="java.math.BigDecimal"/>
+	<field name="COST" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="320" height="30" uuid="2b2e4e40-5856-4e3f-95e7-c984884365e0"/>
+				<text><![CDATA[VENDOR NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="0" width="258" height="30" uuid="bfdf263d-20b4-40f0-83a9-3e893dcc888c"/>
+				<text><![CDATA[PO TYPE DESC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="578" y="0" width="150" height="30" uuid="edce0996-b5d2-4ea2-aa31-1bcc5bdf9286"/>
+				<text><![CDATA[PURCHASE ORDERS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="728" y="0" width="108" height="30" uuid="75a441aa-dddb-4e01-80c1-5f280ff61720"/>
+				<text><![CDATA[LINE ITEMS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="836" y="0" width="150" height="30" uuid="f7f511b9-2c29-421f-a94f-f5ab769388ae"/>
+				<text><![CDATA[COST]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="320" height="30" uuid="493b13fa-937c-4a80-b467-901bb603c851"/>
+				<textFieldExpression><![CDATA[$F{VENDOR_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="320" y="0" width="258" height="30" uuid="2a2b9e8b-63f7-4923-8810-326f7bbd1092"/>
+				<textFieldExpression><![CDATA[$F{PO_TYPE_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="578" y="0" width="150" height="30" uuid="c936df81-33ad-43c3-baef-3f82d0cc5ddf"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{PURCHASE_ORDERS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="728" y="0" width="108" height="30" uuid="ef24c538-486e-4dbb-a860-67cdb1c931e2"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{LINE_ITEMS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="836" y="0" width="150" height="30" uuid="39faff36-5cdc-4140-9de9-ccd5691d4b07">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{COST}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

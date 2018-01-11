@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Erroneous Commitment Report" pageWidth="1080" pageHeight="612" orientation="Landscape" columnWidth="1080" leftMargin="0" rightMargin="0" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="bb590401-7e9d-45cb-9889-d8d31c8ec113">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Erroneous_Commitment_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Erroneous_Commitment_Report"/>
+	<queryString language="SQL">
+		<![CDATA[/*  Find POs which supposedly are closed, but still have commitments.
+*/
+with order_fund as (
+  select
+    po.po_id
+  , po.po_number
+  , po.currency_code
+  , pot.po_type_desc
+  , pos.po_status_desc
+  , po.po_status_date
+  , pof.commitments / 100.00 as commitments
+--  , pof.commit_pending
+--  , pof.expenditures
+--  , pof.expend_pending
+  , f.fiscal_period_name
+  , f.fund_code
+  , f.ledger_name
+  , f.fund_name
+  from purchase_order po
+  inner join po_status pos on po.po_status = pos.po_status
+  inner join po_type pot on po.po_type = pot.po_type
+  inner join po_funds pof on po.po_id = pof.po_id
+  inner join ucla_fundledger_vw f on pof.ledger_id = f.ledger_id and pof.fund_id = f.fund_id
+  where pof.commitments != 0
+  and pos.po_status_desc in ('Received Complete', 'Complete', 'Canceled')
+  AND f.ledger_name LIKE '%16-17%'
+)
+, copies as (
+  select
+    ofd.po_id
+  , lics.line_item_status
+  , lics.invoice_item_status
+  from order_fund ofd
+  inner join line_item li on ofd.po_id = li.po_id
+  inner join line_item_copy_status lics on li.line_item_id = lics.line_item_id
+  where lics.invoice_item_status = 0
+)
+select *
+from order_fund o
+where exists (
+  select *
+  from copies
+  where po_id = o.po_id
+)
+--and po_status_date >= to_date('2011-07-01', 'YYYY-MM-DD')
+order by ledger_name, fund_code, po_status_date
+ --fiscal_period_name,]]>
+	</queryString>
+	<field name="PO_ID" class="java.math.BigDecimal"/>
+	<field name="PO_NUMBER" class="java.lang.String"/>
+	<field name="CURRENCY_CODE" class="java.lang.String"/>
+	<field name="PO_TYPE_DESC" class="java.lang.String"/>
+	<field name="PO_STATUS_DESC" class="java.lang.String"/>
+	<field name="PO_STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="COMMITMENTS" class="java.math.BigDecimal"/>
+	<field name="FISCAL_PERIOD_NAME" class="java.lang.String"/>
+	<field name="FUND_CODE" class="java.lang.String"/>
+	<field name="LEDGER_NAME" class="java.lang.String"/>
+	<field name="FUND_NAME" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="72" height="30" uuid="67276a6f-63c1-4a93-b7d2-abdc1af84f38"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[PO ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="72" y="0" width="98" height="30" uuid="d1929221-9580-4ddd-8efd-578b6eaf5e5d"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[PO NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="0" width="68" height="30" uuid="a20a8449-c750-4fa5-bcb4-93de2685b2af"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[CURRENCY CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="238" y="0" width="112" height="30" uuid="41414e5b-22e8-4eee-a6af-5794a134d041"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[PO TYPE DESC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="124" height="30" uuid="eb7f9ccd-fa35-4554-9809-88c1e0d62583"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[PO STATUS DESC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="474" y="0" width="68" height="30" uuid="ac315e72-a413-45e1-8bae-1667f99b3b9c"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[PO STATUS DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="542" y="0" width="108" height="30" uuid="6c97aa03-398c-443c-af5d-fc0705ab8bda"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[COMMITMENTS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="650" y="0" width="90" height="30" uuid="b6fa17d8-6fcd-4a16-8d18-7fc9c2b743c9"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[FISCAL PERIOD NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="740" y="0" width="92" height="30" uuid="09f06fe8-f049-4c0c-a3f1-6c98f225fa47"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[FUND CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="832" y="0" width="124" height="30" uuid="e9d162e2-e899-453a-be58-bbab0552288a"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[LEDGER NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="956" y="0" width="106" height="30" uuid="9cd2bf33-9b23-45ee-b390-d02c926e7e67"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[FUND NAME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="72" height="30" uuid="18447efe-c110-48bc-8ae1-02dcd1036e32"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PO_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="72" y="0" width="98" height="30" uuid="39ac446d-1730-4a6d-b838-0df1d7f50940"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PO_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="0" width="68" height="30" uuid="d569fbac-d268-486e-8ffa-e31ded160133"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CURRENCY_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="238" y="0" width="112" height="30" uuid="afa83918-289b-4875-bbad-4bb1da756bd7"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PO_TYPE_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="350" y="0" width="124" height="30" uuid="011d76ce-b057-41eb-b6ca-f992159253d0"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PO_STATUS_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="474" y="0" width="68" height="30" uuid="064c336f-ea41-44d2-aa51-a5c62850f79d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PO_STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="542" y="0" width="108" height="30" uuid="c418dfd7-f885-4fd2-98f1-55d306474f96"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{COMMITMENTS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="650" y="0" width="90" height="30" uuid="2a47f58c-4ea4-4de6-bbce-7aa090a193ec"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FISCAL_PERIOD_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="740" y="0" width="92" height="30" uuid="042b706c-b2c8-446a-9e1b-3b5418275d5b">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="832" y="0" width="124" height="30" uuid="a8fa5d2a-0d68-4299-a04e-3d2706d841e6"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{LEDGER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="956" y="0" width="106" height="30" uuid="0af768d3-f63a-4565-97ac-707ee7ff4713"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FUND_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

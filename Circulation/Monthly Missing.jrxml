@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Monthly Missing" pageWidth="1800" pageHeight="612" orientation="Landscape" columnWidth="1760" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" isIgnorePagination="true" uuid="95ceab96-670f-440c-be92-75bcdd06e7b5">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2.25F"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+  ist.item_status_desc,
+  itst.item_status_date,
+  bt.bib_id,
+  bt.isbn,
+  bt.issn,
+  vger_support.unifix(bt.author) as author,
+  vger_support.unifix(bt.TITLE) as title, 
+  vger_support.unifix(bt.edition) as edition,
+  vger_support.unifix(bt.publisher) as publisher,
+  vger_support.unifix(bt.pub_place) as pub_place,
+  vger_support.unifix(bt.series) as series,
+  bt.publisher_date,
+  iv.PERM_LOCATION, 
+  l_temp.location_display_name as temp_location,
+  cpg.circ_group_name,
+  iv.CALL_NO, 
+  iv.BARCODE, 
+  iv.ENUMERATION,
+  i.copy_number,
+  to_char(i.price/100, '$990D99') as price,
+  to_char(ff.fine_fee_amount/100, '$990D99') as fine_fee_amount,
+  to_char(ff.fine_fee_balance/100, '$990D99') as fine_fee_balance,
+  pg.patron_group_name as patron_group
+-- We want some items from the bib_text table so we start with the bib_item 
+-- table. This runs faster than starting with the item table.
+from ucladb.BIB_ITEM bi 
+-- Join with bib_text table so we get the fields we want.
+inner join ucladb.bib_text bt on bi.bib_id = bt.bib_id
+-- Join with item so we get copy_number and price.
+inner join ucladb.item i on bi.item_id = i.item_id
+-- Join with item_view so we get the item fields that we want.
+inner join ucladb.item_vw iv on bi.item_id = iv.item_id
+-- Join with location so we can location_display_name of the temp_location.
+left outer join ucladb.location l_temp on i.temp_location = l_temp.location_id
+-- Join with item_status to get item_status_desc in item_status_type.
+INNER JOIN ucladb.ITEM_STATUS itst on iv.ITEM_ID = itst.ITEM_ID
+-- Join with item_status_type to get item_status_desc.
+INNER JOIN ucladb.ITEM_STATUS_TYPE ist ON itst.ITEM_STATUS = ist.ITEM_STATUS_TYPE
+-- Join with location so we can get location_id.
+LEFT OUTER JOIN ucladb.location l ON l.location_code = iv.PERM_LOCATION_CODE
+-- Join with circ_policy_locs so we can get circ_group_name in 
+-- circ_policy_group.
+LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON l.location_id = cpl.location_id
+-- Join with circ_policy_group so we can get circ_group_name.
+LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+-- Join with fine_fee to get fine fields. Pick only "Lost Item Replacement"
+left outer join ucladb.fine_fee ff on iv.item_id = ff.item_id and ff.fine_fee_type = 2
+-- Join with patron_barcode to get to patron_group.
+left outer join ucladb.patron_barcode pb on ff.patron_id = pb.patron_id
+-- Join with patron_group to get patron_group_name.
+left outer join ucladb.patron_group pg on pb.patron_group_id = pg.patron_group_id
+WHERE 
+-- Pick out the date range we're interested in
+item_status_date between trunc(add_months(last_day(sysdate)+1, -4)) and trunc(add_months(last_day(sysdate)+1, -3))
+-- Pick out the active patron barcode, or the one with the lowest number status
+-- if there isn't an active one.
+and not exists
+(
+  select * from ucladb.patron_barcode pb2
+  where ff.patron_id = pb2.patron_id
+  and (
+        pb.barcode_status > pb2.barcode_status  or 
+        (pb.barcode_status = pb2.barcode_status and pb2.patron_barcode_id > pb.patron_barcode_id)
+      )
+)
+-- Pick the latest entry from the fine_fee table
+and not exists
+(
+  select * from ucladb.fine_fee ff2
+  where iv.item_id = ff2.item_id and ff2.fine_fee_type = 2
+  and (
+        ff2.fine_fee_notice_date > ff.fine_fee_notice_date  or 
+        (ff2.fine_fee_notice_date = ff.fine_fee_notice_date and ff2.fine_fee_id > ff.fine_fee_id)
+      )
+)
+-- Pick out items with 'Missing' (12) status.
+and (itst.ITEM_STATUS = '12')
+ORDER BY cpg.circ_group_name, iv.PERM_LOCATION, iv.CALL_NO]]>
+	</queryString>
+	<field name="ITEM_STATUS_DESC" class="java.lang.String"/>
+	<field name="ITEM_STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="ISBN" class="java.lang.String"/>
+	<field name="ISSN" class="java.lang.String"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="EDITION" class="java.lang.String"/>
+	<field name="PUBLISHER" class="java.lang.String"/>
+	<field name="PUB_PLACE" class="java.lang.String"/>
+	<field name="SERIES" class="java.lang.String"/>
+	<field name="PUBLISHER_DATE" class="java.lang.String"/>
+	<field name="PERM_LOCATION" class="java.lang.String"/>
+	<field name="TEMP_LOCATION" class="java.lang.String"/>
+	<field name="CIRC_GROUP_NAME" class="java.lang.String"/>
+	<field name="CALL_NO" class="java.lang.String"/>
+	<field name="BARCODE" class="java.lang.String"/>
+	<field name="ENUMERATION" class="java.lang.String"/>
+	<field name="COPY_NUMBER" class="java.math.BigDecimal"/>
+	<field name="PRICE" class="java.lang.String"/>
+	<field name="FINE_FEE_AMOUNT" class="java.lang.String"/>
+	<field name="FINE_FEE_BALANCE" class="java.lang.String"/>
+	<field name="PATRON_GROUP" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="1760" height="30" uuid="a2bfb3b5-03a2-440a-a00a-40222af681ca">
+					<property name="com.jaspersoft.studio.unit.x" value="inch"/>
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+				</reportElement>
+				<textElement>
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Monthly CSC: Missing Items"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="88" height="30" uuid="88bbc3a3-b9da-4722-b322-e7d3145970da"/>
+				<text><![CDATA[ITEM STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="0" width="76" height="30" uuid="cff03ef9-b29f-40f7-8d83-422bd4a929d0"/>
+				<text><![CDATA[STATUS DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="164" y="0" width="76" height="30" uuid="ee7a9eab-4f7c-4473-b61f-f805fa370a1d"/>
+				<text><![CDATA[BIB ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="0" width="76" height="30" uuid="1fa0fb43-77e5-4b7a-bccf-69a520ee3a95"/>
+				<text><![CDATA[ISBN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="316" y="0" width="76" height="30" uuid="b63763bd-0a28-4b30-8d8d-198c142e8592"/>
+				<text><![CDATA[ISSN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="392" y="0" width="76" height="30" uuid="7a2f51b1-5f9f-4a02-9748-a12447f7f83c"/>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="468" y="0" width="76" height="30" uuid="cd4d1576-9e9c-40a3-be57-afe85b1e10b3"/>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="544" y="0" width="76" height="30" uuid="74cdf9ea-57f2-4d07-b8f2-fbbc23f1cd9a"/>
+				<text><![CDATA[EDITION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="620" y="0" width="76" height="30" uuid="3044d1ed-7b12-4f12-b9df-cd0ea5f64ef2"/>
+				<text><![CDATA[PUBLISHER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="696" y="0" width="76" height="30" uuid="8a0140c7-4372-4443-adff-5cfeedf353b2"/>
+				<text><![CDATA[PUB PLACE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="772" y="0" width="76" height="30" uuid="2ce7ec4a-70cc-4881-9863-d3d99b3b4285"/>
+				<text><![CDATA[SERIES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="848" y="0" width="76" height="30" uuid="7a0f54a9-5360-4e61-b1fc-e2b8a026b965"/>
+				<text><![CDATA[PUBLISHER DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="924" y="0" width="76" height="30" uuid="c443d5a4-728b-4f88-b475-d356534adda6"/>
+				<text><![CDATA[PERM LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1000" y="0" width="76" height="30" uuid="cde48626-b60e-4bbc-9cb8-b7a3da8cfe6a"/>
+				<text><![CDATA[TEMP LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1076" y="0" width="76" height="30" uuid="f43963a8-f80b-44c5-ac7d-210f9176a731"/>
+				<text><![CDATA[CIRC GROUP NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1152" y="0" width="76" height="30" uuid="9d4e5b54-6996-4344-a16e-92793276e341"/>
+				<text><![CDATA[CALL NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1228" y="0" width="76" height="30" uuid="28126214-eccf-42af-aea1-2c54a07071f0"/>
+				<text><![CDATA[BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1304" y="0" width="76" height="30" uuid="60246dcf-99eb-4364-8f24-0ca9122451f1"/>
+				<text><![CDATA[ENUMERATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1380" y="0" width="76" height="30" uuid="88e3fc24-7373-4664-833e-2e2a67c8d044"/>
+				<text><![CDATA[COPY NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1456" y="0" width="76" height="30" uuid="be081821-2625-444b-80b3-ac951da78f78"/>
+				<text><![CDATA[PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1532" y="0" width="76" height="30" uuid="25cad595-9f91-4b0e-a8ec-7303fcdcc0cb"/>
+				<text><![CDATA[FINE/FEE AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1608" y="0" width="76" height="30" uuid="d4b9677c-625e-4bf8-a166-a6b9d014f75c"/>
+				<text><![CDATA[FINE/FEE BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1684" y="0" width="76" height="30" uuid="07a784df-4900-457a-a830-2da98e23a11a"/>
+				<text><![CDATA[PATRON GROUP]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="88" height="30" uuid="51052f6e-df5a-472d-9218-f66ea3ebb239">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_STATUS_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="88" y="0" width="76" height="30" uuid="bc97ece9-29a4-403b-94e9-fb3d04e68e2d">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="164" y="0" width="76" height="30" uuid="402ed51a-9dac-46c1-ade0-3bc4d5de7aec">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="240" y="0" width="76" height="30" uuid="16dbff16-5d98-47c5-bfb2-ee615754912c">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ISBN}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="316" y="0" width="76" height="30" uuid="d56d0bd8-36a2-4a1a-9570-612f5abda8c7">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ISSN}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="392" y="0" width="76" height="30" uuid="e0a336cc-ed2c-43a9-bc61-ed41af8a2a1d">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="468" y="0" width="76" height="30" uuid="28bd66eb-b2c1-4015-806d-b43b39c45c04">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="544" y="0" width="76" height="30" uuid="90c36428-b504-4ac9-a7dc-29131d6d28ed">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EDITION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="620" y="0" width="76" height="30" uuid="6dc7e8cd-2a9d-452a-9da5-f287682dd533">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PUBLISHER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="696" y="0" width="76" height="30" uuid="4ee2b903-f800-4650-883f-d23b2295319b">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PUB_PLACE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="772" y="0" width="76" height="30" uuid="ec82ec11-2258-41dc-a83f-e979a4baf710">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SERIES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="848" y="0" width="76" height="30" uuid="f8c5d9d7-ff97-4a67-ac1d-52e8dd3aa6f4">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PUBLISHER_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="924" y="0" width="76" height="30" uuid="52d372eb-37cb-4648-84a2-f3ecb51de474">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1000" y="0" width="76" height="30" uuid="fce3257a-5168-4d3d-8ed3-8ad1467aa7e1">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TEMP_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1076" y="0" width="76" height="30" uuid="4579111a-b2bc-409c-b0c8-812a0daa208a">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CIRC_GROUP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1152" y="0" width="76" height="30" uuid="cddbf376-a348-4245-b461-886681006ff6">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1228" y="0" width="76" height="30" uuid="7a8ae636-1892-460c-8533-ff10f4d7741c">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1304" y="0" width="76" height="30" uuid="6f03041e-ac01-4ead-86b2-d1c294902b95">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ENUMERATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1380" y="0" width="76" height="30" uuid="3e6eeda2-8539-4a10-8c84-2d07ddadd6fe">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{COPY_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1456" y="0" width="76" height="30" uuid="113d9b90-6b2e-40c9-8d60-9201416cb8b7">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PRICE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1532" y="0" width="76" height="30" uuid="4cc96a7e-1e40-44bd-b1e9-e09620d48812">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FINE_FEE_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1608" y="0" width="76" height="30" uuid="6dcf5dd2-496a-4fa5-9ef3-412d88ac9e2f">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FINE_FEE_BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1684" y="0" width="76" height="30" uuid="3a5067d5-b489-4ebb-97bf-4124546beb99">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="235">
+			<break>
+				<reportElement x="0" y="12" width="100" height="1" uuid="0778e9ad-e213-4ebe-8a4c-2454b029fb50"/>
+			</break>
+			<subreport>
+				<reportElement x="0" y="35" width="1760" height="200" uuid="80da2345-a3b7-41a4-b8d4-abf8f24456ec">
+					<property name="com.jaspersoft.studio.unit.x" value="inch"/>
+				</reportElement>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["Monthly Claims Returned.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

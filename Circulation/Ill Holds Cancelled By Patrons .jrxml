@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Ill Holds Cancelled By Patrons " pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="0f5c5dab-4f6c-470f-a386-87baed83dbc1">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Ill_Holds_Cancelled_By_Patrons__files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Ill_Holds_Cancelled_By_Patrons_"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+ITEM_TYPE.ITEM_TYPE_NAME,
+PATRON_BARCODE.PATRON_BARCODE,
+ITEM_BARCODE.ITEM_BARCODE,
+HOLD_RECALL_item_archive.hold_recall_status_date AS date_cancelled
+
+FROM CIRC_TRANSACTIONS
+INNER JOIN ITEM_BARCODE ON CIRC_TRANSACTIONS.ITEM_ID = ITEM_BARCODE.ITEM_ID
+INNER JOIN PATRON ON CIRC_TRANSACTIONS.PATRON_ID = PATRON.PATRON_ID
+INNER JOIN PATRON_BARCODE ON PATRON.PATRON_ID = PATRON_BARCODE.PATRON_ID
+INNER JOIN ITEM ON ITEM_BARCODE.ITEM_ID = ITEM.ITEM_ID
+INNER JOIN ITEM_TYPE ON ITEM.ITEM_TYPE_ID = ITEM_TYPE.ITEM_TYPE_ID
+INNER JOIN ITEM_STATUS ON ITEM.ITEM_ID = ITEM_STATUS.ITEM_ID
+INNER JOIN ITEM_STATUS_TYPE ON ITEM_STATUS.ITEM_STATUS = ITEM_STATUS_TYPE.ITEM_STATUS_TYPE
+INNER JOIN HOLD_RECALL_ITEM_ARCHIVE ON ITEM.ITEM_ID = HOLD_RECALL_ITEM_ARCHIVE.ITEM_ID
+
+
+WHERE (ITEM_STATUS_TYPE.ITEM_STATUS_DESC = 'Hold Request'
+      AND HOLD_RECALL_item_archive.hold_recall_status_date BETWEEN TRUNC(SYSDATE - 1) AND TRUNC(SYSDATE)
+      AND (item_type.item_type_name = 'ILL'
+      OR item_type.item_type_name = 'ILL Non-renewable 2 weeks'
+      OR item_type.item_type_name = 'ILL Non-renewable 4 weeks'
+      OR item_type.item_type_name = 'ILL Non-renewable 12 weeks'
+      OR item_type.item_type_name = 'KIT')
+
+      AND HOLD_RECALL_item_archive.hold_recall_status = '3')]]>
+	</queryString>
+	<field name="ITEM_TYPE_NAME" class="java.lang.String"/>
+	<field name="PATRON_BARCODE" class="java.lang.String"/>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="DATE_CANCELLED" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="188" height="30" uuid="eb4ad199-d874-4ce2-ae1f-850d5a1e267e"/>
+				<text><![CDATA[ITEM_TYPE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="0" width="188" height="30" uuid="12683d70-f7ba-4b35-b5f4-cdfd89bbbfea"/>
+				<text><![CDATA[PATRON_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="0" width="188" height="30" uuid="42ece22f-3090-4cf1-aed9-ba183fee72c3"/>
+				<text><![CDATA[ITEM_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="564" y="0" width="188" height="30" uuid="5160f3ba-0108-4aa3-b3c2-ba17db7b1122"/>
+				<text><![CDATA[DATE_CANCELLED]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="33" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="3" width="188" height="30" uuid="d63de1e9-2b9b-4248-85b0-e730a59a4bbc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_TYPE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="3" width="188" height="30" uuid="ad15f647-b745-43bf-8547-e96c92191081">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="376" y="3" width="188" height="30" uuid="1b5e26d9-6c61-463c-9b76-562294fe1bdb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="564" y="3" width="188" height="30" uuid="a4e48a0e-67c5-4f3f-a226-ffdff33cb93e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DATE_CANCELLED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

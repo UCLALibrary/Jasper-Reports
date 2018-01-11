@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operations Page 3" pageWidth="1440" pageHeight="612" orientation="Landscape" columnWidth="1400" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" isIgnorePagination="true" uuid="71fbb320-32d8-4f68-ab4a-8cc238604646">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+      sysdate as report_run,
+      bi.bib_id,
+      ivw.barcode,
+      p.last_name,
+      p.first_name,
+      SUBSTR(pb.patron_barcode, 1, 5) AS patron_barcode,
+      ivw.enumeration,
+      ivw.perm_location,
+      ivw.gov_location,
+      vger_support.Unifix(bt.title) AS title,
+      vger_support.roy_barcode_convert(ivw.perm_location_code,ivw.barcode,ivw.call_no,ivw.enumeration) AS barcode_or_call_no,
+      hri.hold_recall_status_date,
+      hr.expire_date,
+      hr.create_opid,
+      l.location_display_name,
+      hr.patron_comment,
+      vger_support.get_other_request(ivw.item_id,hr.hold_recall_id) AS other_requestor
+FROM
+    ucladb.hold_recall hr
+    inner join ucladb.hold_recall_items hri ON hr.hold_recall_id = hri.hold_recall_id 
+    inner join ucladb.patron p ON hr.patron_id = p.patron_id
+    inner join ucladb.patron_barcode pb ON p.patron_id = pb.patron_id
+    inner join ucladb.location l ON hr.pickup_location = l.location_id
+    inner join ucladb.item_vw ivw ON hri.item_id = ivw.item_id
+    inner join ucladb.bib_item bi ON ivw.item_id = bi.item_id
+    inner join ucladb.bib_text bt ON bi.bib_id = bt.bib_id
+    inner join ucladb.item_status ist ON hri.item_id = ist.item_id
+WHERE
+     hr.expire_date >= (SYSDATE - 14)
+     AND (ist.item_status = 7)
+     AND hri.queue_position = 1
+     AND pb.barcode_status = 1
+     AND trunc(ist.item_status_date) = trunc(sysdate - 1)
+     AND l.location_code like 'cl%'
+]]>
+	</queryString>
+	<field name="REPORT_RUN" class="java.sql.Timestamp"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="BARCODE" class="java.lang.String"/>
+	<field name="LAST_NAME" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="PATRON_BARCODE" class="java.lang.String"/>
+	<field name="ENUMERATION" class="java.lang.String"/>
+	<field name="PERM_LOCATION" class="java.lang.String"/>
+	<field name="GOV_LOCATION" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="BARCODE_OR_CALL_NO" class="java.lang.String"/>
+	<field name="HOLD_RECALL_STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRE_DATE" class="java.sql.Timestamp"/>
+	<field name="CREATE_OPID" class="java.lang.String"/>
+	<field name="LOCATION_DISPLAY_NAME" class="java.lang.String"/>
+	<field name="PATRON_COMMENT" class="java.lang.String"/>
+	<field name="OTHER_REQUESTOR" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="88" height="30" uuid="fb64bd7d-b276-47a4-a1fd-58186fc5ebc6"/>
+				<text><![CDATA[REPORT RUN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="0" width="82" height="30" uuid="6d1d0abb-1584-4b3f-b38f-778cc3ce4443"/>
+				<text><![CDATA[BIB ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="0" width="82" height="30" uuid="64c99e97-f6f4-457e-b09e-715ed093dc7f"/>
+				<text><![CDATA[BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="82" height="30" uuid="66df8e44-fdc2-4093-a22a-ec23b5e73e79"/>
+				<text><![CDATA[LAST NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="334" y="0" width="82" height="30" uuid="0a608c58-4977-400e-83c0-b18a36915f09"/>
+				<text><![CDATA[FIRST NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="416" y="0" width="82" height="30" uuid="2ac2a151-f765-42c2-ba1a-4c869ed38d1d"/>
+				<text><![CDATA[PATRON BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="498" y="0" width="82" height="30" uuid="73075f2c-3dfd-4c8b-a6ac-4d4a00554e44"/>
+				<text><![CDATA[ENUMERATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="0" width="82" height="30" uuid="99b5e884-d4c4-4883-882e-36d006cc86fd"/>
+				<text><![CDATA[PERM LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="662" y="0" width="82" height="30" uuid="69cb0297-adda-41ee-848c-3c9e8c39586c"/>
+				<text><![CDATA[GOV LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="0" width="82" height="30" uuid="e210e373-a019-44ad-9f69-b5ff56ad7c1c"/>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="826" y="0" width="82" height="30" uuid="97fba2ee-3c0d-4af2-808a-cf3f22a94a55"/>
+				<text><![CDATA[BARCODE OR CALL NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="908" y="0" width="82" height="30" uuid="ae593b14-aa45-4fb0-8a47-7f2d10bfd9d5"/>
+				<text><![CDATA[HOLD/RECALL DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="990" y="0" width="82" height="30" uuid="346cd43f-fb6e-4cb4-8c5f-18518170fdd3"/>
+				<text><![CDATA[EXPIRE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1072" y="0" width="82" height="30" uuid="a4b0d0f8-15d0-459f-90dc-ab8089e205c9"/>
+				<text><![CDATA[CREATE OPID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1154" y="0" width="82" height="30" uuid="43910c23-4f6f-4910-b70a-9fbf041e3fe0"/>
+				<text><![CDATA[LOCATION NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1236" y="0" width="82" height="30" uuid="54597662-7485-42b9-a0eb-76ec77cc54d1"/>
+				<text><![CDATA[PATRON COMMENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1318" y="0" width="82" height="30" uuid="59edb1eb-aa14-45e5-bcf5-887f5be6b8d9"/>
+				<text><![CDATA[OTHER REQUESTOR]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="88" height="30" uuid="0547921d-3fc9-471a-997e-fb4323ed03c0">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{REPORT_RUN}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="88" y="0" width="82" height="30" uuid="0db2a605-bbb6-4251-a13f-0b3b9dde2664">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="0" width="82" height="30" uuid="f45ce202-a3d2-4901-a2ba-d0288497384e">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="252" y="0" width="82" height="30" uuid="dd481b31-02dd-4a55-be6f-43af1856d386">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LAST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="334" y="0" width="82" height="30" uuid="d3afaef2-f02f-4f1a-a464-750f5cd3ffb6">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="416" y="0" width="82" height="30" uuid="52a050a8-0332-4947-b380-e5f0d59879ca">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="498" y="0" width="82" height="30" uuid="4b944aa2-8c02-41e3-b41a-77eb78ba2628">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ENUMERATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="580" y="0" width="82" height="30" uuid="55073901-8f36-4e6d-95e9-987ee1a32e98">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="662" y="0" width="82" height="30" uuid="66f32183-3321-476c-8949-87c7716a9f0f">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{GOV_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="744" y="0" width="82" height="30" uuid="21f3d9f9-9519-4d8d-9197-219ce4777b34">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="826" y="0" width="82" height="30" uuid="fe8e6cae-2635-4ba6-96a0-2d266bb335e4">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE_OR_CALL_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="908" y="0" width="82" height="30" uuid="a2ecd227-52fa-4a43-b1ad-a9bea7cd79b4">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{HOLD_RECALL_STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="990" y="0" width="82" height="30" uuid="a411d33e-3738-407f-bccf-d46a3313ee9d">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EXPIRE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1072" y="0" width="82" height="30" uuid="c6b7f4f7-40f4-44c5-a873-762bccf8d81c">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CREATE_OPID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1154" y="0" width="82" height="30" uuid="82bdf07d-a8e9-4a42-889e-f57cfb3f78b5">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_DISPLAY_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1236" y="0" width="82" height="30" uuid="db2b6648-86dc-408b-ad92-052f2b080300">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_COMMENT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1318" y="0" width="82" height="30" uuid="7956fc1e-1cca-43ff-a0e4-ed811be34923">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OTHER_REQUESTOR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="231" splitType="Stretch">
+			<break>
+				<reportElement x="0" y="15" width="100" height="1" uuid="ef4d5d52-074b-4eb3-a0bc-97c66bc9074e"/>
+			</break>
+			<subreport>
+				<reportElement x="0" y="31" width="1400" height="200" uuid="a5ee45cc-48b0-400d-8e3a-940cc2caca98">
+					<property name="com.jaspersoft.studio.unit.x" value="inch"/>
+				</reportElement>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["Operations Page 4.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

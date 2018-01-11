@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Library Card Holders" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="9332358a-ef0f-469e-96fc-336bd2108a2b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Library_Card_Holders_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Library_Card_Holders"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+  p.last_name,
+  p.first_name,
+  perm_add.address_line1,
+  perm_add.address_line2,
+  perm_add.city,
+  perm_add.state_province,
+  perm_add.zip_postal,
+  perm_phone_primary.phone_number,
+  email.address_line1 email,
+  pg.patron_group_name patron_group,
+  vger_support.lws_csc.concat_stat_cats(p.patron_id) stat_cats
+from 
+  ucladb.patron p
+  inner join ucladb.PATRON_BARCODE pb on pb.patron_id = p.patron_id and pb.barcode_status = 1
+  inner join ucladb.PATRON_GROUP pg on pg.patron_group_id = pb.patron_group_id
+  inner join ucladb.PATRON_ADDRESS perm_add on perm_add.patron_id = p.patron_id and perm_add.address_type = 1
+  left outer join ucladb.PATRON_PHONE perm_phone_primary on perm_phone_primary.address_id = perm_add.address_id and perm_phone_primary.phone_type = 1
+  left outer join ucladb.PATRON_ADDRESS email on email.patron_id = p.patron_id and email.address_type = 3
+where
+  p.create_date between trunc($P{startDate})
+  and trunc($P{endDate})
+  and 
+  (
+    pg.patron_group_name = 'External 5 - UCLA Alumni'
+    or pg.patron_group_name = 'External 5 - Other'
+  )
+order by 
+  p.last_name,
+  p.first_name]]>
+	</queryString>
+	<field name="LAST_NAME" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="ADDRESS_LINE1" class="java.lang.String"/>
+	<field name="ADDRESS_LINE2" class="java.lang.String"/>
+	<field name="CITY" class="java.lang.String"/>
+	<field name="STATE_PROVINCE" class="java.lang.String"/>
+	<field name="ZIP_POSTAL" class="java.lang.String"/>
+	<field name="PHONE_NUMBER" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="PATRON_GROUP" class="java.lang.String"/>
+	<field name="STAT_CATS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="72" height="30" uuid="7d24ab12-2e62-496c-99e8-09da96bcd40d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[LAST_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="72" y="0" width="68" height="30" uuid="359f3536-8518-4f01-9cea-7f2e007900ea"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[FIRST_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="0" width="68" height="30" uuid="e28cf3ea-1c07-4870-ac72-c32e7910e751"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ADDRESS_LINE1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="208" y="0" width="68" height="30" uuid="f98f6c98-8f0a-476c-81e6-3705e69de4a6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ADDRESS_LINE2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="276" y="0" width="68" height="30" uuid="39f9a7ac-4dc0-4ed9-be89-fb79ff899475"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[CITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="344" y="0" width="68" height="30" uuid="818966b4-7631-48c9-a452-1f02a39f2a8f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[STATE_PROVINCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="412" y="0" width="68" height="30" uuid="412d06f7-8289-442a-b679-bda6a11ad6d4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ZIP_POSTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="68" height="30" uuid="e377f240-5840-4866-8839-22729cfafebf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PHONE_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="548" y="0" width="68" height="30" uuid="8115bc01-f304-4241-9153-aa3104ba6304"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[EMAIL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="616" y="0" width="68" height="30" uuid="f245f38f-5247-4c17-b868-6d3f7b90a4e5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PATRON_GROUP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="684" y="0" width="68" height="30" uuid="3953bf55-da2e-40aa-ab02-e3bdf3b11d1d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[STAT_CATS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="72" height="30" uuid="1c907b0c-8630-4498-93b0-3da9527e0eca">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LAST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="72" y="0" width="68" height="30" uuid="1dc56a5b-ad83-44da-a54e-5ccd1d7ecdfa">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="0" width="68" height="30" uuid="2ad24e6a-23cc-4139-a2eb-92715c3f2cee">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="208" y="0" width="68" height="30" uuid="d79e67f6-44d8-43e4-8477-e14dda775d67">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="276" y="0" width="68" height="30" uuid="bcc7b43c-b0ef-48d3-9c4c-00d385c48226">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CITY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="344" y="0" width="68" height="30" uuid="5215ba8c-dcec-4a12-84ff-e801dd9ae449">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{STATE_PROVINCE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="412" y="0" width="68" height="30" uuid="9f4b9570-d727-4fba-9cda-aaf2b6cdb467">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ZIP_POSTAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="480" y="0" width="68" height="30" uuid="d80d9cd0-8394-4c6c-876d-afe3e9db980d">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PHONE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="548" y="0" width="68" height="30" uuid="6336aa38-ed0d-41a7-b488-8a4f67c56053">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="616" y="0" width="68" height="30" uuid="32158319-e575-4c8a-8bdb-732bf0f28f43">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="684" y="0" width="68" height="30" uuid="7e0946c3-8bc3-42f1-9962-a8a82c10bf56">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{STAT_CATS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

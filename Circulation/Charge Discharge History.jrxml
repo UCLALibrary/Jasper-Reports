@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Charge Discharge History" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3d9f00f9-f009-417f-afbb-05760608f354">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Charge_Discharge_History_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Charge_Discharge_History"/>
+	<parameter name="BARCODE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+  cta.charge_date,
+  l_c.location_display_name AS charge_location,
+  cta.charge_oper_id,
+  NULL AS discharge_date,
+  NULL AS discharge_location,
+  NULL AS discharge_oper_id
+FROM
+  ucladb.item_barcode ib
+  INNER JOIN ucladb.circ_transactions cta ON ib.item_id = cta.item_id
+  INNER JOIN ucladb.location l_c ON cta.charge_location = l_c.location_id
+WHERE
+  ib.item_barcode = $P{BARCODE}
+UNION
+SELECT
+  cta.charge_date,
+  l_c.location_display_name AS charge_location,
+  cta.charge_oper_id,
+  cta.discharge_date,
+  l_d.location_display_name AS discharge_location,
+  cta.discharge_oper_id
+FROM
+  ucladb.item_barcode ib
+  INNER JOIN ucladb.circ_trans_archive cta ON ib.item_id = cta.item_id
+  INNER JOIN ucladb.location l_c ON cta.charge_location = l_c.location_id
+  INNER JOIN ucladb.location l_d ON cta.discharge_location = l_d.location_id
+WHERE
+  ib.item_barcode = $P{BARCODE}]]>
+	</queryString>
+	<field name="CHARGE_DATE" class="java.util.Date"/>
+	<field name="CHARGE_LOCATION" class="java.lang.String"/>
+	<field name="CHARGE_OPER_ID" class="java.lang.String"/>
+	<field name="DISCHARGE_DATE" class="java.util.Date"/>
+	<field name="DISCHARGE_LOCATION" class="java.lang.String"/>
+	<field name="DISCHARGE_OPER_ID" class="java.lang.String"/>
+	<sortField name="CHARGE_DATE" order="Descending"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="741" height="30" uuid="f80e090f-eefc-4a90-b4e5-aeef504fd246"/>
+				<textElement textAlignment="Center">
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[Item Charge/Discharge History]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="127" height="30" uuid="297184e4-ada2-4885-934c-04fdd83f0a4a"/>
+				<text><![CDATA[CHARGE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="127" y="0" width="125" height="30" uuid="6226b843-6532-4099-8a49-eb828a05b0b2"/>
+				<text><![CDATA[CHARGE LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="125" height="30" uuid="f1682a7c-99fa-4536-aa2d-9db2b5c4974c"/>
+				<text><![CDATA[CHARGE OPERATOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="0" width="125" height="30" uuid="3a56f8de-9123-4e9b-a89e-910ee51ed106"/>
+				<text><![CDATA[DISCHARGE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="125" height="30" uuid="bd101861-dbe5-4ab8-925d-2dccc0958cb5"/>
+				<text><![CDATA[DISCHARGE LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="627" y="0" width="125" height="30" uuid="2e408426-3fc8-4ea1-abc6-400dddc84178"/>
+				<text><![CDATA[DISCHARGE  OPERATOR]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="10" width="127" height="30" uuid="d614ff51-0407-4089-87f9-3576d156eaf9"/>
+				<box bottomPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{CHARGE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="130" y="10" width="125" height="30" uuid="821a01fc-816a-49ed-a745-e61829c60863"/>
+				<box bottomPadding="2" rightPadding="2">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{CHARGE_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="255" y="10" width="125" height="30" uuid="9621a638-862a-436a-9c22-afdeb38da6ed"/>
+				<box bottomPadding="2" rightPadding="2">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{CHARGE_OPER_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="380" y="10" width="125" height="30" uuid="19ff945e-16b0-452f-9ddc-d8abb5504d0b"/>
+				<box bottomPadding="2" rightPadding="2">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{DISCHARGE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="503" y="10" width="125" height="30" uuid="061dbe69-bf60-42b2-b8a2-e71fd66d6583"/>
+				<box bottomPadding="2" rightPadding="2">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{DISCHARGE_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="627" y="10" width="125" height="30" uuid="e6cda9ca-2632-4e15-98cf-65ef0eea78e3"/>
+				<box bottomPadding="2" rightPadding="2">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{DISCHARGE_OPER_ID}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

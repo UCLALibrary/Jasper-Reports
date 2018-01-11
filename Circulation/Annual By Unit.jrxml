@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Annual By Unit" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" isIgnorePagination="true" uuid="1f24dc31-2964-4828-9266-d2aa0cdbda2f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
+	<queryString language="SQL">
+		<![CDATA[WITH CHARGES_DISCHARGES AS
+(
+SELECT 
+-- CIRC_TRANS_ARCHIVE for Chargeouts
+  to_char(cta.charge_date,   'YYYY-MM') AS MONTH,
+  decode(cta.patron_group_id,   0,   'No Group',   report_group_desc) AS group_name,
+--  pg.patron_group_name as patron_group_name,
+  cpg.circ_group_name AS location,
+--  tl.location_name AS trans_location,
+--  il.location_name AS item_location,
+  decode(cta.circ_transaction_id,   NULL,   0,   vger_support.lws_csc.IS_NOT_RESERVE_CHARGE(cta.charge_location, rst.on_reserve)) AS non_reserve_chargeout,
+  decode(cta.circ_transaction_id,   NULL,   0,   vger_support.lws_csc.IS_RESERVE_CHARGE(cta.charge_location, rst.on_reserve)) AS reserve_chargeout,
+  decode(cta.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_STAFF_CHARGE(cta.charge_location)) AS staff_chargeout,
+  decode(cta.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_SELF_CHARGE(cta.charge_location)) AS self_chargeout,
+  0 AS discharge,
+  0 AS staff_renewal,
+  0 as web_renewal
+FROM ucladb.circ_trans_archive cta 
+--LEFT OUTER JOIN ucladb.location tl ON tl.location_id = cta.charge_location 
+--LEFT OUTER JOIN ucladb.item i ON i.item_id = cta.item_id 
+--LEFT OUTER JOIN ucladb.location il ON il.location_id = i.perm_location 
+LEFT OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = cta.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_patron_group_map pgm ON pg.patron_group_id = pgm.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_report_group rg ON pgm.report_group_id = rg.report_group_id 
+LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON cta.charge_location = cpl.location_id 
+LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+LEFT OUTER JOIN vger_report.ucladb_reserve_trans rst ON cta.circ_transaction_id = rst.circ_transaction_id
+ AND cta.item_id = rst.item_id
+WHERE cta.charge_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+  AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANS_ARCHIVE for Discharges
+SELECT 
+  to_char(cta.discharge_date,   'YYYY-MM') AS MONTH,
+  decode(cta.patron_group_id,   0,   'No Group',   report_group_desc) AS group_name,
+--  pg.patron_group_name as patron_group_name,
+  cpg.circ_group_name AS location,
+--  tl.location_name AS trans_location,
+--  il.location_name AS item_location,
+  0 AS non_reserve_chargeout,
+  0 AS reserve_chargeout,
+  0 AS staff_chargeout,
+  0 AS self_chargeout,
+  decode(cta.circ_transaction_id,   NULL,   0,   1) AS discharge,
+  0 AS staff_renewal,
+  0 as web_renewal
+FROM ucladb.circ_trans_archive cta 
+--LEFT OUTER JOIN ucladb.location tl ON tl.location_id = cta.discharge_location 
+--LEFT OUTER JOIN ucladb.item i ON i.item_id = cta.item_id 
+--LEFT OUTER JOIN ucladb.location il ON il.location_id = i.perm_location 
+LEFT OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = cta.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_patron_group_map pgm ON pg.patron_group_id = pgm.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_report_group rg ON pgm.report_group_id = rg.report_group_id 
+LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON cta.discharge_location = cpl.location_id 
+LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+LEFT OUTER JOIN vger_report.ucladb_reserve_trans rst ON cta.circ_transaction_id = rst.circ_transaction_id
+ AND cta.item_id = rst.item_id
+WHERE cta.discharge_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+  AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANS_ARCHIVE for Renewals
+SELECT 
+  to_char(rta.renew_date,   'YYYY-MM') AS MONTH,
+  decode(cta.patron_group_id,   0,   'No Group',   report_group_desc) AS group_name,
+--  pg.patron_group_name as patron_group_name,
+  cpg.circ_group_name AS location,
+--  tl.location_name AS trans_location,
+--  il.location_name AS item_location,
+  0 AS non_reserve_chargeout,
+  0 AS reserve_chargeout,
+  0 AS staff_chargeout,
+  0 AS self_chargeout,
+  0 AS discharge,
+  decode(rta.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_STAFF_RENEWAL(rta.renew_oper_id)) AS staff_renewal,   
+  decode(rta.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_WEB_RENEWAL(rta.renew_oper_id)) AS web_renewal
+FROM ucladb.circ_trans_archive cta 
+LEFT OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = cta.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_patron_group_map pgm ON pg.patron_group_id = pgm.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_report_group rg ON pgm.report_group_id = rg.report_group_id
+INNER JOIN ucladb.renew_trans_archive rta ON cta.circ_transaction_id = rta.circ_transaction_id 
+--LEFT OUTER JOIN ucladb.location tl ON tl.location_id = rta.renew_location 
+--LEFT OUTER JOIN ucladb.item i ON i.item_id = cta.item_id 
+--LEFT OUTER JOIN ucladb.location il ON il.location_id = i.perm_location 
+LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON rta.renew_location = cpl.location_id 
+LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+LEFT OUTER JOIN vger_report.ucladb_reserve_trans rst ON cta.circ_transaction_id = rst.circ_transaction_id
+ AND cta.item_id = rst.item_id
+WHERE rta.renew_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+  AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANSACTIONS for Chargeouts
+SELECT 
+  to_char(ct.charge_date,   'YYYY-MM') AS MONTH,
+  decode(ct.patron_group_id,   0,   'No Group',   report_group_desc) AS group_name,
+--  pg.patron_group_name as patron_group_name,
+  cpg.circ_group_name AS location,
+--  tl.location_name AS trans_location,
+--  il.location_name AS item_location,
+  decode(ct.circ_transaction_id,   NULL,   0,   vger_support.lws_csc.IS_NOT_RESERVE_CHARGE(ct.charge_location, rst.on_reserve)) AS non_reserve_chargeout,
+  decode(ct.circ_transaction_id,   NULL,   0,   vger_support.lws_csc.IS_RESERVE_CHARGE(ct.charge_location, rst.on_reserve)) AS reserve_chargeout,
+  decode(ct.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_STAFF_CHARGE(ct.charge_location)) AS staff_chargeout,
+  decode(ct.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_SELF_CHARGE(ct.charge_location)) AS self_chargeout,
+  0 AS discharge,
+  0 AS staff_renewal,
+  0 as web_renewal
+FROM ucladb.circ_transactions ct 
+--LEFT OUTER JOIN ucladb.location tl ON tl.location_id = ct.charge_location 
+--LEFT OUTER JOIN ucladb.item i ON i.item_id = ct.item_id 
+--LEFT OUTER JOIN ucladb.location il ON il.location_id = i.perm_location 
+LEFT OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = ct.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_patron_group_map pgm ON pg.patron_group_id = pgm.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_report_group rg ON pgm.report_group_id = rg.report_group_id 
+LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON ct.charge_location = cpl.location_id 
+LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+LEFT OUTER JOIN vger_report.ucladb_reserve_trans rst ON ct.circ_transaction_id = rst.circ_transaction_id
+ AND ct.item_id = rst.item_id
+WHERE ct.charge_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+  AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+
+UNION ALL
+
+-- CIRC_TRANSACTIONS for Renewals
+SELECT 
+  to_char(rt.renew_date,   'YYYY-MM') AS MONTH,
+  decode(ct.patron_group_id,   0,   'No Group',   report_group_desc) AS group_name,
+--  pg.patron_group_name as patron_group_name,
+  cpg.circ_group_name AS location,
+--  tl.location_name AS trans_location,
+--  il.location_name AS item_location,
+  0 AS non_reserve_chargeout,
+  0 AS reserve_chargeout,
+  0 AS staff_chargeout,
+  0 AS self_chargeout,
+  0 AS discharge,
+  decode(rt.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_STAFF_RENEWAL(rt.renew_oper_id)) AS staff_renewal,   
+  decode(rt.circ_transaction_id,   NULL,   0,   vger_support.LWS_CSC.IS_WEB_RENEWAL(rt.renew_oper_id)) AS web_renewal
+FROM ucladb.circ_transactions ct 
+LEFT OUTER JOIN ucladb.patron_group pg ON pg.patron_group_id = ct.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_patron_group_map pgm ON pg.patron_group_id = pgm.patron_group_id 
+LEFT OUTER JOIN vger_support.csc_report_group rg ON pgm.report_group_id = rg.report_group_id
+INNER JOIN ucladb.renew_transactions rt ON ct.circ_transaction_id = rt.circ_transaction_id 
+--LEFT OUTER JOIN ucladb.location tl ON tl.location_id = rt.renew_location 
+--LEFT OUTER JOIN ucladb.item i ON i.item_id = ct.item_id 
+--LEFT OUTER JOIN ucladb.location il ON il.location_id = i.perm_location 
+LEFT OUTER JOIN ucladb.circ_policy_locs cpl ON rt.renew_location = cpl.location_id 
+LEFT OUTER JOIN ucladb.circ_policy_group cpg ON cpl.circ_group_id = cpg.circ_group_id 
+LEFT OUTER JOIN vger_report.ucladb_reserve_trans rst ON ct.circ_transaction_id = rst.circ_transaction_id
+ AND ct.item_id = rst.item_id
+WHERE rt.renew_date BETWEEN vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE)
+  AND ADD_MONTHS(vger_support.LWS_UTILITY.PREV_FISCAL_YR_START(SYSDATE), 12)
+)
+SELECT 
+  location,
+  group_name,
+  SUM(non_reserve_chargeout) AS non_reserve_chargeout,
+  SUM(reserve_chargeout) AS reserve_chargeout,
+  SUM(discharge) AS discharge,
+  SUM(staff_renewal) AS staff_renewal,
+  SUM(web_renewal) AS web_renewal
+FROM 
+  CHARGES_DISCHARGES
+GROUP BY 
+  location,
+  group_name
+ORDER BY 
+  location,
+  group_name]]>
+	</queryString>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="GROUP_NAME" class="java.lang.String"/>
+	<field name="NON_RESERVE_CHARGEOUT" class="java.math.BigDecimal"/>
+	<field name="RESERVE_CHARGEOUT" class="java.math.BigDecimal"/>
+	<field name="DISCHARGE" class="java.math.BigDecimal"/>
+	<field name="STAFF_RENEWAL" class="java.math.BigDecimal"/>
+	<field name="WEB_RENEWAL" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="750" height="30" uuid="df49a600-c7f9-4f12-8da1-56bd610531a6">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[By Unit]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="110" height="30" uuid="fbe5ca83-79d2-4782-abe9-206be5b95a97"/>
+				<text><![CDATA[LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="0" width="107" height="30" uuid="189caccd-d431-4762-a108-7aad0f5b96f6"/>
+				<text><![CDATA[GROUP NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="217" y="0" width="107" height="30" uuid="be2e723d-a765-433b-b841-cacb47c951bf"/>
+				<text><![CDATA[NON RESERVE CHARGEOUT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="324" y="0" width="107" height="30" uuid="1f798173-7869-4455-95cd-7e8ce7188aa1"/>
+				<text><![CDATA[RESERVE CHARGEOUT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="0" width="107" height="30" uuid="a0b0475f-dc73-468a-8ff2-7b039a15de5d"/>
+				<text><![CDATA[DISCHARGE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="538" y="0" width="107" height="30" uuid="5e72b5af-4a8a-4f9c-a92c-a5f9e2ce9733"/>
+				<text><![CDATA[STAFF RENEWAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="645" y="0" width="107" height="30" uuid="71ddc414-bbc0-4f60-90a8-90abba102c34"/>
+				<text><![CDATA[WEB RENEWAL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="110" height="30" uuid="363fc783-ebb1-4863-a074-fc157fa63667">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.5F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="0" width="107" height="30" uuid="46f5a7d0-d298-4e8c-be84-04808c6098df">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.5F"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{GROUP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="0" width="107" height="30" uuid="89945537-f2c2-436c-bb96-5b8a51722869">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{NON_RESERVE_CHARGEOUT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="324" y="0" width="107" height="30" uuid="ddda85ef-9d03-4646-bdf9-9d0576b19686">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{RESERVE_CHARGEOUT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="431" y="0" width="107" height="30" uuid="99633be1-1009-461c-8eca-4f36514d49c3">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DISCHARGE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="538" y="0" width="107" height="30" uuid="9febbff3-1156-4254-88a7-e3b46c8fc4ad">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{STAFF_RENEWAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="645" y="0" width="107" height="30" uuid="9d028d0f-1d50-4832-95bf-d1e52f567bac">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{WEB_RENEWAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="225" splitType="Stretch">
+			<break>
+				<reportElement x="0" y="7" width="100" height="1" uuid="54609ff6-5a7e-46ff-8ae5-9fc46e3dfc07"/>
+			</break>
+			<subreport>
+				<reportElement x="0" y="25" width="750" height="200" uuid="3e8482d4-34bd-48c3-a689-c3fc2d9656c2">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["Annual Chargeouts.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4_1" pageWidth="235" pageHeight="1080" columnWidth="195" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="8ca5e757-2d87-4c6f-8c41-a4c6e147faeb">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Hold_Slip_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Hold_Slip"/>
+	<parameter name="p_barcode" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select 
+    '4. Title: ' || cast(vger_support.unifix(bt.title_brief) as varchar2(4000)) as field
+from 
+    ucladb.item_barcode ib
+    inner join ucladb.bib_item bi on ib.item_id = bi.item_id
+    inner join ucladb.bib_text bt on bi.bib_id = bt.bib_id
+where
+    ib.item_barcode = upper($P{p_barcode})
+union
+select 
+    '5. Item Barcode: ' || ib.item_barcode as field
+from 
+    ucladb.item_barcode ib
+where
+    ib.item_barcode = upper($P{p_barcode})
+union
+select 
+    '2. Patron Barcode: *' || substr(pb.patron_barcode,-5) as field
+from 
+    ucladb.item_barcode ib
+    inner join ucladb.hold_recall_items hri on ib.item_id = hri.item_id
+    inner join ucladb.hold_recall hr on hri.hold_recall_id = hr.hold_recall_id
+    inner join ucladb.patron_barcode pb on hr.patron_id = pb.patron_id and hr.patron_group_id = pb.patron_group_id 
+where
+    ib.item_barcode = upper($P{p_barcode})
+    and hri.queue_position = 1
+    and pb.barcode_status = 1
+union
+select 
+    '3. Hold Expires: ' || hr.expire_date as field
+from 
+    ucladb.item_barcode ib
+    inner join ucladb.hold_recall_items hri on ib.item_id = hri.item_id
+    inner join ucladb.hold_recall hr on hri.hold_recall_id = hr.hold_recall_id
+where
+    ib.item_barcode = upper($P{p_barcode})
+    and hri.queue_position = 1
+union
+select 
+    '1. Patron Name: ' || 
+    case
+        when length(p.normal_last_name) > 4 then trim(substr(p.normal_last_name,1,4)) || '*'
+        else p.normal_last_name
+    end as field
+from 
+    ucladb.item_barcode ib
+    inner join ucladb.hold_recall_items hri on ib.item_id = hri.item_id
+    inner join ucladb.hold_recall hr on hri.hold_recall_id = hr.hold_recall_id
+    inner join ucladb.patron p on hr.patron_id = p.patron_id
+where
+    ib.item_barcode = upper($P{p_barcode})
+    and hri.queue_position = 1]]>
+	</queryString>
+	<field name="FIELD" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="108" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="inch"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="200" height="30" uuid="f62c7fdc-acec-43b2-864a-86a26639426e"/>
+				<textFieldExpression><![CDATA[$F{FIELD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

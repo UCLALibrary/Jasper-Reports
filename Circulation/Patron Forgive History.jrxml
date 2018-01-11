@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Patron Forgive History" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="381d9c04-2e35-4576-a59f-1d58a04c7500">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Patron_Forgive_History_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Patron_Forgive_History"/>
+	<parameter name="Patron" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+	fft.fine_fee_id,
+	nvl(item_barcode, 'N/A') AS item_barcode,
+	nvl(display_call_no, 'N/A') AS call_no,
+	nvl(vger_support.get_latest_item_status(ff.item_id), 'N/A') AS current_status,
+	transaction_desc,
+	trans_amount/100 as trans_amount,
+	fft.operator_id,
+	trans_note,
+	trans_date
+FROM
+	ucladb.fine_fee_transactions fft
+	INNER JOIN ucladb.fine_fee_trans_type fftt ON fft.trans_type = fftt.transaction_type
+	INNER JOIN ucladb.fine_fee ff ON fft.fine_fee_id = ff.fine_fee_id
+	INNER JOIN ucladb.patron_barcode pb  ON ff.patron_id = pb.patron_id
+	LEFT OUTER JOIN ucladb.item_barcode ib ON ff.item_id = ib.item_id
+	LEFT OUTER JOIN ucladb.mfhd_item mi ON ib.item_id = mi.item_id
+	LEFT OUTER JOIN ucladb.mfhd_master mm ON mi.mfhd_id = mm.mfhd_id
+WHERE
+	upper(pb.patron_barcode) = upper($P{Patron})
+	AND fft.trans_type not in (1,5,6,7,9)]]>
+	</queryString>
+	<field name="FINE_FEE_ID" class="java.lang.Integer"/>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="CALL_NO" class="java.lang.String"/>
+	<field name="CURRENT_STATUS" class="java.lang.String"/>
+	<field name="TRANSACTION_DESC" class="java.lang.String"/>
+	<field name="TRANS_AMOUNT" class="java.lang.Float"/>
+	<field name="OPERATOR_ID" class="java.lang.String"/>
+	<field name="TRANS_NOTE" class="java.lang.String"/>
+	<field name="TRANS_DATE" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="742" height="30" uuid="faa19ead-b6c6-4a9f-9abb-e21c016ef5d3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Black" size="18"/>
+				</textElement>
+				<text><![CDATA[Patron Forgive History]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="94" height="30" uuid="2188e428-f611-4f34-bf9c-5d9c7d8898d1"/>
+				<text><![CDATA[Item]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="94" y="0" width="94" height="30" uuid="57fddd74-f8ee-4535-af3b-ded2275cbafb"/>
+				<text><![CDATA[Call #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="0" width="94" height="30" uuid="8c7f91cf-bda7-4016-80f5-f03be05aec24"/>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="94" height="30" uuid="89c814bd-d348-4e38-9d41-bf79065060d3"/>
+				<text><![CDATA[Refund Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="0" width="94" height="30" uuid="06213f9b-2213-4f5e-803e-14d2a7705d83"/>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="0" width="94" height="30" uuid="8042ff45-67b8-465f-ad85-50d5d30a9c55"/>
+				<text><![CDATA[Operator]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="564" y="0" width="94" height="30" uuid="0b30c613-6d23-4a79-bac0-6b33e0aa86ad"/>
+				<text><![CDATA[Note]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="658" y="0" width="94" height="30" uuid="76f49786-b5a9-4f97-8d4d-8050148a7a26"/>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="94" height="30" uuid="067cd760-7767-4af6-9b33-76d0999f8411">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ITEM_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="94" y="0" width="94" height="30" uuid="59fbaee9-bf2b-4fac-968e-639bff21363a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CALL_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="0" width="94" height="30" uuid="98aad25b-dc77-4c52-8c5c-50099fc2fa4c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CURRENT_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="282" y="0" width="94" height="30" uuid="140b0ed0-0999-4493-9292-9b2a95e21261">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TRANSACTION_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="376" y="0" width="94" height="30" uuid="5ae7dcc1-2733-4b3c-9252-528deb8c64e8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Justified" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{TRANS_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="470" y="0" width="94" height="30" uuid="3a017ee7-e287-400c-aa55-cbddf4aaa2d8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{OPERATOR_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="564" y="0" width="94" height="30" uuid="b182e092-6a7e-4c07-a58e-4c41d0ac9d90">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TRANS_NOTE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="658" y="0" width="94" height="30" uuid="b8c9869d-2593-4fa5-9128-e292f57ce19d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TRANS_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

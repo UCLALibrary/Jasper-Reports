@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Patron by email address" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ce419ae8-daa3-4444-b38f-e8fb61effe69">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Patron_by_email_address_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Patron_by_email_address"/>
+	<parameter name="email_address" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	p.first_name || ' ' ||  p.middle_name || ' ' ||  p.last_name AS name,
+	pa.address_line1 AS email_address,
+	pb.patron_barcode as barcode,
+	pbs.barcode_status_desc as barcode_status
+FROM 
+	patron p
+	INNER JOIN patron_address pa ON p.patron_id = pa.patron_id
+	LEFT OUTER JOIN patron_barcode pb ON p.patron_id = pb.patron_id
+	LEFT OUTER JOIN patron_barcode_status pbs ON pb.barcode_status = pbs.barcode_status_type
+WHERE 
+	pa.address_type = 3
+	AND Upper(pa.address_line1) LIKE '%' || Upper($P{email_address}) || '%'
+ORDER BY 
+	email_address, 
+	barcode_status, 
+	barcode DESC]]>
+	</queryString>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="EMAIL_ADDRESS" class="java.lang.String"/>
+	<field name="BARCODE" class="java.lang.String"/>
+	<field name="BARCODE_STATUS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="30" uuid="86e3164c-7a01-4ec0-bb2a-adcdd8c880a7">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<text><![CDATA[EMAIL_ADDRESS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="267" y="0" width="100" height="30" uuid="c0e49ee1-bc0a-4b66-b6dc-03cec2b3af14"/>
+				<text><![CDATA[NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="586" y="0" width="100" height="30" uuid="08959a1d-3b09-456e-9943-5f96e95adba4"/>
+				<text><![CDATA[BARCODE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="260" height="30" uuid="b2c20c69-d592-49fb-99ee-48bf48f22181">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name=" net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name=" net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EMAIL_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="267" y="0" width="303" height="30" uuid="afac26be-1bdd-473f-8340-ad1dcbd393bf">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name=" net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name=" net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="586" y="0" width="100" height="30" uuid="3b93d69e-d790-4857-a9b2-c9700acd54c6">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name=" net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name=" net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BARCODE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

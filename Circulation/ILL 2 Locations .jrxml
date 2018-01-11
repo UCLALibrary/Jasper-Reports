@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ILL 2 Locations " pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="b854a83b-93e1-461f-aaf9-4cab23b0dca2">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/ILL_2_Locations__files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/ILL_2_Locations_"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+ITEM_BARCODE.ITEM_BARCODE,
+PATRON_BARCODE.PATRON_BARCODE,
+CIRC_TRANSACTIONS.CHARGE_DUE_DATE AS due_date
+
+
+FROM CIRC_TRANSACTIONS
+INNER JOIN ITEM_BARCODE ON CIRC_TRANSACTIONS.ITEM_ID = ITEM_BARCODE.ITEM_ID
+INNER JOIN PATRON ON CIRC_TRANSACTIONS.PATRON_ID = PATRON.PATRON_ID
+INNER JOIN PATRON_BARCODE ON PATRON.PATRON_ID = PATRON_BARCODE.PATRON_ID
+INNER JOIN ITEM ON CIRC_TRANSACTIONS.ITEM_ID = ITEM.ITEM_ID
+INNER JOIN ITEM_TYPE ON ITEM.ITEM_TYPE_ID = ITEM_TYPE.ITEM_TYPE_ID
+
+WHERE 
+((ITEM_TYPE.ITEM_TYPE_CODE = 'illnr2' Or ITEM_TYPE.ITEM_TYPE_CODE = 'illnr4' Or ITEM_TYPE.ITEM_TYPE_CODE = 'illnr12') 
+AND PATRON_BARCODE.BARCODE_STATUS = '1'
+AND CIRC_TRANSACTIONS.CHARGE_DATE BETWEEN TRUNC(SYSDATE - 1) AND TRUNC(SYSDATE))]]>
+	</queryString>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="PATRON_BARCODE" class="java.lang.String"/>
+	<field name="DUE_DATE" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="252" height="30" uuid="3268a088-a7f1-408f-a2f5-3f0846ba7440"/>
+				<text><![CDATA[ITEM_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="250" height="30" uuid="3533e8e2-7438-4a63-a9b4-b69ba1cd5c0f"/>
+				<text><![CDATA[PATRON_BARCODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="250" height="30" uuid="e89bb38d-3b78-4af5-9b84-1e3ea65cbeb9"/>
+				<text><![CDATA[DUE_DATE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="33" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="3" width="252" height="30" uuid="d9bd5223-cda7-4014-938b-8f35bf7f9322">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="252" y="3" width="250" height="30" uuid="ec543fd6-da10-4ec0-bdf2-601c354e79bf">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="502" y="3" width="250" height="30" uuid="edfe81f3-d46b-479f-ace6-94af65c52398">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DUE_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
