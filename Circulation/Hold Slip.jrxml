@@ -27,7 +27,7 @@ where
     ib.item_barcode = upper($P{p_barcode})
 union
 select 
-    '2. Patron Barcode: *' || substr(pb.patron_barcode,-5) as field
+    '3. Patron Barcode: *' || substr(pb.patron_barcode,-5) as field
 from 
     ucladb.item_barcode ib
     inner join ucladb.hold_recall_items hri on ib.item_id = hri.item_id
@@ -39,7 +39,7 @@ where
     and pb.barcode_status = 1
 union
 select 
-    '3. Hold Expires: ' || hr.expire_date as field
+    '2. Hold Expires: ' || hr.expire_date as field
 from 
     ucladb.item_barcode ib
     inner join ucladb.hold_recall_items hri on ib.item_id = hri.item_id
@@ -72,6 +72,9 @@ where
 			<property name="com.jaspersoft.studio.unit.height" value="inch"/>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="200" height="30" uuid="f62c7fdc-acec-43b2-864a-86a26639426e"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{FIELD}]]></textFieldExpression>
 			</textField>
 		</band>
