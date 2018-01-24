@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Fund Codes with Allocations" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="2319ae6e-fa73-443f-b3f4-565b161539a7">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="fiscal_period" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+fund_code,
+fund_name,
+original_allocation,
+current_allocation,
+commitments,
+commit_pending,
+expenditures,
+expend_pending,
+cash_balance,
+free_balance,
+(free_balance - commit_pending) AS FB_Minus_CP,
+CASE current_allocation
+        WHEN 0 THEN 000000
+        ELSE (commitments+expenditures) / current_allocation * 100 END AS Percentage_Spent
+
+
+FROM UCLA_FUNDLEDGER_VW
+
+WHERE UCLA_FUNDLEDGER_VW.FUND_category = 'Allocated'
+AND ucla_FUNDLEDGER_VW.FISCAL_PERIOD_NAME = $P{fiscal_period}
+
+
+ORDER BY UCLA_FUNDLEDGER_VW.FUND_CODE]]>
+	</queryString>
+	<field name="FUND_CODE" class="java.lang.String"/>
+	<field name="FUND_NAME" class="java.lang.String"/>
+	<field name="ORIGINAL_ALLOCATION" class="java.math.BigDecimal"/>
+	<field name="CURRENT_ALLOCATION" class="java.math.BigDecimal"/>
+	<field name="COMMITMENTS" class="java.math.BigDecimal"/>
+	<field name="COMMIT_PENDING" class="java.math.BigDecimal"/>
+	<field name="EXPENDITURES" class="java.math.BigDecimal"/>
+	<field name="EXPEND_PENDING" class="java.math.BigDecimal"/>
+	<field name="CASH_BALANCE" class="java.math.BigDecimal"/>
+	<field name="FREE_BALANCE" class="java.math.BigDecimal"/>
+	<field name="FB_MINUS_CP" class="java.math.BigDecimal"/>
+	<field name="PERCENTAGE_SPENT" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="47" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="71" height="47" uuid="8536d5cf-cd64-4a44-8058-ebba44718fdf">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FUND_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="0" width="71" height="47" uuid="1e5fa169-aa4d-4a63-b241-a8b15a0d1af4">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FUND_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="142" y="0" width="70" height="47" uuid="78dbdaf0-b3a6-439a-ba53-6e0d7d9ebbab">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ORIGINAL_ALLOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="212" y="0" width="70" height="47" uuid="3b4e33a4-d049-48fb-b0ec-d3eae9902241">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CURRENT_ALLOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="70" height="47" uuid="14dfd6cf-bafa-4ccb-b0b2-0dd67f97be90">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[COMMITMENTS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="352" y="0" width="70" height="47" uuid="fba8b878-49fd-4a07-8757-edcae9253d59">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[COMMIT_PENDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="0" width="70" height="47" uuid="533ea7cd-41b1-4644-8ead-7690ff8ac9c6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[EXPENDITURES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="492" y="0" width="70" height="47" uuid="d05c6dab-9bd3-43f6-b6aa-af98b3189731">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[EXPEND_PENDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="562" y="0" width="70" height="47" uuid="d94eedaf-6f4d-4c88-b5f4-adb269e5d368">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CASH_BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="632" y="0" width="70" height="47" uuid="e466d1d5-2cf3-4b98-90c8-5c89d1559fcc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FREE_BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="702" y="0" width="70" height="47" uuid="9c4ae6a1-cda8-41ff-97fa-6c9f24068dcf">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FB_MINUS_CP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="772" y="0" width="70" height="47" uuid="3f506f08-14f6-4dba-b759-819de6514bf5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERCENTAGE_SPENT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="58" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="71" height="58" uuid="46b8faaa-066e-4342-ab93-0ff81ad693fe">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="0" width="71" height="58" uuid="6cc58f10-431d-4780-a17b-eee37295b57e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="142" y="0" width="70" height="58" uuid="d22700c1-1928-4443-828c-4faef9b5ebac">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ORIGINAL_ALLOCATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="212" y="0" width="70" height="58" uuid="118ba8c7-9a3e-4aa5-95c1-7a06e760441a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CURRENT_ALLOCATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="282" y="0" width="70" height="58" uuid="dc82a735-e5f4-44e1-86e3-fb0d79d6d76d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{COMMITMENTS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="352" y="0" width="70" height="58" uuid="0e3ecb44-01f3-4583-a00c-131f35bf42ec">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{COMMIT_PENDING}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="422" y="0" width="70" height="58" uuid="a4e59fdd-c929-409e-9dd4-49f2b86f0d18">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EXPENDITURES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="492" y="0" width="70" height="58" uuid="bf266e9f-071f-463a-b520-c8e1ebb28653">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EXPEND_PENDING}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="562" y="0" width="70" height="58" uuid="fcf702df-8cfb-44e8-8cd5-79b8ce233a75">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CASH_BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="632" y="0" width="70" height="58" uuid="d860efab-5f43-40a1-bef7-01ddd8e05913">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FREE_BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="702" y="0" width="70" height="58" uuid="abc15126-95af-4f10-bfb1-322aafccc39e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FB_MINUS_CP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="772" y="0" width="70" height="58" uuid="897a3e23-c196-47bd-b22b-277e03b1c37d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERCENTAGE_SPENT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
