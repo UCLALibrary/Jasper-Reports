@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Approved Invoices by Date" pageWidth="1224" pageHeight="595" orientation="Landscape" columnWidth="1224" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="317b1764-43f8-4519-b961-0aafbabdfb4a">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/LBS/Approved_Invoices_by_Date_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/LBS/Approved_Invoices_by_Date"/>
+	<parameter name="date_1" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+  i.invoice_id
+, i.invoice_number
+, (select ledger_name from ucladb.ledger where ledger_id = (
+    select min(ledger_id) from ucladb.invoice_funds where invoice_id = i.invoice_id)
+  ) as ledger
+, i.invoice_date
+, i.invoice_status_date as approved_date
+, i.create_opid as created_by
+, i.update_opid as updated_by
+, v.vendor_code
+, v.institution_id as vck
+, case 
+    when exists (select * from vger_support.vbbi_pac_invoice_data where invoice_id = i.invoice_id)
+    then 'Y'
+    else 'N'
+  end as to_pac
+, case
+    when vld.message is not null then message || ': ' || amount
+  end as export_message
+, vbe.error_description as reject_message
+from ucladb.invoice i
+inner join ucladb.invoice_status ist on i.invoice_status = ist.invoice_status
+inner join ucladb.vendor v on i.vendor_id = v.vendor_id
+left outer join vger_support.vbbi_log_data vld on i.invoice_id = vld.invoice_id
+left outer join vger_support.vbbi_batch_errors vbe on i.invoice_number = vbe.invoice_number
+
+where ist.invoice_status_desc = 'Approved'
+and trunc(i.invoice_status_date) = trunc($P{date_1})]]>
+	</queryString>
+	<field name="INVOICE_ID" class="java.math.BigDecimal"/>
+	<field name="INVOICE_NUMBER" class="java.lang.String"/>
+	<field name="LEDGER" class="java.lang.String"/>
+	<field name="INVOICE_DATE" class="java.sql.Timestamp"/>
+	<field name="APPROVED_DATE" class="java.sql.Timestamp"/>
+	<field name="CREATED_BY" class="java.lang.String"/>
+	<field name="UPDATED_BY" class="java.lang.String"/>
+	<field name="VENDOR_CODE" class="java.lang.String"/>
+	<field name="VCK" class="java.lang.String"/>
+	<field name="TO_PAC" class="java.lang.String"/>
+	<field name="EXPORT_MESSAGE" class="java.lang.String"/>
+	<field name="REJECT_MESSAGE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="52" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="102" height="52" uuid="92597e34-b4fe-4d09-a30a-2f8b7fe1e67f">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[INVOICE_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="102" y="0" width="102" height="52" uuid="149c87cd-7ded-4534-b62a-c85cd41a1453">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[INVOICE_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="204" y="0" width="102" height="52" uuid="0f8fe315-1d6e-43aa-85f5-9e1b230e17ae">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LEDGER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="306" y="0" width="102" height="52" uuid="c853db85-910c-4d0c-823e-d1804d8802a5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[INVOICE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="408" y="0" width="102" height="52" uuid="639db471-619b-472a-8f05-5c4c0887b1fd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[APPROVED_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="0" width="102" height="52" uuid="9809145e-102f-4020-8a18-076f8620261d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CREATED_BY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="612" y="0" width="102" height="52" uuid="13817a53-e3f3-435e-b4e2-a32964e97f99">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[UPDATED_BY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="714" y="0" width="102" height="52" uuid="a3de1d9e-5d5a-4322-8999-418c887c246a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[VENDOR_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="816" y="0" width="102" height="52" uuid="a629753a-68fa-45cf-b509-0e3a087e4c00">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[VCK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="918" y="0" width="102" height="52" uuid="516289c2-dfc4-4628-9133-54d578caffd3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[TO_PAC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1020" y="0" width="102" height="52" uuid="70636b40-69ca-49a7-acdf-cf45d8925f1c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[EXPORT_MESSAGE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1122" y="0" width="102" height="52" uuid="93f73a81-8ced-4ca7-9cc8-f52538252b5c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[REJECT_MESSAGE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="68" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="102" height="68" uuid="641c2894-51c2-43bc-8880-89c2ce495b0d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="102" y="0" width="102" height="68" uuid="3d9cfed6-e478-4fb1-a865-cd7bb81b5092">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="204" y="0" width="102" height="68" uuid="3e576aeb-4ed4-4923-ae39-deeda61aa312">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LEDGER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="306" y="0" width="102" height="68" uuid="5d09ab77-191f-4c82-b2f2-37589b9827c2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="408" y="0" width="102" height="68" uuid="a07225ec-c011-4384-a8be-6c653c015c3b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{APPROVED_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="510" y="0" width="102" height="68" uuid="767d2c6a-544a-4308-a2de-71662ff8122c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CREATED_BY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="612" y="0" width="102" height="68" uuid="031de1e4-e8a4-47e5-b175-7594855c12a3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{UPDATED_BY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="714" y="0" width="102" height="68" uuid="75031b27-5115-4661-b174-e784714f255b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{VENDOR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="816" y="0" width="102" height="68" uuid="496b0407-5faf-4a57-adaa-c7d191aaa9dc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{VCK}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="918" y="0" width="102" height="68" uuid="f6fc6846-2b53-49a9-96ee-d13888ea758f">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TO_PAC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1020" y="0" width="102" height="68" uuid="72757795-a2cd-4273-81d1-d55c808f4f82">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EXPORT_MESSAGE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1122" y="0" width="102" height="68" uuid="45c9532d-1938-40a3-8d52-3299205dbaff">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{REJECT_MESSAGE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
