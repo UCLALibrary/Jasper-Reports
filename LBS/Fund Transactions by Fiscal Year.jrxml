@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Fund Transactions by Fiscal Year" pageWidth="864" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="864" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="33b10ad1-c976-4d85-80c0-35e891b11772">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<scriptlet name="Select Fiscal Period, then Select Transaction Type" class="net.sf.jasperreports.engine.JRDefaultScriptlet"/>
+	<parameter name="fiscal_period_all" class="java.lang.String"/>
+	<parameter name="trans_type" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	u.ledger_name
+,	u.fund_name
+,	u.fund_code
+,	u.fund_category
+,	u.institution_fund_id AS fau
+,	tmp.trans_type_desc AS trans_type
+,	tmp.reference_no
+,	tmp.amount
+FROM ucla_fundledger_vw u
+INNER JOIN
+(	SELECT
+		ft.ledger_id
+	,	CASE
+			WHEN ft.statistical_fund IS NOT NULL THEN ft.statistical_fund
+			ELSE ft.fund_id
+		END AS fund_id
+	,	ftt.trans_type_desc
+	,	ft.reference_no
+	,	Sum(ft.amount) / 100 AS amount
+	FROM fund_transaction ft
+	INNER JOIN vger_support.fund_transaction_type ftt
+		ON ft.trans_type = ftt.trans_type
+	GROUP BY
+		ft.ledger_id
+	,	CASE
+			WHEN ft.statistical_fund IS NOT NULL THEN ft.statistical_fund
+			ELSE ft.fund_id
+		END
+	,	ftt.trans_type_desc
+	,	ft.reference_no
+	HAVING Sum(amount) != 0
+) tmp
+	ON u.ledger_id = tmp.ledger_id
+	AND u.fund_id = tmp.fund_id
+WHERE u.fiscal_period_name = $P{fiscal_period_all}
+-- Transaction type filter with default of ALL: optional
+and (  tmp.trans_type_desc = $P{trans_type}
+    or $P{trans_type} = 'ALL'
+)
+ORDER BY u.ledger_name, fau, trans_type]]>
+	</queryString>
+	<field name="LEDGER_NAME" class="java.lang.String"/>
+	<field name="FUND_NAME" class="java.lang.String"/>
+	<field name="FUND_CODE" class="java.lang.String"/>
+	<field name="FUND_CATEGORY" class="java.lang.String"/>
+	<field name="FAU" class="java.lang.String"/>
+	<field name="TRANS_TYPE" class="java.lang.String"/>
+	<field name="REFERENCE_NO" class="java.lang.String"/>
+	<field name="AMOUNT" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="108" height="30" uuid="b2d7208f-90e9-48e4-bc15-1cda301e6867">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LEDGER_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="108" y="0" width="108" height="30" uuid="f0fd0f78-9ae0-4777-973a-b30b5b4d417b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FUND_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="0" width="108" height="30" uuid="0c679987-0379-45b9-9fb1-72f06e471b89">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FUND_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="324" y="0" width="108" height="30" uuid="6f3f906d-50ef-4088-9971-cda22296ffd7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FUND_CATEGORY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="432" y="0" width="108" height="30" uuid="59c71b49-58b7-4c77-9800-8dd8bf0bc24d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FAU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="0" width="108" height="30" uuid="df5920d8-32c0-4e20-9231-79354c832aed">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[TRANS_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="648" y="0" width="108" height="30" uuid="b751d609-448a-4966-8a57-1b6cc32a0673">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[REFERENCE_NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="756" y="0" width="108" height="30" uuid="c27d0679-75e9-4548-9705-28a926659bcf">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[AMOUNT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="36" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="108" height="36" uuid="cea2f44a-f774-4a4d-86c0-5139fcbd0a51">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LEDGER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="108" y="0" width="108" height="36" uuid="0e3d4f26-251a-42a2-807b-7bde834b7f31">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="216" y="0" width="108" height="36" uuid="f0ad1bd8-e22f-43f9-adbd-995da4fa2ed6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="324" y="0" width="108" height="36" uuid="5fdcaed7-200b-44a3-9de1-4c229e42db48">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_CATEGORY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="432" y="0" width="108" height="36" uuid="ca3b925b-06a4-4b8f-b8dc-fe2fea64721e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FAU}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="540" y="0" width="108" height="36" uuid="39af9df0-57d7-4d2e-8e70-94365b129018">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TRANS_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="648" y="0" width="108" height="36" uuid="73dbeb75-b1ff-4af2-bd6c-9a981a6a8352">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{REFERENCE_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="756" y="0" width="108" height="36" uuid="74753279-6551-46e6-9190-0f403d124885">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
