@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Vendors Modified Yesterday" pageWidth="1152" pageHeight="595" orientation="Landscape" columnWidth="1152" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="571bab25-1d7e-42d8-8631-2e1889534673">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Vendors_Modified_Yesterday_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Vendors_Modified_Yesterday"/>
+	<queryString language="SQL">
+		<![CDATA[select
+  v.institution_id as vck
+, v.vendor_name
+, va.address_line1
+, va.address_line2
+, va.address_line3
+, va.address_line4
+, va.address_line5
+, va.city
+, va.state_province
+, va.zip_postal
+, va.country
+, to_char(trunc(sysdate) - 1, 'MON DD, YYYY') as report_date
+from vendor v
+inner join vendor_address va 
+  on v.vendor_id = va.vendor_id
+where v.institution_id is not null
+and va.payment_address = 'Y'
+-- Vendors modified yesterday only; can't figure out to default to yesterday
+-- while still allowing users to pick dates, so hard-coding for this report
+and ( (v.create_date between trunc(sysdate) - 1 and trunc(sysdate))
+  or  (v.update_date between trunc(sysdate) - 1 and trunc(sysdate))
+-- addresses have no create date
+  or  (va.modify_date between trunc(sysdate) - 1 and trunc(sysdate))
+)
+order by institution_id]]>
+	</queryString>
+	<field name="VCK" class="java.lang.String"/>
+	<field name="VENDOR_NAME" class="java.lang.String"/>
+	<field name="ADDRESS_LINE1" class="java.lang.String"/>
+	<field name="ADDRESS_LINE2" class="java.lang.String"/>
+	<field name="ADDRESS_LINE3" class="java.lang.String"/>
+	<field name="ADDRESS_LINE4" class="java.lang.String"/>
+	<field name="ADDRESS_LINE5" class="java.lang.String"/>
+	<field name="CITY" class="java.lang.String"/>
+	<field name="STATE_PROVINCE" class="java.lang.String"/>
+	<field name="ZIP_POSTAL" class="java.lang.String"/>
+	<field name="COUNTRY" class="java.lang.String"/>
+	<field name="REPORT_DATE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="42" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="96" height="42" uuid="99d32bc3-c5bb-41ac-bf95-33cee05e6adc"/>
+				<text><![CDATA[VCK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="0" width="96" height="42" uuid="de583f03-5462-4068-aa47-22d18e710b17"/>
+				<text><![CDATA[VENDOR_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="192" y="0" width="96" height="42" uuid="d8ca4401-cc46-41ff-bfaf-16f572b09bc0"/>
+				<text><![CDATA[ADDRESS_LINE1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="0" width="96" height="42" uuid="a4e847a7-c1e8-4aed-8ab2-cdd524b1ce75"/>
+				<text><![CDATA[ADDRESS_LINE2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="384" y="0" width="96" height="42" uuid="7b12f3e4-62b7-4616-aef6-8730d9414b03"/>
+				<text><![CDATA[ADDRESS_LINE3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="96" height="42" uuid="7f20e4fa-70d6-4a27-96b1-fc64f4d83616"/>
+				<text><![CDATA[ADDRESS_LINE4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="576" y="0" width="96" height="42" uuid="060fd8e8-ac5a-44c7-a1d1-a25ca06e03c4"/>
+				<text><![CDATA[ADDRESS_LINE5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="672" y="0" width="96" height="42" uuid="5043cea1-d706-4f51-8af7-ce6ba049a093"/>
+				<text><![CDATA[CITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="768" y="0" width="96" height="42" uuid="51efca07-3e92-4d94-9cd5-c1c5c5648117"/>
+				<text><![CDATA[STATE_PROVINCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="864" y="0" width="96" height="42" uuid="3bb75f1b-8c17-4deb-a958-b4308943d7c8"/>
+				<text><![CDATA[ZIP_POSTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="960" y="0" width="96" height="42" uuid="d5911135-6ae4-48f5-a4d2-7fc1ddcd1410"/>
+				<text><![CDATA[COUNTRY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1056" y="0" width="96" height="42" uuid="69c7c6ef-b42f-4244-9863-3a4a39b637c8"/>
+				<text><![CDATA[REPORT_DATE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="55" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="96" height="55" uuid="5eafc899-7094-44da-9f1f-c459bb73c924"/>
+				<textFieldExpression><![CDATA[$F{VCK}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="96" y="0" width="96" height="55" uuid="7c7309a5-78ff-405c-8171-3700d87d7999"/>
+				<textFieldExpression><![CDATA[$F{VENDOR_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="192" y="0" width="96" height="55" uuid="9ed80160-77d5-43f1-9521-caf03bcb41d6"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="288" y="0" width="96" height="55" uuid="47bbd7f1-fd8c-4c4e-8741-9e537bfb30cc"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="384" y="0" width="96" height="55" uuid="35fbdc7e-e775-48e7-9940-d7b055860685"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="0" width="96" height="55" uuid="3754516c-9e9a-48e7-a9e1-de474377e3e7"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="576" y="0" width="96" height="55" uuid="e5b3238a-e64b-4077-8b95-f7ffe20d66a9"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="672" y="0" width="96" height="55" uuid="7a0e5f86-013b-4453-9006-551f1459f4bb"/>
+				<textFieldExpression><![CDATA[$F{CITY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="768" y="0" width="96" height="55" uuid="da39bb2b-3133-4c1a-841f-d9b01366e0ec"/>
+				<textFieldExpression><![CDATA[$F{STATE_PROVINCE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="864" y="0" width="96" height="55" uuid="b3c64d82-19cd-47aa-bc04-95f82f8227fd"/>
+				<textFieldExpression><![CDATA[$F{ZIP_POSTAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="960" y="0" width="96" height="55" uuid="e978a8c2-356b-4b70-b609-e3f74f6f1e54"/>
+				<textFieldExpression><![CDATA[$F{COUNTRY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1056" y="0" width="96" height="55" uuid="afcc2427-c532-4038-ba3d-dbac3c74d65b"/>
+				<textFieldExpression><![CDATA[$F{REPORT_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
