@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice detail" pageWidth="2160" pageHeight="595" orientation="Landscape" columnWidth="2120" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="41a67e01-501e-4c83-846f-f1fe3cac6b50">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<parameter name="Date_1" class="java.sql.Date"/>
+	<parameter name="Date_2" class="java.sql.Date"/>
+	<parameter name="Unit_Code" class="java.lang.String"/>
+	<parameter name="Invoice_Status" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+  ivw.invoice_number,
+  ivw.invoice_date,
+  invw.note,
+  ilf.service_name,
+  ilf.subtype_name,
+  l.fau,
+  ilf.unit_price,
+  ilf.total_price,
+  ila.adjustment_amount,
+  decode(p.uc_community, 0, 'non-UC', 'UC') AS uc_community,
+  decode(ivw.patron_on_premises, 'Y', 'on-site', 'off-site') as patron_on_premises,
+  -- Patron name & basic address added per GHR-184257 akohler 20151118
+  p.normal_last_name || ', ' || p.normal_first_name as patron_name,
+  p.perm_address1,
+  p.perm_address2,
+  p.perm_address3,
+  p.perm_address4,
+  p.perm_address5,
+  p.perm_city,
+  p.perm_state,
+  p.perm_zip,
+  p.perm_country
+FROM 
+  invoice_owner.invoice_vw ivw
+  LEFT OUTER JOIN invoice_owner.invoice_line_full_vw ilf ON ivw.invoice_number = ilf.invoice_number 
+  LEFT OUTER JOIN invoice_owner.invoice_adjustment_vw iav ON ivw.invoice_number = iav.invoice_number
+  LEFT OUTER JOIN invoice_owner.payment_vw pvw ON ivw.invoice_number = pvw.invoice_number
+  LEFT OUTER JOIN invoice_owner.invoice_note_vw invw ON ivw.invoice_number = invw.invoice_number
+  LEFT OUTER JOIN invoice_owner.invoice_line_adjustment_vw ila ON ivw.invoice_number = ila.invoice_number
+  LEFT OUTER JOIN invoice_owner.PATRON_VW p ON ivw.patron_id = p.patron_id
+  LEFT OUTER JOIN invoice_owner.location_service_vw l ON ilf.location_service_id = l.location_service_id
+WHERE 
+  ivw.invoice_date BETWEEN trunc($P{Date_1}) and trunc($P{Date_2})  
+  AND substr(ivw.invoice_number, 1, 2) IN $P{Unit_Code}
+  AND ivw.status IN $P{Invoice_Status}
+ORDER BY 
+  ivw.invoice_number]]>
+	</queryString>
+	<field name="INVOICE_NUMBER" class="java.lang.String"/>
+	<field name="INVOICE_DATE" class="java.sql.Timestamp"/>
+	<field name="NOTE" class="java.lang.String"/>
+	<field name="SERVICE_NAME" class="java.lang.String"/>
+	<field name="SUBTYPE_NAME" class="java.lang.String"/>
+	<field name="FAU" class="java.lang.String"/>
+	<field name="UNIT_PRICE" class="java.math.BigDecimal"/>
+	<field name="TOTAL_PRICE" class="java.math.BigDecimal"/>
+	<field name="ADJUSTMENT_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="UC_COMMUNITY" class="java.lang.String"/>
+	<field name="PATRON_ON_PREMISES" class="java.lang.String"/>
+	<field name="PATRON_NAME" class="java.lang.String"/>
+	<field name="PERM_ADDRESS1" class="java.lang.String"/>
+	<field name="PERM_ADDRESS2" class="java.lang.String"/>
+	<field name="PERM_ADDRESS3" class="java.lang.String"/>
+	<field name="PERM_ADDRESS4" class="java.lang.String"/>
+	<field name="PERM_ADDRESS5" class="java.lang.String"/>
+	<field name="PERM_CITY" class="java.lang.String"/>
+	<field name="PERM_STATE" class="java.lang.String"/>
+	<field name="PERM_ZIP" class="java.lang.String"/>
+	<field name="PERM_COUNTRY" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="101" height="61" uuid="8a6f2f8e-0ee1-4b47-b70c-033dbb7391ca">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[INVOICE_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="0" width="101" height="61" uuid="56184902-7be7-45b0-a83d-8b5a814e8dc7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[INVOICE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="202" y="0" width="101" height="61" uuid="39f408f5-37ba-4df7-9043-b45ab40116e2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[NOTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="303" y="0" width="101" height="61" uuid="cff24755-bbbb-4b19-83af-84cc7e352cb3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[SERVICE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="0" width="101" height="61" uuid="bc1de3df-4430-4386-9223-262f7d3a4217">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[SUBTYPE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="505" y="0" width="101" height="61" uuid="f8624450-efd9-46d2-a8db-e9c172f079cc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FAU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="606" y="0" width="101" height="61" uuid="7924015c-209b-4694-a1c9-e40e8647daaa">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[UNIT_PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="707" y="0" width="101" height="61" uuid="c3fe029d-2372-4fe1-a43e-b26e54a09be3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[TOTAL_PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="808" y="0" width="101" height="61" uuid="0cbd51d7-d99f-4c22-9a1f-9627a6d9751c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ADJUSTMENT_AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="909" y="0" width="101" height="61" uuid="d3d92fe3-c6da-4878-a398-3423bab106b0">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[UC_COMMUNITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1010" y="0" width="101" height="61" uuid="d124480b-8e77-46b2-9f0a-2459da2af0c2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PATRON_ON_PREMISES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1111" y="0" width="101" height="61" uuid="5013ec44-d986-4226-bb63-d832d1549c36">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PATRON_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1212" y="0" width="101" height="61" uuid="e9e38e78-35c2-4150-bc24-c008307ad659">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_ADDRESS1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1313" y="0" width="101" height="61" uuid="3f0acb3b-9ce0-4bc5-bbf9-3c84a817ae66">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_ADDRESS2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1414" y="0" width="101" height="61" uuid="c842beca-b8f5-4e5c-979b-1d1c41226df1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_ADDRESS3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1515" y="0" width="101" height="61" uuid="5036a73c-75b4-4696-a6d6-7d81c86d6b2d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_ADDRESS4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1616" y="0" width="101" height="61" uuid="e2a1c2bd-fc1e-49cf-ba26-c298efb2ebe6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_ADDRESS5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1717" y="0" width="101" height="61" uuid="8f4d0750-bb97-45f8-b0cb-a84715372b7b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_CITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1818" y="0" width="101" height="61" uuid="23d04d3a-c546-48f7-aa20-d117944c2997">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_STATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1919" y="0" width="101" height="61" uuid="de0aecec-58ee-48b1-acf7-168224685d4c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_ZIP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2020" y="0" width="100" height="61" uuid="b7d234e7-9b20-4af1-9f31-d5d37ac11462">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PERM_COUNTRY]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="101" height="125" uuid="8359be1a-3728-441b-88f4-f3e61f32bad6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="101" y="0" width="101" height="125" uuid="bd29ce96-8eeb-4a71-b637-92192e1dfc9c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="202" y="0" width="101" height="125" uuid="85b083b7-3de6-4070-9771-01c1fb6eb3d6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{NOTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="0" width="101" height="125" uuid="5bd4997f-d1d3-4d8f-a8f5-e7aa96d9c211">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SERVICE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="404" y="0" width="101" height="125" uuid="40b5fb40-4bd1-427a-9690-9c0e6a9583ed">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SUBTYPE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="505" y="0" width="101" height="125" uuid="ac08be83-51cf-473b-bea6-82341012e721">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FAU}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="606" y="0" width="101" height="125" uuid="20651210-df5e-43f1-80d3-7d1630294645">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{UNIT_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="707" y="0" width="101" height="125" uuid="ff634d81-e3c1-49d9-9a3e-bb1574058b9c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="808" y="0" width="101" height="125" uuid="98f2b021-27f2-4413-ab82-fff07544d648">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ADJUSTMENT_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="909" y="0" width="101" height="125" uuid="ffdca986-50c3-4816-9832-c003f24e6b56">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{UC_COMMUNITY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1010" y="0" width="101" height="125" uuid="37ad651a-b996-433d-90d0-51790c545f4a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_ON_PREMISES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1111" y="0" width="101" height="125" uuid="ff35ffb9-a3fb-4f4a-a5c6-2be2000a59db">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1212" y="0" width="101" height="125" uuid="750ed6a5-2b27-4c83-9bce-08056ccea828">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_ADDRESS1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1313" y="0" width="101" height="125" uuid="34d8195d-a9df-4a21-9eb5-f146f25d5667">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_ADDRESS2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1414" y="0" width="101" height="125" uuid="98641c81-723c-42ba-9490-0d7d75b8a996">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_ADDRESS3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1515" y="0" width="101" height="125" uuid="03799316-3e27-4600-ab86-fd8297fe69b1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_ADDRESS4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1616" y="0" width="101" height="125" uuid="3899a2c3-18c3-4200-9cdf-6f0f340c1c63">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_ADDRESS5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1717" y="0" width="101" height="125" uuid="c9194968-86fb-45c2-943c-0d3ecd181e18">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_CITY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1818" y="0" width="101" height="125" uuid="b06c222c-e34f-4bd8-9527-74e754147f51">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_STATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1919" y="0" width="101" height="125" uuid="bc046354-da79-4cc6-9a44-79dfdb0a4d99">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_ZIP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2020" y="0" width="100" height="125" uuid="f5e9feec-04f2-4e86-8dc8-fb8281512c4c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PERM_COUNTRY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
