@@ -18,14 +18,28 @@
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/LBS/LBS_Invoice_Report"/>
 	<parameter name="p_ledger_name" class="java.lang.String"/>
 	<parameter name="p_fund_code" class="java.lang.String"/>
-	<parameter name="p_status" class="java.lang.String"/>
+	<parameter name="p_invoice_status" class="java.util.Collection"/>
 	<parameter name="p_operator_id" class="java.lang.String"/>
 	<parameter name="p_start_date" class="java.sql.Date"/>
 	<parameter name="p_end_date" class="java.sql.Date"/>
 	<queryString language="SQL">
-		<![CDATA[with invoices as (
+		<![CDATA[with invoice_pre_filter as (
   select
-    i.*
+    i.invoice_id
+  , i.create_opid
+  , i.update_opid
+  , i.invoice_number
+  , i.voucher_number
+  , i.invoice_date
+  , i.invoice_total
+  , i.total AS system_total -- always same as invoice_total on approved invoices
+  -- Later we'll query against invoice_status_date for Approved, invoice_update_date for Pending/Both
+  , case 
+      when ist.invoice_status_desc = 'Approved'
+      then i.invoice_status_date
+      else i.invoice_update_date
+    end as invoice_status_date
+  , i.conversion_rate
   , ist.invoice_status_desc as invoice_status_desc
   , v.vendor_name
   , v.institution_id as vck
@@ -33,26 +47,16 @@
   inner join invoice_status ist on i.invoice_status = ist.invoice_status
   inner join vendor v on i.vendor_id = v.vendor_id
   where i.vendor_id != 0 -- filter out "ghost" invoices started but never really created
- 
-   and ( ('BOTH' = $P{p_status} and ist.invoice_status_desc in ('Pending', 'Approved'))
-          or  (ist.invoice_status_desc = $P{p_status})
-  )
-           -- Use invoice_status_date for Approved, invoice_update_date for Pending/Both
-  and (
-          (     (ist.invoice_status_desc = $P{p_status} and $P{p_status} = 'Approved')
-            and i.invoice_status_date between trunc($P{p_start_date}) and trunc($P{p_end_date})
-          )
-      or
-          (     (ist.invoice_status_desc = $P{p_status} and $P{p_status} = 'Pending')
-            and i.invoice_update_date between trunc($P{p_start_date}) and trunc($P{p_end_date})
-          )
-      or
-          (     (ist.invoice_status_desc in ('Pending', 'Approved') and $P{p_status} = 'BOTH')
-            and i.invoice_update_date between trunc($P{p_start_date}) and trunc($P{p_end_date})
-          )
-      )
-      AND (i.update_opid = $P{p_operator_id} or $P{p_operator_id} is null)
-   
+  and ist.invoice_status_desc in ('Pending', 'Approved')
+)
+, invoices as (
+  select
+    *
+  from invoice_pre_filter
+  -- Apply first batch of parameters from report
+  where (update_opid = $P{p_operator_id} or $P{p_operator_id} is null)
+  and $X{IN, invoice_status_desc, p_invoice_status}
+  and invoice_status_date between trunc($P{p_start_date}) and trunc($P{p_end_date})
 )
 , alldata as (
   select
@@ -81,7 +85,7 @@
     , i.voucher_number
     , i.invoice_date
     , i.invoice_total
-    , i.total AS system_total -- always same as invoice_total on approved invoices
+    , i.system_total -- always same as invoice_total on approved invoices
     , i.invoice_status_desc
     , i.invoice_status_date
     , i.conversion_rate
@@ -113,7 +117,7 @@
     , i.voucher_number
     , i.invoice_date
     , i.invoice_total
-    , i.total AS system_total -- always same as invoice_total on approved invoices
+    , i.system_total -- always same as invoice_total on approved invoices
     , i.invoice_status_desc
     , i.invoice_status_date
     , i.conversion_rate
@@ -145,12 +149,12 @@ from alldata
 where invoice_id in (
     select distinct invoice_id
     from alldata
-    where  (fund_code = $P{p_fund_code} or $P{p_fund_code} IS NULL)
-     and (ledger_name = $P{p_ledger_name} or $P{p_ledger_name} IS NULL)
-    
+    where  (fund_code = $P{p_fund_code} or $P{p_fund_code} is null)
+    and (ledger_name = $P{p_ledger_name} or $P{p_ledger_name} is null)    
 )
 group by invoice_status, invoice_status_date, voucher_number, invoice_number, invoice_date, create_opid, vendor_name, vck, ledger_name, fund_code, fau
-order by invoice_status desc, voucher_number, invoice_number, ledger_name, fund_code]]>
+order by invoice_status desc, voucher_number, invoice_number, ledger_name, fund_code
+]]>
 	</queryString>
 	<field name="INVOICE_STATUS" class="java.lang.String"/>
 	<field name="INVOICE_STATUS_DATE" class="java.sql.Timestamp"/>
