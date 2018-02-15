@@ -16,7 +16,7 @@
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/LBS/LBS_Invoice_Report_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/LBS/LBS_Invoice_Report"/>
-	<parameter name="p_ledger_name" class="java.lang.String"/>
+	<parameter name="p_ledger_name" class="java.util.Collection"/>
 	<parameter name="p_fund_code" class="java.lang.String"/>
 	<parameter name="p_invoice_status" class="java.util.Collection"/>
 	<parameter name="p_operator_id" class="java.lang.String"/>
@@ -150,11 +150,10 @@ where invoice_id in (
     select distinct invoice_id
     from alldata
     where  (fund_code = $P{p_fund_code} or $P{p_fund_code} is null)
-    and (ledger_name = $P{p_ledger_name} or $P{p_ledger_name} is null)    
+    and $X{IN, ledger_name, p_ledger_name}
 )
 group by invoice_status, invoice_status_date, voucher_number, invoice_number, invoice_date, create_opid, vendor_name, vck, ledger_name, fund_code, fau
-order by invoice_status desc, voucher_number, invoice_number, ledger_name, fund_code
-]]>
+order by invoice_status desc, voucher_number, invoice_number, ledger_name, fund_code]]>
 	</queryString>
 	<field name="INVOICE_STATUS" class="java.lang.String"/>
 	<field name="INVOICE_STATUS_DATE" class="java.sql.Timestamp"/>
