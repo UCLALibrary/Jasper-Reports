@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Canceled Orders" pageWidth="1440" pageHeight="595" orientation="Landscape" columnWidth="1440" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" isIgnorePagination="true" uuid="c4c84499-7298-4758-9b74-dcf0af4c455b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<parameter name="select_ledger_name_all" class="java.lang.String"/>
+	<parameter name="select_date_1" class="java.sql.Date"/>
+	<parameter name="select_date_2" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[with canceled_pos as (
+  select
+    po.po_id
+  , po.po_number
+  , po.po_approve_date as order_date
+  , po.po_status_date as cancel_date
+  , po.currency_code
+  , po.conversion_rate
+  , po.vendor_id
+  , po.order_location
+  from ucladb.purchase_order po
+  inner join ucladb.po_status pos on po.po_status = pos.po_status
+  where pos.po_status_desc = 'Canceled'
+  and (po.po_status_date BETWEEN trunc($P{select_date_1}) and trunc($P{select_date_2})  
+  )
+)
+select
+  cpo.po_number
+, v.vendor_name
+, li.bib_id
+, l.location_name as order_loc
+, cpo.order_date
+, cpo.cancel_date
+, f.fund_code
+, ucladb.tobasecurrency(lif.amount, cpo.currency_code, cpo.conversion_rate) as usd_amount
+, pon.note as po_note
+, bt.author as author
+, bt.title_brief as title
+, bt.edition as edition
+, bt.publisher as publisher
+, coalesce(bt.isbn, bt.issn) as isbn_issn
+from canceled_pos cpo
+inner join ucladb.vendor v on cpo.vendor_id = v.vendor_id
+inner join ucladb.location l on cpo.order_location = l.location_id
+inner join ucladb.line_item li on cpo.po_id = li.po_id
+inner join ucladb.line_item_copy_status lics on li.line_item_id = lics.line_item_id
+inner join ucladb.line_item_funds lif on lics.copy_id = lif.copy_id
+inner join ucladb.ucla_fundledger_vw f on lif.ledger_id = f.ledger_id and lif.fund_id = f.fund_id
+inner join ucladb.bib_text bt on li.bib_id = bt.bib_id
+left outer join ucladb.po_notes pon on cpo.po_id = pon.po_id
+where f.ledger_name = $P{select_ledger_name_all}>
+	</queryString>
+	<field name="PO_NUMBER" class="java.lang.String"/>
+	<field name="VENDOR_NAME" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="ORDER_LOC" class="java.lang.String"/>
+	<field name="ORDER_DATE" class="java.sql.Timestamp"/>
+	<field name="CANCEL_DATE" class="java.sql.Timestamp"/>
+	<field name="FUND_CODE" class="java.lang.String"/>
+	<field name="USD_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="PO_NOTE" class="java.lang.String"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="EDITION" class="java.lang.String"/>
+	<field name="PUBLISHER" class="java.lang.String"/>
+	<field name="ISBN_ISSN" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="28" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="103" height="28" uuid="9ebe2649-784a-4c4b-a0f4-64b68751ab1c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PO_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="103" y="0" width="103" height="28" uuid="4dd55483-951b-485e-8787-8a001c6e8f58">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[VENDOR_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="206" y="0" width="103" height="28" uuid="4634f94b-e0a3-4d47-9e23-af80a6438edb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="309" y="0" width="103" height="28" uuid="ca65f284-0d6e-4244-8cfc-815362d73043">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ORDER_LOC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="412" y="0" width="103" height="28" uuid="c2470cce-1859-43f5-aec6-8d0f2ada87f7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ORDER_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="515" y="0" width="103" height="28" uuid="62a499dc-ebc4-4598-a09a-4de208329ce5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CANCEL_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="618" y="0" width="103" height="28" uuid="b25d0579-86b6-44d6-9494-47e98891fd17">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[FUND_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="721" y="0" width="103" height="28" uuid="603d2fd8-6409-49c6-93fa-c25648c7f329">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[USD_AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="824" y="0" width="103" height="28" uuid="6132c4fc-d145-48e5-b8d7-83c716308cfc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PO_NOTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="927" y="0" width="103" height="28" uuid="ac94f34d-8a99-49f3-a328-5994ce0ab476">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1030" y="0" width="103" height="28" uuid="9fe94f5e-e27e-4586-98ac-aafe424aae88">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1133" y="0" width="103" height="28" uuid="304a15ec-7545-4f0d-9224-aa5cab1d9807">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[EDITION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1236" y="0" width="102" height="28" uuid="f98b6655-4d9d-4300-a1e7-a4a9b6558d69">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PUBLISHER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1338" y="0" width="102" height="28" uuid="06d8c38e-ebdf-409f-9983-2157793d29fd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ISBN_ISSN]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="35" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="103" height="35" uuid="af518153-69d5-4610-a3dd-d95702bb5a83">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PO_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="0" width="103" height="35" uuid="c054c40d-40c6-4033-a8ca-0a3e569e9207">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{VENDOR_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="206" y="0" width="103" height="35" uuid="f3edd1a4-2e4f-4695-9f63-145bfe5ebc0c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="309" y="0" width="103" height="35" uuid="b13bd029-9167-415f-a90e-af097c4d4b71">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ORDER_LOC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="412" y="0" width="103" height="35" uuid="7a22edd4-fcb3-47f5-96a2-60c36cd620f5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ORDER_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="515" y="0" width="103" height="35" uuid="7df36569-4658-41d3-962f-9f203143257c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CANCEL_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="618" y="0" width="103" height="35" uuid="e3cdb78a-4630-46b9-a805-01d826b368bf">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="721" y="0" width="103" height="35" uuid="6401f313-bc05-4431-bbb6-4f52474113cf">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{USD_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="824" y="0" width="103" height="35" uuid="6d43669d-5415-4811-97c4-ea1b8a887710">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PO_NOTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="927" y="0" width="103" height="35" uuid="9497d262-9178-4732-90fa-2337c4f321b9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1030" y="0" width="103" height="35" uuid="ca482ca3-8644-469f-814b-ff3a6f521e6b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1133" y="0" width="103" height="35" uuid="c38b929b-0e81-4122-b693-93f74384983c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EDITION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1236" y="0" width="102" height="35" uuid="c1bb6c27-9032-484f-a5c8-3a3abda8a85c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PUBLISHER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1338" y="0" width="102" height="35" uuid="8c909c0f-f0ca-4b14-8848-b6161f6fc4aa">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ISBN_ISSN}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

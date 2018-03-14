@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Vendor Count Firm Orders PO + Line Items by Date with Costs" pageWidth="720" pageHeight="595" orientation="Landscape" columnWidth="720" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="04b25ba7-7a4b-4718-8503-a1f93abd4f96">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Vendor_Count_Firm_Orders_PO___Line_Items_by_Date_with_Costs_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Vendor_Count_Firm_Orders_PO___Line_Items_by_Date_with_Costs"/>
+	<parameter name="date_1" class="java.sql.Date"/>
+	<parameter name="date_2" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+v.vendor_name
+--l.location_name
+, Count (DISTINCT po.po_id) AS purchase_orders
+, Count(li.line_item_id) AS line_items
+, Sum(li.line_price/100) AS cost
+
+FROM purchase_order po
+INNER JOIN location l ON po.order_location = l.location_id
+INNER JOIN po_type pt ON po.po_type = pt.po_type
+INNER JOIN po_status ps ON po.po_status = ps.po_status
+INNER JOIN line_item li ON po.po_id = li.po_id
+INNER JOIN line_item_copy_status lics ON li.line_item_id = lics.line_item_id
+inner join vendor v ON v.vendor_id = po.vendor_id
+
+WHERE pt.po_type_desc = 'Firm Order'
+AND (po.po_number NOT LIKE 'DCS%'  OR po.po_number NOT LIKE 'CDL%')
+AND (ps.po_status_desc = 'Received Complete'  OR ps.po_status_desc = 'Received Partial')
+AND li.create_DATE BETWEEN trunc($P{date_1}) and trunc($P{date_2})
+AND (po.order_location = '550' OR po.order_location = '348' OR  po.order_location = '247')
+
+
+GROUP BY
+--BY l.location_name
+v.vendor_name]]>
+	</queryString>
+	<field name="VENDOR_NAME" class="java.lang.String"/>
+	<field name="PURCHASE_ORDERS" class="java.math.BigDecimal"/>
+	<field name="LINE_ITEMS" class="java.math.BigDecimal"/>
+	<field name="COST" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="40" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="180" height="40" uuid="a5140bf1-50b3-4b28-a03e-2e87f630236b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[VENDOR_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="180" height="40" uuid="ce4728e6-b5fb-4b38-be37-b07db206dc8c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PURCHASE_ORDERS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="0" width="180" height="40" uuid="c300a2d3-234e-42a7-b6a9-1883881fcd1c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LINE_ITEMS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="0" width="180" height="40" uuid="852646e2-8d30-404c-82d1-93847c24f52c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[COST]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="180" height="40" uuid="40498687-a6a8-49b6-9d16-a16b633a5f9b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{VENDOR_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="0" width="180" height="40" uuid="fadd8619-c64b-454f-acd8-b2bd3614a1d2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PURCHASE_ORDERS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="360" y="0" width="180" height="40" uuid="a9973131-1ce1-4c7b-90fd-dd3042d4a210">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LINE_ITEMS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="540" y="0" width="180" height="40" uuid="842bc7cb-aae7-4164-a9d1-e850586bff67">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{COST}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

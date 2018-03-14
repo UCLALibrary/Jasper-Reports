@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="grid2" pageWidth="792" pageHeight="1224" orientation="Landscape" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c475016a-cf95-4eaf-bd0e-e12422434a69">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+ledger_name,
+FUND_NAME,
+--ORIGINAL_ALLOCATION,
+CURRENT_ALLOCATION,
+EXPENDITURES,
+EXPEND_PENDING,
+COMMITMENTS,
+--COMMIT_PENDING,
+CASH_BALANCE,
+free_balance,
+--free_balance - commit_pending AS FreeBalMINUSComPen,
+CASE current_allocation
+        WHEN 0 THEN 0
+        ELSE (expend_pending+expenditures) / current_allocation * 100 END
+        AS Percentage_Spent
+
+FROM (
+
+SELECT
+ledger_name,
+FUND_NAME,
+ORIGINAL_ALLOCATION,
+CURRENT_ALLOCATION,
+EXPENDITURES,
+EXPEND_PENDING,
+COMMITMENTS,
+COMMIT_PENDING,
+CASH_BALANCE,
+free_balance,
+free_balance - commit_pending AS FreeBalMINUSComPen,
+CASE current_allocation
+        WHEN 0 THEN 0
+        ELSE (expend_pending+expenditures) / current_allocation * 100 END
+        AS Percentage_Spent,
+
+1 AS sorter
+
+FROM FUNDLEDGER_VW
+
+WHERE FISCAL_PERIOD_NAME = '2017-2018'
+
+AND (ledger_name = 'ARTS 17-18'
+ OR ledger_name = 'BIOMED 17-18'
+ --OR ledger_name = 'GENERAL ACQUISITIONS 17-18'
+ OR ledger_name = 'CRIS 17-18'
+ OR ledger_name = 'POWELL 17-18'
+ OR ledger_name = 'EAST ASIAN 17-18'
+ OR  ledger_name = 'IS 17-18'
+ OR ledger_name = 'MANAGEMENT 17-18'
+ OR ledger_name = 'MUSIC 17-18'
+ OR ledger_name = 'SSH 17-18'
+ OR ledger_name = 'SEL 17-18'
+ OR ledger_name = 'SPECIAL COLLECTIONS 17-18'
+ --OR ledger_name = 'SSHA ACQUISITIONS 17-18'
+ OR ledger_name = 'COLLECTIONS MANAGEMENT 17-18')
+
+ AND FUND_CATEGORY = 'Summary'
+ AND FUND_name = 'Ledger Summary'
+
+
+UNION ALL
+
+SELECT
+ledger_name,
+FUND_NAME,
+ORIGINAL_ALLOCATION,
+CURRENT_ALLOCATION,
+EXPENDITURES,
+EXPEND_PENDING,
+COMMITMENTS,
+COMMIT_PENDING,
+CASH_BALANCE,
+free_balance,
+free_balance - fundledger_vw.commit_pending AS FreeBalMINUSComPen,
+CASE current_allocation
+        WHEN 0 THEN 0
+        ELSE (FUNDLEDGER_VW.expend_pending+FUNDLEDGER_VW.expenditures) / FUNDLEDGER_VW.current_allocation * 100 END
+        AS Percentage_Spent,
+
+
+3 AS sorter
+
+FROM FUNDLEDGER_VW
+
+WHERE FUNDLEDGER_VW.FISCAL_PERIOD_NAME = '2017-2018'
+
+
+
+ AND (FUNDLEDGER_VW.fund_name Like 'AUL Patron Driven Acq%' 
+    OR  FUNDLEDGER_VW.fund_name like 'AUL PDA Digital%'
+    OR  FUNDLEDGER_VW.fund_name LIKE 'AUL ACMI%OER%'
+    OR  FUNDLEDGER_VW.fund_name LIKE 'I% Digital Ephemera%')
+
+
+
+UNION ALL
+
+SELECT
+FUNDLEDGER_VW.ledger_name,
+FUNDLEDGER_VW.FUND_NAME,
+FUNDLEDGER_VW.ORIGINAL_ALLOCATION,
+FUNDLEDGER_VW.CURRENT_ALLOCATION,
+FUNDLEDGER_VW.EXPENDITURES,
+FUNDLEDGER_VW.EXPEND_PENDING,
+FUNDLEDGER_VW.COMMITMENTS,
+FUNDLEDGER_VW.COMMIT_PENDING,
+FUNDLEDGER_VW.CASH_BALANCE,
+fundledger_vw.free_balance,
+fundledger_vw.free_balance - fundledger_vw.commit_pending AS FreeBalMINUSComPen,
+CASE current_allocation
+        WHEN 0 THEN 0
+        ELSE (FUNDLEDGER_VW.expend_pending+FUNDLEDGER_VW.expenditures) / FUNDLEDGER_VW.current_allocation * 100 END
+        AS Percentage_Spent,
+
+2 AS sorter
+
+
+FROM FUNDLEDGER_VW
+
+WHERE FUNDLEDGER_VW.FISCAL_PERIOD_NAME = '2017-2018'
+    AND FUNDLEDGER_VW.ledger_name = 'AUL COLLECTIONS 17-18'
+
+
+ AND 
+     -- (FUNDLEDGER_VW.fund_name LIKE 'AUL ACMI%OER%'
+ -- Or FUNDLEDGER_VW.fund_name LIKE 'I% Digital Ephemera%'
+   (FUNDLEDGER_VW.fund_name Like 'AUL Discretionary%'
+  OR FUNDLEDGER_VW.fund_name Like 'Barter Exchange%'
+  Or FUNDLEDGER_VW.fund_name Like 'Bindery%'
+  Or FUNDLEDGER_VW.fund_name LIKE 'AUL CDL Resources%'
+  Or FUNDLEDGER_VW.fund_name LIKE 'Collection Mgmt Support%'
+  Or FUNDLEDGER_VW.fund_name LIKE 'Preservation%'
+  --Or FUNDLEDGER_VW.fund_name Like 'Digital Resources%'
+  OR FUNDLEDGER_VW.fund_name Like 'ILL%'
+  OR FUNDLEDGER_VW.fund_name Like 'YRL Grad Reserve%')
+
+
+ AND FUNDLEDGER_VW.FUND_CATEGORY = 'Summary'
+
+
+) temp
+
+ORDER BY sorter, ledger_name]]>
+	</queryString>
+	<field name="LEDGER_NAME" class="java.lang.String"/>
+	<field name="FUND_NAME" class="java.lang.String"/>
+	<field name="CURRENT_ALLOCATION" class="java.math.BigDecimal"/>
+	<field name="EXPENDITURES" class="java.math.BigDecimal"/>
+	<field name="EXPEND_PENDING" class="java.math.BigDecimal"/>
+	<field name="COMMITMENTS" class="java.math.BigDecimal"/>
+	<field name="CASH_BALANCE" class="java.math.BigDecimal"/>
+	<field name="FREE_BALANCE" class="java.math.BigDecimal"/>
+	<field name="PERCENTAGE_SPENT" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="0" width="88" height="33" uuid="9e5e7402-0aaf-4187-bf7c-ba74f04ca5e1"/>
+				<text><![CDATA[LEDGER_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="88" y="0" width="88" height="33" uuid="dd2b9d95-1d45-4b6e-833e-8bac43b6cf11"/>
+				<text><![CDATA[FUND_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="176" y="0" width="88" height="33" uuid="6f13f441-1b2c-4b59-8bae-10936567f2bc"/>
+				<text><![CDATA[CURRENT_ALLOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="264" y="0" width="88" height="33" uuid="89698fee-4e89-492a-a279-968092ad6427"/>
+				<text><![CDATA[EXPENDITURES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="352" y="0" width="88" height="33" uuid="81d761cb-8806-4bd1-9841-fffadfa3f5ca"/>
+				<text><![CDATA[EXPEND_PENDING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="440" y="0" width="88" height="33" uuid="a3a1546d-60e5-4a24-a1ea-1d6f0e0a94f7"/>
+				<text><![CDATA[COMMITMENTS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="528" y="0" width="88" height="33" uuid="1d1d926d-c76a-4b06-858f-70b4b1ac6758"/>
+				<text><![CDATA[CASH_BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="616" y="0" width="88" height="33" uuid="55589af9-9e8c-4052-ad5b-30ebae2c309f"/>
+				<text><![CDATA[FREE_BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="704" y="0" width="88" height="33" uuid="dbd74d21-c373-4780-975c-92681517006f"/>
+				<text><![CDATA[PERCENTAGE_SPENT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="43" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="88" height="43" uuid="93ef701a-4d55-4316-994f-6c086b0bbb69"/>
+				<textFieldExpression><![CDATA[$F{LEDGER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="88" y="0" width="88" height="43" uuid="8eae93a8-e557-45ef-a3c2-5319ada2ed10"/>
+				<textFieldExpression><![CDATA[$F{FUND_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="176" y="0" width="88" height="43" uuid="62612e97-0ddc-4648-8d90-b06e753f4e0c"/>
+				<textFieldExpression><![CDATA[$F{CURRENT_ALLOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="264" y="0" width="88" height="43" uuid="216f8c4f-ea4d-4d19-9641-9ba8ba6e14c4"/>
+				<textFieldExpression><![CDATA[$F{EXPENDITURES}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="352" y="0" width="88" height="43" uuid="de7bec19-30f2-4706-9b71-5ce190b352b7"/>
+				<textFieldExpression><![CDATA[$F{EXPEND_PENDING}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="440" y="0" width="88" height="43" uuid="07737943-05b0-420b-8f88-ce36ac433936"/>
+				<textFieldExpression><![CDATA[$F{COMMITMENTS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="528" y="0" width="88" height="43" uuid="450fe952-1b05-45d9-91b8-032b8e3e482a"/>
+				<textFieldExpression><![CDATA[$F{CASH_BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="616" y="0" width="88" height="43" uuid="2bb8df4e-ed15-47a5-835a-d7224a166c7e"/>
+				<textFieldExpression><![CDATA[$F{FREE_BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="704" y="0" width="88" height="43" uuid="7f6cbc45-0df5-4232-8837-9179546f0732"/>
+				<textFieldExpression><![CDATA[$F{PERCENTAGE_SPENT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

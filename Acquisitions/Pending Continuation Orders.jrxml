@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Pending Continuation Orders" pageWidth="576" pageHeight="595" orientation="Landscape" columnWidth="576" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="264631cb-434b-4eb1-afeb-666831e9e3e8">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Pending_Continuation_Orders_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Pending_Continuation_Orders"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+PURCHASE_ORDER.po_number,
+PURCHASE_ORDER.create_OPID,
+location.location_name
+
+FROM PURCHASE_ORDER
+INNER JOIN PO_STATUS ON PURCHASE_ORDER.PO_STATUS = PO_STATUS.PO_STATUS
+INNER JOIN PO_TYPE ON PURCHASE_ORDER.PO_TYPE = PO_TYPE.PO_TYPE
+INNER JOIN LOCATION ON PURCHASE_ORDER.ORDER_LOCATION = LOCATION.LOCATION_ID
+
+WHERE PO_STATUS.PO_STATUS_DESC = 'Pending'
+AND PO_TYPE.PO_TYPE_DESC = 'Continuation'
+    
+ORDER BY location.location_name]]>
+	</queryString>
+	<field name="PO_NUMBER" class="java.lang.String"/>
+	<field name="CREATE_OPID" class="java.lang.String"/>
+	<field name="LOCATION_NAME" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="192" height="33" uuid="46c8382c-43eb-4e19-a1f3-63a6dceee07c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PO_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="192" y="0" width="192" height="33" uuid="d069ee00-58c6-4e2a-8c7d-95896c590a5c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CREATE_OPID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="384" y="0" width="192" height="33" uuid="e22b4e0b-a920-46f7-81c4-8104371b0792">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LOCATION_NAME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="50" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="192" height="50" uuid="b5fdd7e5-f1e9-4cd4-be2d-2f62def05c0c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PO_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="192" y="0" width="192" height="50" uuid="145ff91d-6697-4f67-9618-972be6f059b9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CREATE_OPID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="384" y="0" width="192" height="50" uuid="c251ccb7-c1a7-4bc3-848d-71a8448c94d2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

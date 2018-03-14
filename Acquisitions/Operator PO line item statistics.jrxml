@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operator PO line item statistics" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="f4cd1169-e14a-406c-8b26-c93105df2b0d">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="operator_id" class="java.lang.String"/>
+	<parameter name="date_1" class="java.sql.Date"/>
+	<parameter name="date_2" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+purchase_order.create_opid po_create_operator,
+line_item.create_opid AS li_create_operator,
+po_type.po_type_desc AS PO_TYPE,
+vendor.vendor_code,
+
+Count (DISTINCT purchase_order.po_id) AS Orders,
+Count  (line_item.Line_item_id) AS lineitems
+
+FROM line_item
+INNER JOIN PURCHASE_ORDER ON LINE_ITEM.PO_ID = PURCHASE_ORDER.PO_ID
+INNER JOIN PO_TYPE ON PURCHASE_ORDER.PO_TYPE = PO_TYPE.PO_TYPE
+INNER JOIN VENDOR ON PURCHASE_ORDER.VENDOR_ID = VENDOR.VENDOR_ID
+
+WHERE line_item.create_opid = $P{operator_id} AND line_item.create_DATE between trunc($P{date_1}) and trunc($P{date_2}) 
+GROUP BY purchase_order.create_opid, line_item.create_opid, po_type.po_type_desc, vendor.vendor_code
+
+
+ORDER BY purchase_order.create_opid, line_item.create_opid, po_type.po_type_desc, vendor.vendor_code]]>
+	</queryString>
+	<field name="PO_CREATE_OPERATOR" class="java.lang.String"/>
+	<field name="LI_CREATE_OPERATOR" class="java.lang.String"/>
+	<field name="PO_TYPE" class="java.lang.String"/>
+	<field name="VENDOR_CODE" class="java.lang.String"/>
+	<field name="ORDERS" class="java.math.BigDecimal"/>
+	<field name="LINEITEMS" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="141" height="31" uuid="055bed2a-9f2e-4bbf-9af6-9f39424c78c0"/>
+				<text><![CDATA[PO_CREATE_OPERATOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="141" y="0" width="141" height="31" uuid="e1266654-eb0b-4345-925d-a148a55c4049"/>
+				<text><![CDATA[LI_CREATE_OPERATOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="140" height="31" uuid="04080bda-2319-4e1e-9307-a37b7368684c"/>
+				<text><![CDATA[PO_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="0" width="140" height="31" uuid="ed1a40fc-e8fc-4b25-ac5e-a136c7dde688"/>
+				<text><![CDATA[VENDOR_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="562" y="0" width="140" height="31" uuid="ac6a4e77-59b7-4b9b-b44a-cce6d2d49da3"/>
+				<text><![CDATA[ORDERS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="702" y="0" width="140" height="31" uuid="57086192-f4d5-41d3-a1a4-2ebd82d65afe"/>
+				<text><![CDATA[LINEITEMS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="27" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="141" height="27" uuid="b1883e6a-1a1a-4d14-9404-486ed956a291"/>
+				<textFieldExpression><![CDATA[$F{PO_CREATE_OPERATOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="141" y="0" width="141" height="27" uuid="8599ef1f-f7b8-4bb8-87c6-3b9565177e0b"/>
+				<textFieldExpression><![CDATA[$F{LI_CREATE_OPERATOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="282" y="0" width="140" height="27" uuid="f823a68a-86b9-40c1-963d-86eab88006c6"/>
+				<textFieldExpression><![CDATA[$F{PO_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="422" y="0" width="140" height="27" uuid="898fc3f6-29c2-4b2a-9ea7-4d1cb15cef4d"/>
+				<textFieldExpression><![CDATA[$F{VENDOR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="562" y="0" width="140" height="27" uuid="7ddad5f0-33ac-4f3d-bbd5-1b9f23694a62"/>
+				<textFieldExpression><![CDATA[$F{ORDERS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="702" y="0" width="140" height="27" uuid="9f1ba624-465c-4113-a066-4c572fe97f7c"/>
+				<textFieldExpression><![CDATA[$F{LINEITEMS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

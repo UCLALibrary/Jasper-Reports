@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Law Library invoices by fund by ledger" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="22d78f34-c6dc-46f5-9531-cfbb33bbfc5b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="ledger_name" class="java.lang.String"/>
+	<parameter name="fund_name" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select  
+  f.ledger_name
+, f.fund_name
+, v.vendor_name
+, i.invoice_date
+, i.invoice_number
+, (ucladb.toBaseCurrency(ilif.amount, i.currency_code, i.conversion_rate)) as expenditure_IN_usd
+, po.po_number
+, pot.po_type_desc
+, vger_support.unifix(bt.title) as title
+
+from fundledger_vw f
+inner join invoice_line_item_funds ilif
+  on f.ledger_id = ilif.ledger_id
+  and f.fund_id = ilif.fund_id
+inner join invoice_line_item ili on ilif.inv_line_item_id = ili.inv_line_item_id
+inner join line_item li on ili.line_item_id = li.line_item_id
+ INNER JOIN PURCHASE_ORDER po ON li.PO_ID = po.PO_ID
+ INNER JOIN PO_TYPE pot ON po.PO_TYPE = pot.PO_TYPE
+ INNER JOIN VENDOR v ON po.VENDOR_ID = v.VENDOR_ID
+inner join bib_text bt on li.bib_id = bt.bib_id
+inner join invoice i on ili.invoice_id = i.invoice_id
+INNER JOIN INVOICE_STATUS ist ON i.INVOICE_STATUS = ist.INVOICE_STATUS
+
+WHERE ist.INVOICE_STATUS_desc = 'Approved'
+and f.ledger_name = $P{ledger_name} 
+AND f.fund_name  = $P{fund_name} 
+
+ 
+ORDER BY bt.title]]>
+	</queryString>
+	<field name="LEDGER_NAME" class="java.lang.String"/>
+	<field name="FUND_NAME" class="java.lang.String"/>
+	<field name="VENDOR_NAME" class="java.lang.String"/>
+	<field name="INVOICE_DATE" class="java.sql.Timestamp"/>
+	<field name="INVOICE_NUMBER" class="java.lang.String"/>
+	<field name="EXPENDITURE_IN_USD" class="java.math.BigDecimal"/>
+	<field name="PO_NUMBER" class="java.lang.String"/>
+	<field name="PO_TYPE_DESC" class="java.lang.String"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="94" height="35" uuid="50a65656-59cc-4310-8070-48c2851dfb52"/>
+				<text><![CDATA[LEDGER_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="94" y="0" width="94" height="35" uuid="588f0c30-e428-4cfc-a43f-a60167711eeb"/>
+				<text><![CDATA[FUND_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="0" width="94" height="35" uuid="7e4b3cb4-9588-4d93-8a1c-84aba67be642"/>
+				<text><![CDATA[VENDOR_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="94" height="35" uuid="4a33a2fb-84a1-47fa-a4b7-167e3c169005"/>
+				<text><![CDATA[INVOICE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="0" width="94" height="35" uuid="bb6e862e-50de-4059-b3e8-e74cca163d41"/>
+				<text><![CDATA[INVOICE_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="0" width="93" height="35" uuid="0842c513-a7b7-4756-bf94-80256b223bda"/>
+				<text><![CDATA[EXPENDITURE_IN_USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="563" y="0" width="93" height="35" uuid="64c2dfea-375d-4ff3-99e6-2726f88fccf7"/>
+				<text><![CDATA[PO_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="656" y="0" width="93" height="35" uuid="f4473b69-18b9-47ee-b6ff-065dcde68993"/>
+				<text><![CDATA[PO_TYPE_DESC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="749" y="0" width="93" height="35" uuid="940e95f6-22d2-4c29-b9c1-de827c595b2b"/>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="39" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="94" height="39" uuid="4218c58a-6e6f-4fba-bf93-6968b9bed0f7"/>
+				<textFieldExpression><![CDATA[$F{LEDGER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="94" y="0" width="94" height="39" uuid="a954ff70-926d-49cb-977e-baae06ce73e6"/>
+				<textFieldExpression><![CDATA[$F{FUND_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="188" y="0" width="94" height="39" uuid="e2cc496d-c3c9-4e56-ba50-1d1d03297283"/>
+				<textFieldExpression><![CDATA[$F{VENDOR_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="282" y="0" width="94" height="39" uuid="9397da81-d2b2-4660-adf8-1f2d8a4f414c"/>
+				<textFieldExpression><![CDATA[$F{INVOICE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="376" y="0" width="94" height="39" uuid="f0f81102-7ef3-45dc-b8d5-ffcdb749f917"/>
+				<textFieldExpression><![CDATA[$F{INVOICE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="470" y="0" width="93" height="39" uuid="ccfb7631-6c50-4e15-89df-9cd6243e6632"/>
+				<textFieldExpression><![CDATA[$F{EXPENDITURE_IN_USD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="563" y="0" width="93" height="39" uuid="6e7a6678-7dc9-46ea-ac58-72f558c8a349"/>
+				<textFieldExpression><![CDATA[$F{PO_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="656" y="0" width="93" height="39" uuid="38343ba9-7f23-405f-b2fc-bf64890487d7"/>
+				<textFieldExpression><![CDATA[$F{PO_TYPE_DESC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="749" y="0" width="93" height="39" uuid="5837f804-953f-40af-aefa-03453dcc2afa"/>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

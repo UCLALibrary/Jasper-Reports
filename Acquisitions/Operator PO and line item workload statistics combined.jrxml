@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operator PO and line item workload statistics combined " pageWidth="864" pageHeight="595" orientation="Landscape" columnWidth="864" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="3f01b2db-e20f-4c01-bff7-23181c545fd1">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Operator_PO_and_line_item_workload_statistics_combined__files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Operator_PO_and_line_item_workload_statistics_combined_"/>
+	<parameter name="enter_operator_id" class="java.lang.String"/>
+	<parameter name="select_date_1" class="java.sql.Date"/>
+	<parameter name="select_date_2" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+purchase_order.create_opid po_create_operator,
+line_item.create_opid AS li_create_operator,
+po_type.po_type_desc AS PO_TYPE,
+vendor.vendor_code,
+
+Count (DISTINCT purchase_order.po_id) AS Orders,
+Count  (line_item.Line_item_id) AS lineitems
+
+FROM line_item
+INNER JOIN PURCHASE_ORDER ON LINE_ITEM.PO_ID = PURCHASE_ORDER.PO_ID
+INNER JOIN PO_TYPE ON PURCHASE_ORDER.PO_TYPE = PO_TYPE.PO_TYPE
+INNER JOIN VENDOR ON PURCHASE_ORDER.VENDOR_ID = VENDOR.VENDOR_ID
+
+WHERE line_item.create_opid = $P{enter_operator_id} 
+AND line_item.create_DATE BETWEEN trunc($P{select_date_1}) and trunc($P{select_date_2}) 
+
+GROUP BY purchase_order.create_opid, line_item.create_opid, po_type.po_type_desc, vendor.vendor_code
+
+
+ORDER BY purchase_order.create_opid, line_item.create_opid, po_type.po_type_desc, vendor.vendor_code]]>
+	</queryString>
+	<field name="PO_CREATE_OPERATOR" class="java.lang.String"/>
+	<field name="LI_CREATE_OPERATOR" class="java.lang.String"/>
+	<field name="PO_TYPE" class="java.lang.String"/>
+	<field name="VENDOR_CODE" class="java.lang.String"/>
+	<field name="ORDERS" class="java.math.BigDecimal"/>
+	<field name="LINEITEMS" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="144" height="33" uuid="29d5dd93-e2ac-401b-b723-77bae6006b49">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PO_CREATE_OPERATOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="144" y="0" width="144" height="33" uuid="9a3e537c-6be5-4a9d-9a9a-3348761c663c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LI_CREATE_OPERATOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="0" width="144" height="33" uuid="e0d3a3f1-fb44-4660-8f9c-519c2d29519c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PO_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="432" y="0" width="144" height="33" uuid="89b7d634-8b61-441f-af41-714bd69ebb83">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[VENDOR_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="576" y="0" width="144" height="33" uuid="41ee2c6c-4e66-4d67-990f-a28e4b0d9cd3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ORDERS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="720" y="0" width="144" height="33" uuid="248ecc9a-5342-4276-8b94-88c53f020d58">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LINEITEMS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="42" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="144" height="42" uuid="505bd17a-e494-4044-b8d3-06e49dea6d3b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PO_CREATE_OPERATOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="144" y="0" width="144" height="42" uuid="5357957b-3e2b-4aa5-b46e-551656aaa2d1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LI_CREATE_OPERATOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="288" y="0" width="144" height="42" uuid="d89eb09e-79a7-4454-b236-6dec1ff132d3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PO_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="432" y="0" width="144" height="42" uuid="6f1bdfbb-d90c-478e-af8d-2b0c7ab5f791">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{VENDOR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="576" y="0" width="144" height="42" uuid="fb7541b3-acc4-40ba-ae7e-faf8635c1bd1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ORDERS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="720" y="0" width="144" height="42" uuid="f260ec39-8460-44f8-beb4-1658b9b3deab">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LINEITEMS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

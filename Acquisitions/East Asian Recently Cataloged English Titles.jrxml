@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="East Asian Recently Cataloged English Titles" pageWidth="842" pageHeight="1440" orientation="Landscape" whenNoDataType="BlankPage" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="8405de14-1e69-4bdc-9acc-4585df604b1a">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/East_Asian_Recently_Cataloged_English_Titles_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/East_Asian_Recently_Cataloged_English_Titles"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+ucla_bibtext_vw.title,
+ucla_bibtext_vw.author,
+ucla_bibtext_vw.PUBLISHER,
+ucla_bibtext_vw.PUBLISHER_DATE,
+ucla_bibtext_vw.SERIES,
+ucladb.getbibtag(ucla_bibtext_vw.Bib_id, '650') AS subject,
+Mfhd_Master.display_call_no AS call_number,
+ucladb.getbibsubfield(ucla_bibtext_vw.bib_id, '901', 'b') as collection,
+location.location_name
+
+FROM vger_report.cat_948_base_rpt
+
+INNER JOIN ucla_bibtext_vw ON vger_report.cat_948_base_rpt.bib_id = ucla_bibtext_vw.bib_id
+INNER JOIN BIB_INDEX ON ucla_BIBTEXT_vw.BIB_ID = BIB_INDEX.BIB_ID
+INNER JOIN BIB_MFHD ON ucla_bibtext_vw.BIB_ID = BIB_MFHD.BIB_ID
+INNER JOIN BIB_MASTER ON ucla_bibtext_vw.BIB_ID = BIB_MASTER.BIB_ID
+INNER JOIN MFHD_MASTER ON MFHD_MASTER.MFHD_ID = BIB_MFHD.MFHD_ID
+inner join location on mfhd_master.location_id = location.location_id
+
+WHERE (
+      (normal_heading LIKE '%EAST ASIA%'
+        OR normal_heading LIKE '%CHINA%'
+        OR normal_heading LIKE '%CHINESE%'
+        OR normal_heading LIKE '%KOREA%'
+        OR normal_heading LIKE '%KOREAN%'
+        OR normal_heading LIKE '%JAPAN%'
+        OR normal_heading LIKE '%JAPANESE%')
+
+
+      --AND LOCATION.LOCATION_CODE like 'yr%'
+      AND ucla_bibtext_vw.LANGUAGE= 'eng'
+      AND ucla_bibtext_vw.bib_format = 'am'
+      AND Mfhd_Master.SUPPRESS_IN_OPAC <> 'Y'
+      AND s948c between to_char(trunc(sysdate-30), 'YYYYMMDD') and to_char(trunc(sysdate), 'YYYYMMDD')
+      )
+
+ORDER BY  Mfhd_Master.display_call_no]]>
+	</queryString>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="AUTHOR" class="java.lang.String"/>
+	<field name="PUBLISHER" class="java.lang.String"/>
+	<field name="PUBLISHER_DATE" class="java.lang.String"/>
+	<field name="SERIES" class="java.lang.String"/>
+	<field name="SUBJECT" class="java.lang.String"/>
+	<field name="CALL_NUMBER" class="java.lang.String"/>
+	<field name="COLLECTION" class="java.lang.String"/>
+	<field name="LOCATION_NAME" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="98" height="30" uuid="ccb71c9a-82c2-49e4-89d5-81685ba983da">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="98" y="0" width="93" height="30" uuid="29810ab8-64c9-44c1-94fd-4710d70d143d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<text><![CDATA[AUTHOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="191" y="0" width="93" height="30" uuid="b6ca41f2-84a9-4ef2-838f-bd9f7cda6008">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<text><![CDATA[PUBLISHER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="0" width="93" height="30" uuid="9c865144-ed5b-4b87-9d6c-3c2b86d0482d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PUBLISHER_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="0" width="93" height="30" uuid="98e3f042-081f-4c85-adbe-4b1abf8c9669">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[SERIES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="0" width="93" height="30" uuid="343a59b7-9bd3-4f6b-8fca-91dc0dd9096d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[SUBJECT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="563" y="0" width="93" height="30" uuid="9048b1c4-8677-4869-a4e9-55dedf3f5f7d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CALL_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="656" y="0" width="93" height="30" uuid="47274f41-745d-4a08-a8a5-fa09c7dd2063">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[COLLECTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="749" y="0" width="93" height="30" uuid="cf47e8a8-29e3-4309-917e-91938c494f7a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LOCATION_NAME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="47" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="94" height="47" uuid="ab863116-304f-49fd-bcfd-b3ec7c35fc8d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="94" y="0" width="94" height="47" uuid="3d03b38c-c63c-42c7-b4da-302de647bb42">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="0" width="94" height="47" uuid="66163e3e-d970-4def-a50d-93d317716f04">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PUBLISHER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="282" y="0" width="94" height="47" uuid="44d176e3-4115-4e02-a314-461c6f6e2f33">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PUBLISHER_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="376" y="0" width="94" height="47" uuid="46831c30-bf21-4e37-b7c1-74713e5e0a81">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SERIES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="470" y="0" width="93" height="47" uuid="73b1755b-4396-4932-a64a-ffb5d92baa50">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SUBJECT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="563" y="0" width="93" height="47" uuid="ae39b1ec-6a39-4e01-bb17-f09539182072">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CALL_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="656" y="0" width="93" height="47" uuid="55f84e4c-0cb8-4b05-87b8-ad28a48b3991">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{COLLECTION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="749" y="0" width="93" height="47" uuid="ba6a810d-77a0-4dd7-b415-371a173b54f4">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

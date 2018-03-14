@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operator ID Report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="19f96e75-83d0-4ff3-a436-6e65ae1a4d15">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<parameter name="date_1" class="java.sql.Date"/>
+	<parameter name="date_2" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+Trunc(INVOICE.INVOICE_STATUS_DATE) AS DATE_APPROVED,
+INVOICE.UPDATE_OPID, Count (*) AS num
+
+FROM INVOICE
+INNER JOIN INVOICE_STATUS ON INVOICE.INVOICE_STATUS = INVOICE_STATUS.INVOICE_STATUS
+
+WHERE INVOICE_STATUS.INVOICE_STATUS_DESC = 'Approved' 
+AND INVOICE.INVOICE_STATUS_DATE between trunc($P{date_1}) and trunc($P{date_2}) 
+
+GROUP BY Trunc(INVOICE.INVOICE_STATUS_DATE), INVOICE.UPDATE_OPID
+ORDER BY DATE_APPROVED, INVOICE.UPDATE_OPID]]>
+	</queryString>
+	<field name="DATE_APPROVED" class="java.sql.Timestamp"/>
+	<field name="UPDATE_OPID" class="java.lang.String"/>
+	<field name="NUM" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="28" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="268" height="28" uuid="691fe087-4772-4e68-b491-46079b3f2548"/>
+				<text><![CDATA[DATE_APPROVED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="268" y="0" width="267" height="28" uuid="4c07b302-bb2f-4bd0-a4c8-3221e1fe3820"/>
+				<text><![CDATA[UPDATE_OPID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="535" y="0" width="267" height="28" uuid="4d0dcc5b-c03d-4156-90ff-d090e947f4e1"/>
+				<text><![CDATA[NUM]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="268" height="34" uuid="ada77476-a53f-462e-87b8-b3a8f15842b1"/>
+				<textFieldExpression><![CDATA[$F{DATE_APPROVED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="268" y="0" width="267" height="34" uuid="85f440a1-a17b-4594-b0f0-dbb995a70f7d"/>
+				<textFieldExpression><![CDATA[$F{UPDATE_OPID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="535" y="0" width="267" height="34" uuid="f212e95a-64e5-425d-b270-1f5d4ea7b075"/>
+				<textFieldExpression><![CDATA[$F{NUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

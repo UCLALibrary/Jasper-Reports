@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Operator item statistics by location" pageWidth="720" pageHeight="595" orientation="Landscape" columnWidth="720" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="14d0da5b-e47a-4aed-9b82-3ddeaf5ae485">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<parameter name="enter_operator_id" class="java.lang.String"/>
+	<parameter name="select_date_1" class="java.sql.Date"/>
+	<parameter name="select_date_2" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT  DISTINCT
+ITEM.CREATE_OPERATOR_ID AS create_operator_id,
+bib_text.bib_format,
+Count(DISTINCT item.item_id) AS items,
+location.location_code AS LOC_code
+--item_create_date
+
+FROM LOCATION
+INNER JOIN BIB_TEXT INNER JOIN BIB_MFHD ON BIB_TEXT.BIB_ID = BIB_MFHD.BIB_ID
+INNER JOIN ITEM INNER JOIN MFHD_ITEM ON ITEM.ITEM_ID = MFHD_ITEM.ITEM_ID ON BIB_MFHD.MFHD_ID = MFHD_ITEM.MFHD_ID INNER JOIN MFHD_MASTER ON BIB_MFHD.MFHD_ID = MFHD_MASTER.MFHD_ID ON LOCATION.LOCATION_ID = MFHD_MASTER.LOCATION_ID
+
+WHERE item.CREATE_operator_id = $P{enter_operator_id}
+AND item.create_DATE BETWEEN trunc($P{select_date_1}) and trunc($P{select_date_2})  
+
+GROUP BY  ITEM.CREATE_OPERATOR_ID, location.location_code, bib_text.bib_format 
+ORDER BY  ITEM.CREATE_OPERATOR_ID, location.location_code, bib_text.bib_format]]>
+	</queryString>
+	<field name="CREATE_OPERATOR_ID" class="java.lang.String"/>
+	<field name="BIB_FORMAT" class="java.lang.String"/>
+	<field name="ITEMS" class="java.math.BigDecimal"/>
+	<field name="LOC_CODE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="180" height="26" uuid="7d93df09-9af2-456d-beb3-e9603921bc6c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CREATE_OPERATOR_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="180" height="26" uuid="db977ff6-1dc6-4576-8d74-0323cdcbd5fb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[BIB_FORMAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="0" width="180" height="26" uuid="2427536c-0cf8-453c-9a0e-0c2df4d06a67">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ITEMS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="0" width="180" height="26" uuid="be2234a6-80bf-40d4-a032-bf09cb757c75">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LOC_CODE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="48" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="180" height="48" uuid="3cf7215a-5c70-40dc-b24f-f3e80c948b20">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CREATE_OPERATOR_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="0" width="180" height="48" uuid="fcaf9a18-373b-4a90-b7a0-0d209695d729">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_FORMAT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="360" y="0" width="180" height="48" uuid="c2c820dd-bde3-4f9b-8f29-e927354365f2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEMS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="540" y="0" width="180" height="48" uuid="d4768b62-14e3-4229-8479-8fd1d964f8ee">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOC_CODE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

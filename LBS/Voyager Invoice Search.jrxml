@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Voyager Invoice Search" pageWidth="1260" pageHeight="595" orientation="Landscape" columnWidth="1260" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="766a1919-8b0b-45c6-a580-15be67b4bb0d">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/LBS/Voyager_Invoice_Search_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/LBS/Voyager_Invoice_Search"/>
+	<parameter name="Invoice_ID" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select
+  invoice_id
+, invoice_number
+, invoice_date
+, invoice_status
+, tax_rate
+, vck
+, vendor_code
+, voy_invoice_total
+, is_line_item
+, lib_tax_code
+, decode(is_line_item, 'Y', 'Line item(s)', description) as description
+, fau
+, fund_code
+, fund_name
+, sum(amount) as amount
+, round(sum(vendor_tax), 2) as vendor_tax
+, round(sum(state_tax), 2) as state_tax
+from vger_support.voyager_invoice_data
+where invoice_id = $P{Invoice_ID}
+group by
+  invoice_id
+, invoice_number
+, invoice_date
+, invoice_status
+, tax_rate
+, vck
+, vendor_code
+, voy_invoice_total
+, is_line_item
+, lib_tax_code
+, decode(is_line_item, 'Y', 'Line item(s)', description)
+, fau
+, fund_code
+, fund_name
+order by invoice_id, is_line_item desc, fau]]>
+	</queryString>
+	<field name="INVOICE_ID" class="java.math.BigDecimal"/>
+	<field name="INVOICE_NUMBER" class="java.lang.String"/>
+	<field name="INVOICE_DATE" class="java.sql.Timestamp"/>
+	<field name="INVOICE_STATUS" class="java.lang.String"/>
+	<field name="TAX_RATE" class="java.math.BigDecimal"/>
+	<field name="VCK" class="java.lang.String"/>
+	<field name="VENDOR_CODE" class="java.lang.String"/>
+	<field name="VOY_INVOICE_TOTAL" class="java.math.BigDecimal"/>
+	<field name="IS_LINE_ITEM" class="java.lang.String"/>
+	<field name="LIB_TAX_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="FAU" class="java.lang.String"/>
+	<field name="FUND_CODE" class="java.lang.String"/>
+	<field name="FUND_NAME" class="java.lang.String"/>
+	<field name="AMOUNT" class="java.math.BigDecimal"/>
+	<field name="VENDOR_TAX" class="java.math.BigDecimal"/>
+	<field name="STATE_TAX" class="java.math.BigDecimal"/>
+	<variable name="VENDOR" class="java.lang.String">
+		<variableExpression><![CDATA[CONCATENATE($F{VENDOR_CODE}, " (", $F{VCK}, ")")]]></variableExpression>
+	</variable>
+	<group name="INVOICE_ID">
+		<groupExpression><![CDATA[$F{INVOICE_ID}]]></groupExpression>
+	</group>
+	<group name="INVOICE_NUMBER">
+		<groupExpression><![CDATA[$F{INVOICE_NUMBER}]]></groupExpression>
+	</group>
+	<group name="INVOICE_DATE">
+		<groupExpression><![CDATA[$F{INVOICE_DATE}]]></groupExpression>
+	</group>
+	<group name="INVOICE_STATUS">
+		<groupExpression><![CDATA[$F{INVOICE_STATUS}]]></groupExpression>
+	</group>
+	<group name="TAX_RATE">
+		<groupExpression><![CDATA[$F{TAX_RATE}]]></groupExpression>
+	</group>
+	<group name="VCK">
+		<groupExpression><![CDATA[$F{VCK}]]></groupExpression>
+	</group>
+	<group name="VENDOR_CODE">
+		<groupExpression><![CDATA[$F{VENDOR_CODE}]]></groupExpression>
+	</group>
+	<group name="VOY_INVOICE_TOTAL">
+		<groupExpression><![CDATA[$F{VOY_INVOICE_TOTAL}]]></groupExpression>
+	</group>
+	<group name="IS_LINE_ITEM">
+		<groupExpression><![CDATA[$F{IS_LINE_ITEM}]]></groupExpression>
+	</group>
+	<group name="LIB_TAX_CODE">
+		<groupExpression><![CDATA[$F{LIB_TAX_CODE}]]></groupExpression>
+	</group>
+	<group name="DESCRIPTION">
+		<groupExpression><![CDATA[$F{DESCRIPTION}]]></groupExpression>
+	</group>
+	<group name="FAU">
+		<groupExpression><![CDATA[$F{FAU}]]></groupExpression>
+	</group>
+	<group name="FUND_CODE">
+		<groupExpression><![CDATA[$F{FUND_CODE}]]></groupExpression>
+	</group>
+	<group name="FUND_NAME">
+		<groupExpression><![CDATA[$F{FUND_NAME}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="60" height="30" uuid="a20172ac-4a5b-47ba-bcdc-5cff15a88528"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INVOICE ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="0" width="100" height="30" uuid="580a3e1f-3c43-4e25-963d-5f606a39f93d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INVOICE NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="0" width="68" height="30" uuid="7a15f6f4-6788-4524-903b-bf720931702d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INVOICE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="228" y="0" width="50" height="30" uuid="91f491dc-859b-4b20-8f7a-55bcf3e1d6e9"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="0" width="118" height="30" uuid="ee500bdd-e49a-4914-a05f-01c408026d97"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[VENDOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="396" y="0" width="82" height="30" uuid="79367bac-e6eb-498d-82fa-c7363e725a24"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="478" y="0" width="50" height="30" uuid="eddc215a-c5e0-42ef-a081-bb6f9039f28a"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TAX CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="528" y="0" width="118" height="30" uuid="b1abc22b-5ecb-4c92-a329-a34562fca93c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="646" y="0" width="118" height="30" uuid="f4e8563b-d7b6-48dd-9ba2-5f7eddfa20e8"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FAU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="764" y="0" width="74" height="30" uuid="2b5c5df1-551c-452b-bb19-d07a50e56e24"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FUND CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="838" y="0" width="130" height="30" uuid="3000a2c1-7f6d-42cc-9465-9c2af8147dbd"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[FUND NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="968" y="0" width="92" height="30" uuid="4c24aea6-c3a8-4cd5-bb06-18b838571aa1"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1060" y="0" width="79" height="30" uuid="9fe59738-79f6-4aa1-98f5-0114d85d026f"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[VENDOR TAX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1139" y="0" width="80" height="30" uuid="831048f1-627b-461c-b0c5-a0deb28fa20e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[STATE TAX]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="60" height="30" uuid="40152409-4a65-4914-b583-83fe9e8103a7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="0" width="100" height="30" uuid="8d69db73-9eeb-409b-b865-fd33864625af">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMM d, yyyy" isBlankWhenNull="true">
+				<reportElement x="160" y="0" width="68" height="30" uuid="7315339e-83a9-49b5-b8d6-4d763ac6dd8a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="228" y="0" width="50" height="30" uuid="ae7d6381-9098-4789-b637-682a0d1c8605">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="278" y="0" width="118" height="30" uuid="12eaad1d-4bdb-4ecf-a3f6-bdcdaf3b55da">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$V{VENDOR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00;($#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="396" y="0" width="82" height="30" uuid="dde24d92-3691-4706-84d1-4fa592eef1c6">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{VOY_INVOICE_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="478" y="0" width="50" height="30" uuid="26b519a1-89ed-437a-b5f9-d7f5d3e7c360">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LIB_TAX_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="528" y="0" width="118" height="30" uuid="c4e18e5a-54c7-472a-ac34-7887fe0ae189">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="646" y="0" width="118" height="30" uuid="fcabbbe2-82f9-4915-ac93-39fb2fc5a9ec">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FAU}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="764" y="0" width="74" height="30" uuid="b1a3b364-267a-43f0-bc28-27c292b82952">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="838" y="0" width="130" height="30" uuid="86307c3e-1dd1-42ab-9caf-5f48c9977b0b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FUND_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00;($#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="968" y="0" width="92" height="30" uuid="d32c5d0a-02a4-4ceb-9cd9-8f33816bb968">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00;($#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="1060" y="0" width="79" height="30" uuid="7e2d0630-f40c-4691-a8a3-12eb99ed3770">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{VENDOR_TAX}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00;($#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="1139" y="0" width="80" height="30" uuid="dd67f37c-2a79-43a6-a266-8f78f0dc87bc">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{STATE_TAX}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
