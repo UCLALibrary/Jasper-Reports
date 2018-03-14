@@ -73,7 +73,7 @@ where
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="200" height="30" uuid="f62c7fdc-acec-43b2-864a-86a26639426e"/>
 				<textElement>
-					<font size="16"/>
+					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{FIELD}]]></textFieldExpression>
 			</textField>

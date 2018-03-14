@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Laptop Charges in Fiscal Year" pageWidth="1080" pageHeight="612" orientation="Landscape" columnWidth="1040" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="1067bcd6-2c4c-444f-be25-b208ca887a90">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.5F"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Laptop_Charges_in_Fiscal_Year_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Laptop_Charges_in_Fiscal_Year"/>
+	<parameter name="startDate" class="java.util.Date">
+		<parameterDescription><![CDATA[Start date of report range]]></parameterDescription>
+	</parameter>
+	<parameter name="endDate" class="java.util.Date">
+		<parameterDescription><![CDATA[End date of report range]]></parameterDescription>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+  p.institution_id,
+  pg.patron_group_display,
+  vger_support.get_all_patron_stat_codes(p.patron_id, ',') AS patron_stat_codes,
+  mi.item_enum,
+  cta.charge_date,
+  lc.location_name AS charge_place,
+  cta.discharge_date,
+  null AS discharge_place
+FROM
+  ucladb.item i
+  INNER JOIN ucladb.circ_transactions cta ON i.item_id = cta.item_id
+  INNER JOIN ucladb.patron p ON cta.patron_id = p.patron_id
+  INNER JOIN ucladb.patron_group pg ON cta.patron_group_id = pg.patron_group_id
+  INNER JOIN ucladb.location lc ON cta.charge_location = lc.location_id
+  INNER JOIN ucladb.location ld ON cta.discharge_location = ld.location_id
+  INNER JOIN ucladb.mfhd_item mi ON i.item_id = mi.item_id
+WHERE
+  i.item_type_id = 50
+  AND trunc(cta.charge_date) between trunc($P{startDate}) and trunc($P{endDate})
+UNION
+SELECT
+  p.institution_id,
+  pg.patron_group_display,
+  vger_support.get_all_patron_stat_codes(p.patron_id, ',') AS patron_stat_codes,
+  mi.item_enum,
+  cta.charge_date,
+  lc.location_name AS charge_place,
+  cta.discharge_date,
+  ld.location_name AS discharge_place
+FROM
+  ucladb.item i
+  INNER JOIN ucladb.circ_trans_archive cta ON i.item_id = cta.item_id
+  INNER JOIN ucladb.patron p ON cta.patron_id = p.patron_id
+  INNER JOIN ucladb.patron_group pg ON cta.patron_group_id = pg.patron_group_id
+  INNER JOIN ucladb.location lc ON cta.charge_location = lc.location_id
+  INNER JOIN ucladb.location ld ON cta.discharge_location = ld.location_id
+  INNER JOIN ucladb.mfhd_item mi ON i.item_id = mi.item_id
+WHERE
+  i.item_type_id = 50
+  AND trunc(cta.charge_date) between trunc($P{startDate}) and trunc($P{endDate})]]>
+	</queryString>
+	<field name="INSTITUTION_ID" class="java.lang.String"/>
+	<field name="PATRON_GROUP_DISPLAY" class="java.lang.String"/>
+	<field name="PATRON_STAT_CODES" class="java.lang.String"/>
+	<field name="ITEM_ENUM" class="java.lang.String"/>
+	<field name="CHARGE_DATE" class="java.sql.Timestamp"/>
+	<field name="CHARGE_PLACE" class="java.lang.String"/>
+	<field name="DISCHARGE_DATE" class="java.sql.Timestamp"/>
+	<field name="DISCHARGE_PLACE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="1040" height="30" uuid="081c3de0-13fd-492e-ad1c-71df11661f58">
+					<property name="com.jaspersoft.studio.unit.x" value="inch"/>
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Laptop Charges in Fiscal Year]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="130" height="30" uuid="8fab020a-a15d-4371-bd1e-8e35f1f29e4c"/>
+				<text><![CDATA[INSTITUTION ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="0" width="130" height="30" uuid="80323310-870c-4517-97d6-52789042a86d"/>
+				<text><![CDATA[PATRON GROUP DISPLAY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="260" y="0" width="130" height="30" uuid="76dcedb0-3773-4a31-8c24-db2ffe04e881"/>
+				<text><![CDATA[PATRON STAT CODES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="390" y="0" width="130" height="30" uuid="8cbf3cd3-be87-48c7-bf56-7f76b671ebf8"/>
+				<text><![CDATA[ITEM ENUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="0" width="130" height="30" uuid="aa8eb426-f07a-49fc-911a-81254b79c6ed"/>
+				<text><![CDATA[CHARGE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="650" y="0" width="130" height="30" uuid="58203827-596d-45f6-ab61-037f019d8ccb"/>
+				<text><![CDATA[CHARGE PLACE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="780" y="0" width="130" height="30" uuid="13d52423-1f23-45be-b631-2d94abb31446"/>
+				<text><![CDATA[DISCHARGE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="910" y="0" width="130" height="30" uuid="a2544634-8454-45d2-9772-50b5615c270d"/>
+				<text><![CDATA[DISCHARGE PLACE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="130" height="30" uuid="4172a5dc-70ce-4eb8-8fb7-e6752921d4ed"/>
+				<textFieldExpression><![CDATA[$F{INSTITUTION_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="130" y="0" width="130" height="30" uuid="f77efad7-c070-4b3b-a290-fbd0c20e0b25">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP_DISPLAY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="260" y="0" width="130" height="30" uuid="949d756a-211b-43f8-a260-2e65199d7c18">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_STAT_CODES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="390" y="0" width="130" height="30" uuid="c3f5401e-0167-470b-a236-33fc32c0a3b6"/>
+				<textFieldExpression><![CDATA[$F{ITEM_ENUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="520" y="0" width="130" height="30" uuid="391d8703-9281-4429-8efc-65405257f2e8"/>
+				<textFieldExpression><![CDATA[$F{CHARGE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="650" y="0" width="130" height="30" uuid="2d95c52c-a870-49f9-9c0c-4f18d9af3c25"/>
+				<textFieldExpression><![CDATA[$F{CHARGE_PLACE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="780" y="0" width="130" height="30" uuid="96066d45-6ab7-41bb-803c-75085e4234b5"/>
+				<textFieldExpression><![CDATA[$F{DISCHARGE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="910" y="0" width="130" height="30" uuid="ba5a68a9-c7eb-4a12-aa25-50dff49b1205"/>
+				<textFieldExpression><![CDATA[$F{DISCHARGE_PLACE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
