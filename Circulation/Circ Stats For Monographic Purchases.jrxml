@@ -19,7 +19,7 @@
 	<property name="ireport.jasperserver.user" value="drickard"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases"/>
-	<parameter name="select_vendor" class="java.util.Collection">
+	<parameter name="select_vendor_1" class="java.util.Collection">
 		<parameterDescription><![CDATA[Vendor filter]]></parameterDescription>
 	</parameter>
 	<parameter name="ledger_name_multi" class="java.util.Collection">
@@ -78,7 +78,7 @@ FROM
 WHERE
 	substr(bt.bib_format, 2, 1) = 'm' -- bib level
 	AND i.invoice_status = 1 --approved invoices
-	AND $X{IN, v.vendor_id, select_vendor}
+	AND $X{IN, v.vendor_id, select_vendor_1}
 	AND $X{IN, f.ledger_id, ledger_name_multi}
 	AND $X{IN, f.fiscal_period_id, fiscal_year_multi} 
 ORDER BY 
