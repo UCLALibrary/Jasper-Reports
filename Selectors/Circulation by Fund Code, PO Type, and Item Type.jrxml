@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Circulation by Fund Code, PO Type, and Item Type" pageWidth="1584" pageHeight="595" orientation="Landscape" columnWidth="1584" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="95329393-c7bd-4567-9ca5-9e560e753da2">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.unit." value="inch"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
@@ -12,13 +12,13 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
-	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
-	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Selectors/Circulation_by_Fund_Code__PO_Type__and_Item_Type_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Selectors/Circulation_by_Fund_Code__PO_Type__and_Item_Type"/>
-	<parameter name="enter_fund_code" class="java.lang.String"/>
-	<parameter name="enter_po_type" class="java.lang.String"/>
-	<parameter name="enter_item_type" class="java.lang.String"/>
+	<parameter name="select_fund_code" class="java.lang.String"/>
+	<parameter name="select_po_type" class="java.lang.String"/>
+	<parameter name="select_item_type" class="java.lang.String"/>
 	<parameter name="select_date_1" class="java.sql.Date"/>
 	<parameter name="select_date_2" class="java.sql.Date"/>
 	<queryString language="SQL">
@@ -68,9 +68,9 @@ INNER JOIN ITEM_STAT_CODE ON ITEM_STATS.ITEM_STAT_ID = ITEM_STAT_CODE.ITEM_STAT_
 INNER JOIN CIRCCHARGES_VW cc ON MFHD_MASTER.MFHD_ID = cc.MFHD_ID
 
 WHERE
-fund.fund_code = $P{enter_fund_code}  
-AND PO_TYPE.PO_TYPE_desc = $P{enter_po_type}  
-AND item_type.item_type_name = $P{enter_item_type}   
+fund.fund_code = $P{select_fund_code}  
+AND (PO_TYPE.PO_TYPE_desc = $P{select_po_type}  OR $P{select_po_type}  IS NULL)
+AND (item_type.item_type_name = $P{select_item_type} OR $P{select_item_type} IS NULL)
 AND LINE_ITEM.UPDATE_DATE BETWEEN trunc($P{select_date_1}) and trunc($P{select_date_2})
 
 GROUP BY ucla_bibtext_vw.isbn, 
