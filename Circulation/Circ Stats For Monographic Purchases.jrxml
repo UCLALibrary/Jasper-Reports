@@ -19,7 +19,7 @@
 	<property name="ireport.jasperserver.user" value="drickard"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases"/>
-	<parameter name="select_vendor_1" class="java.util.Collection">
+	<parameter name="select_vendor" class="java.util.Collection">
 		<parameterDescription><![CDATA[Vendor filter]]></parameterDescription>
 	</parameter>
 	<parameter name="ledger_name_multi" class="java.util.Collection">
@@ -29,89 +29,117 @@
 		<parameterDescription><![CDATA[FY filter]]></parameterDescription>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT
-	v.vendor_code,
-	f.fiscal_period_name,
-	f.ledger_name,
-	f.fund_code,
-	bm.mfhd_id,
-	bm.bib_id,
-	bt.bib_format as bib_level,
-	bt.begin_pub_date as date1,
-	bt.pub_place,
-	bt.language,
-	vger_support.get_bib_tags(bt.bib_id, '035') as f035,
-	ucladb.GetBibTag(bt.bib_id, '050') as f050,
-	vger_support.unifix(bt.title) as title,
-	vger_support.get_bib_tags(bt.bib_id, '245') as f245,
-	vger_support.unifix(ucladb.GetTag(bt.bib_id, 'B', '650', 1)) as f650_1,
-	vger_support.unifix(ucladb.GetTag(bt.bib_id, 'B', '650', 2)) as f650_2,
-	vger_support.get_bib_tags(bt.bib_id, '852b') as f852b,
-	vger_support.get_bib_tags(bt.bib_id, '852h') as f852h,
-	ib.item_barcode as barcode,
-	it.reserve_charges as reserves,
-	it.historical_charges as charges,
-	it.historical_browses as browses,
-	it.recalls_placed as recalls,
-	it.holds_placed as holds,
-	it.historical_bookings as bookings,
-	it.short_loan_charges as short_loans,
-	( 
-		select coalesce(sum(reserve_charges), 0)
-		from ucladb.reserve_item_history
-		where item_id = it.item_id
-	) as hist_reserves
-FROM
-	ucladb.invoice i
-	inner join ucladb.vendor v on i.vendor_id = v.vendor_id
-	inner join ucladb.invoice_line_item ili on i.invoice_id = ili.invoice_id
-	inner join ucladb.invoice_line_item_funds ilif on ili.inv_line_item_id = ilif.inv_line_item_id
-	inner join ucladb.ucla_fundledger_vw f on ilif.ledger_id = f.ledger_id and ilif.fund_id = f.fund_id
-	inner join ucladb.line_item_copy_status lics on ilif.copy_id = lics.copy_id
-	inner join ucladb.line_item li on ili.line_item_id = li.line_item_id -- slight shortcut but no data loss for 2004-2005 at least
-	left outer join ucladb.bib_mfhd bm on lics.mfhd_id = bm.mfhd_id
-	left outer join ucladb.bib_text bt on bm.bib_id = bt.bib_id
-	left outer join ucladb.mfhd_master mm on bm.mfhd_id = mm.mfhd_id
-	left outer join ucladb.mfhd_item mi on mm.mfhd_id = mi.mfhd_id
-	left outer join ucladb.item it on mi.item_id = it.item_id
-	left outer join ucladb.item_barcode ib on it.item_id = ib.item_id and ib.barcode_status = 1 -- Approved
-WHERE
-	substr(bt.bib_format, 2, 1) = 'm' -- bib level
-	AND i.invoice_status = 1 --approved invoices
-	AND $X{IN, v.vendor_id, select_vendor_1}
-	AND $X{IN, f.ledger_id, ledger_name_multi}
-	AND $X{IN, f.fiscal_period_id, fiscal_year_multi} 
-ORDER BY 
-	vendor_code, 
-	bib_id, 
-	mfhd_id]]>
+		<![CDATA[with acq as (
+	select 
+		v.vendor_code,
+		f.fiscal_period_name,
+		f.ledger_name,
+		f.fund_code,
+		bm.mfhd_id, 
+		bm.bib_id, 
+		bt.begin_pub_date as date1, 
+		bt.place_code, 
+		bt.language, 
+		bt.bib_format as bib_level,
+		( select replace(normal_heading, 'UCOCLC', '') from ucladb.bib_index where bib_id = bt.bib_id and index_code = '0350' and normal_heading like 'UCOCLC%' and rownum < 2) as oclc, 
+		ucladb.GetBibTag(bt.bib_id, '050') as f050, 
+		vger_support.unifix(bt.title) as title, 
+		vger_support.unifix(ucladb.GetTag(bt.bib_id, 'B', '650', 1)) as f650_1, 
+		vger_support.unifix(ucladb.GetTag(bt.bib_id, 'B', '650', 2)) as f650_2, 
+		l.location_code as loc_code, 
+		ucladb.GetMfhdSubfield(mm.mfhd_id, '852', 'h') as f852h
+	from 
+		ucladb.invoice i
+		inner join ucladb.vendor v on i.vendor_id = v.vendor_id
+		inner join ucladb.invoice_line_item ili on i.invoice_id = ili.invoice_id
+		inner join ucladb.invoice_line_item_funds ilif on ili.inv_line_item_id = ilif.inv_line_item_id
+		inner join ucladb.ucla_fundledger_vw f on ilif.ledger_id = f.ledger_id and ilif.fund_id = f.fund_id
+		inner join ucladb.line_item_copy_status lics on ilif.copy_id = lics.copy_id
+		inner join ucladb.line_item li on ili.line_item_id = li.line_item_id -- slight shortcut but no data loss for 2004-2005 at least
+		left outer join ucladb.bib_mfhd bm on lics.mfhd_id = bm.mfhd_id
+		left outer join ucladb.bib_text bt on bm.bib_id = bt.bib_id
+		left outer join ucladb.mfhd_master mm on bm.mfhd_id = mm.mfhd_id
+		left outer join ucladb.location l on mm.location_id = l.location_id
+	where 
+		substr(bt.bib_format, 2, 1) = 'm' -- bib level
+		and i.invoice_status = 1 --approved invoices
+		and $X{IN, v.vendor_id, select_vendor}
+		and $X{IN, f.ledger_id, ledger_name_multi}
+		and $X{IN, f.fiscal_period_id, fiscal_year_multi} 
+), 
+items as (
+	select
+		mi.mfhd_id, 
+		count(i.item_id) as items, 
+		sum(i.recalls_placed) as recalls, 
+		sum(i.holds_placed) as holds, sum(i.historical_charges) as charges, 
+		sum(i.historical_browses) as browses, 
+		sum(i.reserve_charges) as reserves, 
+		sum(  ( select coalesce(sum(reserve_charges), 0) from ucladb.reserve_item_history where item_id = i.item_id ) ) as hist_reserves
+	from 
+		ucladb.mfhd_item mi
+		left outer join ucladb.item i on mi.item_id = i.item_id
+	where 
+		exists (
+			select *
+			from acq
+			where mfhd_id = mi.mfhd_id
+		)
+	group by 
+		mi.mfhd_id
+)
+select
+	acq.vendor_code,
+	acq.fiscal_period_name,
+	acq.fund_code,
+	acq.mfhd_id, 
+	acq.bib_id, 
+	acq.bib_level,
+	acq.date1, 
+	acq.place_code, 
+	acq.language, 
+	acq.oclc, 
+	acq.f050, 
+	acq.title, 
+	acq.f650_1, 
+	acq.f650_2, 
+	acq.loc_code, 
+	acq.f852h, 
+	(select items from items where mfhd_id = acq.mfhd_id) as items, 
+	(select recalls from items where mfhd_id = acq.mfhd_id) as recalls, 
+	(select holds from items where mfhd_id = acq.mfhd_id) as holds, 
+	(select charges from items where mfhd_id = acq.mfhd_id) as charges, 
+	(select browses from items where mfhd_id = acq.mfhd_id) as browses, 
+	(select reserves from items where mfhd_id = acq.mfhd_id) as reserves, 
+	(select hist_reserves from items where mfhd_id = acq.mfhd_id) as hist_reserves
+from 
+	acq 
+order by 
+	acq.bib_id, 
+	acq.mfhd_id]]>
 	</queryString>
 	<field name="VENDOR_CODE" class="java.lang.String"/>
 	<field name="FISCAL_PERIOD_NAME" class="java.lang.String"/>
-	<field name="LEDGER_NAME" class="java.lang.String"/>
 	<field name="FUND_CODE" class="java.lang.String"/>
 	<field name="MFHD_ID" class="java.math.BigDecimal"/>
 	<field name="BIB_ID" class="java.math.BigDecimal"/>
 	<field name="BIB_LEVEL" class="java.lang.String"/>
 	<field name="DATE1" class="java.lang.String"/>
-	<field name="PUB_PLACE" class="java.lang.String"/>
+	<field name="PLACE_CODE" class="java.lang.String"/>
 	<field name="LANGUAGE" class="java.lang.String"/>
-	<field name="F035" class="java.lang.String"/>
+	<field name="OCLC" class="java.lang.String"/>
 	<field name="F050" class="java.lang.String"/>
 	<field name="TITLE" class="java.lang.String"/>
-	<field name="F245" class="java.lang.String"/>
 	<field name="F650_1" class="java.lang.String"/>
 	<field name="F650_2" class="java.lang.String"/>
-	<field name="F852B" class="java.lang.String"/>
+	<field name="LOC_CODE" class="java.lang.String"/>
 	<field name="F852H" class="java.lang.String"/>
-	<field name="BARCODE" class="java.lang.String"/>
-	<field name="RESERVES" class="java.math.BigDecimal"/>
-	<field name="CHARGES" class="java.math.BigDecimal"/>
-	<field name="BROWSES" class="java.math.BigDecimal"/>
+	<field name="ITEMS" class="java.math.BigDecimal"/>
 	<field name="RECALLS" class="java.math.BigDecimal"/>
 	<field name="HOLDS" class="java.math.BigDecimal"/>
-	<field name="BOOKINGS" class="java.math.BigDecimal"/>
-	<field name="SHORT_LOANS" class="java.math.BigDecimal"/>
+	<field name="CHARGES" class="java.math.BigDecimal"/>
+	<field name="BROWSES" class="java.math.BigDecimal"/>
+	<field name="RESERVES" class="java.math.BigDecimal"/>
 	<field name="HIST_RESERVES" class="java.math.BigDecimal"/>
 	<background>
 		<band splitType="Stretch"/>
@@ -133,107 +161,95 @@ ORDER BY
 	<columnHeader>
 		<band height="30" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="92" height="30" uuid="b067fb46-3b9a-4c6b-90a5-62bc7fa8ef14"/>
+				<reportElement x="0" y="0" width="96" height="30" uuid="e6616894-2492-4bdf-8b4a-f2cc3b000e41"/>
 				<text><![CDATA[VENDOR CODE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="92" y="0" width="78" height="30" uuid="d0da4e52-9aab-4dd8-a1b5-c13cb1f31c33"/>
+				<reportElement x="96" y="0" width="92" height="30" uuid="d4b75098-74f9-42cc-a190-7b36394ee86c"/>
 				<text><![CDATA[FISCAL PERIOD]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="170" y="0" width="78" height="30" uuid="f5c155fa-1ebe-4e22-8a12-0ed64be99b05"/>
-				<text><![CDATA[LEDGER NAME]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="248" y="0" width="78" height="30" uuid="35e3d6c9-77fc-4ee1-a1c4-830ba1691a56"/>
+				<reportElement x="188" y="0" width="92" height="30" uuid="e472919d-d451-41ef-992f-faa51b736e37"/>
 				<text><![CDATA[FUND CODE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="326" y="0" width="78" height="30" uuid="7517d687-03b2-4f69-9453-1b3ae8e0f084"/>
+				<reportElement x="280" y="0" width="92" height="30" uuid="0d9eb439-10ba-496a-91cf-571296a63523"/>
 				<text><![CDATA[MFHD ID]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="404" y="0" width="78" height="30" uuid="a1848288-aab4-4e8b-b9ac-a1889fc390ef"/>
+				<reportElement x="372" y="0" width="92" height="30" uuid="c569541f-7cc6-462b-a936-49970747c592"/>
 				<text><![CDATA[BIB ID]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="482" y="0" width="78" height="30" uuid="e2546797-4092-4ee3-8ced-ff6b8743b398"/>
+				<reportElement x="464" y="0" width="92" height="30" uuid="6769c1ff-35a4-4a84-9356-fc4d2a88c2c6"/>
 				<text><![CDATA[BIB LEVEL]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="560" y="0" width="78" height="30" uuid="25f228a9-1da7-4058-b80b-9d4fb6f4e9bc"/>
+				<reportElement x="556" y="0" width="92" height="30" uuid="81b50bbc-0f3e-41c4-b0c6-5620eef6d786"/>
 				<text><![CDATA[DATE1]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="638" y="0" width="78" height="30" uuid="657219bd-ddc1-4a99-8ed0-2385bc4c9eb2"/>
-				<text><![CDATA[PUB PLACE]]></text>
+				<reportElement x="648" y="0" width="92" height="30" uuid="7e4cd5ea-2f02-4e6d-b3ce-3af031d072ab"/>
+				<text><![CDATA[PLACE CODE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="716" y="0" width="78" height="30" uuid="6ba9b113-6ea4-468f-b4e3-b55e3da8e95a"/>
+				<reportElement x="740" y="0" width="92" height="30" uuid="5538090a-38c1-4b32-988a-b00547803926"/>
 				<text><![CDATA[LANGUAGE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="794" y="0" width="78" height="30" uuid="6122b3b9-70b6-42b8-a557-9fe8ec18f419"/>
-				<text><![CDATA[F035]]></text>
+				<reportElement x="832" y="0" width="92" height="30" uuid="f593d4cd-9fa2-4a98-a770-0ab751bdf29f"/>
+				<text><![CDATA[OCLC]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="872" y="0" width="78" height="30" uuid="e78a0f73-d5b0-47db-97ee-7f86ad65d397"/>
+				<reportElement x="924" y="0" width="92" height="30" uuid="becc7dc8-668d-4f74-bd5d-01e31f41d260"/>
 				<text><![CDATA[F050]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="950" y="0" width="78" height="30" uuid="45ff06a9-1222-4a96-95e7-3b08db6df628"/>
-				<text><![CDATA[F245]]></text>
+				<reportElement x="1016" y="0" width="92" height="30" uuid="efccb7e2-f88f-4e9e-8f98-01a4ede7e524"/>
+				<text><![CDATA[TITLE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1028" y="0" width="78" height="30" uuid="6590987f-1e69-48d6-8ac1-48880c4bbaf9"/>
+				<reportElement x="1108" y="0" width="92" height="30" uuid="7faab831-cbaf-46b9-9b50-a945b62e86ae"/>
 				<text><![CDATA[F650_1]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1106" y="0" width="78" height="30" uuid="9d7adeb5-661c-43b1-b88b-a1ae51f9b7fb"/>
+				<reportElement x="1200" y="0" width="92" height="30" uuid="d31a1cdb-7d31-442e-b3a2-602a5b8b0f01"/>
 				<text><![CDATA[F650_2]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1184" y="0" width="78" height="30" uuid="bc13f27e-2641-435c-b7d8-546bde79f931"/>
-				<text><![CDATA[F852B]]></text>
+				<reportElement x="1292" y="0" width="92" height="30" uuid="6e4d0eb8-a876-46b7-83b6-c9f301b5844e"/>
+				<text><![CDATA[LOC CODE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1262" y="0" width="78" height="30" uuid="f0faaaff-8add-4f52-b474-2706ecfe39f7"/>
+				<reportElement x="1384" y="0" width="92" height="30" uuid="8525f69f-f802-442f-abc9-fa2060e3e283"/>
 				<text><![CDATA[F852H]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1340" y="0" width="78" height="30" uuid="749ea997-e357-4918-a4e3-8af81e185fe7"/>
-				<text><![CDATA[BARCODE]]></text>
+				<reportElement x="1476" y="0" width="92" height="30" uuid="925eba13-fe64-4c06-bca1-bfafd27deca8"/>
+				<text><![CDATA[ITEMS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1418" y="0" width="78" height="30" uuid="84598c90-752a-461c-93ee-0453ebbe1924"/>
-				<text><![CDATA[RESERVES]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1496" y="0" width="78" height="30" uuid="9ad8f2b7-b95d-4fe6-b9d8-480a0f47a6f3"/>
-				<text><![CDATA[CHARGES]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1574" y="0" width="78" height="30" uuid="81666a59-140e-4566-8d84-70b2224ddd8c"/>
-				<text><![CDATA[BROWSES]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1652" y="0" width="78" height="30" uuid="2f2d1d5e-b608-4375-baaa-d654533add75"/>
+				<reportElement x="1568" y="0" width="92" height="30" uuid="4039dc47-cba0-4c9f-ae50-b5ea8a3ab837"/>
 				<text><![CDATA[RECALLS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1730" y="0" width="78" height="30" uuid="e4994812-4cc1-4fd9-8403-2ed7cff8ea42"/>
+				<reportElement x="1660" y="0" width="92" height="30" uuid="4423ed96-43d8-48e1-91d3-fd65a0ba6e98"/>
 				<text><![CDATA[HOLDS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1808" y="0" width="78" height="30" uuid="1d887904-cadb-4ae3-880c-2a43284c6beb"/>
-				<text><![CDATA[BOOKINGS]]></text>
+				<reportElement x="1752" y="0" width="92" height="30" uuid="363a3e3e-90b5-4447-aa96-216348d0c1c6"/>
+				<text><![CDATA[CHARGES]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1886" y="0" width="78" height="30" uuid="04b1d14d-1fbe-419b-b3be-40841f68ce04"/>
-				<text><![CDATA[SHORT LOANS]]></text>
+				<reportElement x="1844" y="0" width="92" height="30" uuid="2bc77ab1-3253-4877-bc6c-23eb46211530"/>
+				<text><![CDATA[BROWSES]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1964" y="0" width="78" height="30" uuid="fb60fc41-6b68-4408-951e-5e73df8b7d31"/>
+				<reportElement x="1936" y="0" width="92" height="30" uuid="159625c2-6eaf-46e1-9451-29624432298a"/>
+				<text><![CDATA[RESERVES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2028" y="0" width="92" height="30" uuid="ffaa3149-8614-48af-bdcf-b05ecee58004"/>
 				<text><![CDATA[HIST RESERVES]]></text>
 			</staticText>
 		</band>
@@ -241,110 +257,186 @@ ORDER BY
 	<detail>
 		<band height="30" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="92" height="30" uuid="b4c81a66-0209-45cc-81ea-57ffce8daecc"/>
+				<reportElement x="0" y="0" width="96" height="30" uuid="09f71c19-c3fa-4563-a254-8cbda4066534">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{VENDOR_CODE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="92" y="0" width="78" height="30" uuid="ddd8a1d4-0b82-4c71-a2b5-fc79659c5b28"/>
+				<reportElement x="96" y="0" width="92" height="30" uuid="f7088644-0ae3-489a-b034-e66e2eb2d8c4">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{FISCAL_PERIOD_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="170" y="0" width="78" height="30" uuid="f04bd17d-316a-4441-9eee-3e19b0c1af46"/>
-				<textFieldExpression><![CDATA[$F{LEDGER_NAME}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="248" y="0" width="78" height="30" uuid="b4cd087a-f21d-4623-a123-9278bfb56f1a"/>
+				<reportElement x="188" y="0" width="92" height="30" uuid="03bb0ebf-2467-41ca-953f-4dd01d8854a2">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{FUND_CODE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="326" y="0" width="78" height="30" uuid="d41f7c06-7d1a-49bd-bfee-409d76b2ca01"/>
+				<reportElement x="280" y="0" width="92" height="30" uuid="5c7755fd-2c00-4269-ad07-103b9c56180d">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{MFHD_ID}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="404" y="0" width="78" height="30" uuid="f5d55d7f-585a-4769-a3c9-896544e82739"/>
+				<reportElement x="372" y="0" width="92" height="30" uuid="80be55a7-c703-4d0d-ac80-1eb5ad98d687">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="482" y="0" width="78" height="30" uuid="da14681f-9514-4c08-8b8f-07b826b45d9b"/>
+				<reportElement x="464" y="0" width="92" height="30" uuid="ed0bfe5f-d6b6-4aa9-b66e-ad9f665dded9">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{BIB_LEVEL}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="560" y="0" width="78" height="30" uuid="5bcbb059-7be2-4892-8552-3cba7401daec">
+				<reportElement x="556" y="0" width="92" height="30" uuid="54265669-4c8d-4e59-a469-5ad54fb7b00f">
 					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{DATE1}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="638" y="0" width="78" height="30" uuid="d1e4ec51-4b05-41bd-a0da-cfeb3adee5e3"/>
-				<textFieldExpression><![CDATA[$F{PUB_PLACE}]]></textFieldExpression>
+				<reportElement x="648" y="0" width="92" height="30" uuid="71f13d0d-7f94-4248-89fd-5c48d4f1e5a8">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PLACE_CODE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="716" y="0" width="78" height="30" uuid="a7529b22-eb04-4161-948c-037b3a543e40"/>
+				<reportElement x="740" y="0" width="92" height="30" uuid="c95f28c5-5c74-401f-a4c4-c1eeedbcd981">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{LANGUAGE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="794" y="0" width="78" height="30" uuid="c8e2b8eb-3984-4444-954d-cf1f0ffbaaa2"/>
-				<textFieldExpression><![CDATA[$F{F035}]]></textFieldExpression>
+				<reportElement x="832" y="0" width="92" height="30" uuid="da2013c5-3d79-4658-8854-14b85ca7c500">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OCLC}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="872" y="0" width="78" height="30" uuid="b97d2ab7-44ae-4410-90ba-bfc4f6258b97"/>
+				<reportElement x="924" y="0" width="92" height="30" uuid="69e889bf-4347-46bc-b589-1a82ef0b2964">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{F050}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="950" y="0" width="78" height="30" uuid="e6bfb268-5bce-463a-b6b4-45fbba0dc374"/>
-				<textFieldExpression><![CDATA[$F{F245}]]></textFieldExpression>
+				<reportElement x="1016" y="0" width="92" height="30" uuid="f7344f21-17bf-431b-a2b1-e5edd2b97b83">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1028" y="0" width="78" height="30" uuid="5f952a9f-5abe-48f1-80e6-a0fe2cd94714"/>
+				<reportElement x="1108" y="0" width="92" height="30" uuid="14c6c7d9-a479-43ac-81ee-ca4665be5f34">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{F650_1}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1106" y="0" width="78" height="30" uuid="2349db5d-9235-4ddf-879c-2c719213f69e"/>
+				<reportElement x="1200" y="0" width="92" height="30" uuid="d1e871ff-487b-40ad-8c06-131e2c017ba6">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{F650_2}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1184" y="0" width="78" height="30" uuid="42919767-9233-4e9f-aa4b-f0af78860fbc"/>
-				<textFieldExpression><![CDATA[$F{F852B}]]></textFieldExpression>
+				<reportElement x="1292" y="0" width="92" height="30" uuid="fa555661-481c-4ce2-800c-70629ca2195e">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LOC_CODE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1262" y="0" width="78" height="30" uuid="7f470a32-99be-49f5-8cbd-c9573bb6e9ed"/>
+				<reportElement x="1384" y="0" width="92" height="30" uuid="bf388752-2f2a-464b-b0cf-60d454b57c25">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{F852H}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1340" y="0" width="78" height="30" uuid="ab2c97f5-c0ab-4314-a343-d0913c719e2a"/>
-				<textFieldExpression><![CDATA[$F{BARCODE}]]></textFieldExpression>
+				<reportElement x="1476" y="0" width="92" height="30" uuid="82b6bc13-b5ac-41de-9d8e-a3433b77a22e">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEMS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1418" y="0" width="78" height="30" uuid="bc924fa1-5960-4ae6-9033-b24f39ae79cd"/>
-				<textFieldExpression><![CDATA[$F{RESERVES}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="1496" y="0" width="78" height="30" uuid="26613cf5-19e8-4f77-bd08-61d75e0aaa20"/>
-				<textFieldExpression><![CDATA[$F{CHARGES}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="1574" y="0" width="78" height="30" uuid="eee6a9ea-97ac-45ae-89b7-fa0617726298"/>
-				<textFieldExpression><![CDATA[$F{BROWSES}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="1652" y="0" width="78" height="30" uuid="ff1b3825-cc47-4ca6-8af7-6ae0c56b6a9c"/>
+				<reportElement x="1568" y="0" width="92" height="30" uuid="38bd1a02-8dda-46bd-8f81-da7909facb2d">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{RECALLS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1730" y="0" width="78" height="30" uuid="831c30fa-fc74-4c68-984b-a201dd49b267"/>
+				<reportElement x="1660" y="0" width="92" height="30" uuid="d91cc8bb-2faf-4f69-9d8b-0a8c7e13c528">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$F{HOLDS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1808" y="0" width="78" height="30" uuid="53c3487b-f43f-4dca-9a5a-124100505e7e"/>
-				<textFieldExpression><![CDATA[$F{BOOKINGS}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="1886" y="0" width="78" height="30" uuid="fcf4ff07-2bb0-4eed-a52e-dc36d6c1b356"/>
-				<textFieldExpression><![CDATA[$F{SHORT_LOANS}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="1964" y="0" width="78" height="30" uuid="7f3a73f2-0d55-49ec-885d-f389f63dfbed">
+				<reportElement x="1752" y="0" width="92" height="30" uuid="23c111e7-6dd0-4fa8-9ce8-3498c77e553c">
 					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CHARGES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1844" y="0" width="92" height="30" uuid="302d594b-cc46-4aaa-8e68-cce67e114034">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BROWSES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1936" y="0" width="92" height="30" uuid="2e37154e-c19c-4070-91ca-bbdc20e85ff7">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{RESERVES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2028" y="0" width="92" height="30" uuid="cd98fbf0-6732-4681-acaf-e01e515cb4da">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{HIST_RESERVES}]]></textFieldExpression>
 			</textField>
