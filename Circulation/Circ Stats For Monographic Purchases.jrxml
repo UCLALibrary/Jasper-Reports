@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Circ Stats For Monographic Purchases" pageWidth="2160" pageHeight="612" orientation="Landscape" columnWidth="2120" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="eff9f80b-198c-4a9e-83a4-24915266c773">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
@@ -16,18 +16,13 @@
 	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
 	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
-	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases"/>
-	<parameter name="select_vendor" class="java.util.Collection">
-		<parameterDescription><![CDATA[Vendor filter]]></parameterDescription>
-	</parameter>
 	<parameter name="ledger_name_multi" class="java.util.Collection">
 		<parameterDescription><![CDATA[Ledger filter]]></parameterDescription>
 	</parameter>
-	<parameter name="fiscal_year_multi" class="java.util.Collection">
-		<parameterDescription><![CDATA[FY filter]]></parameterDescription>
-	</parameter>
+	<parameter name="vendor_code" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[with acq as (
 	select 
@@ -63,9 +58,8 @@
 	where 
 		substr(bt.bib_format, 2, 1) = 'm' -- bib level
 		and i.invoice_status = 1 --approved invoices
-		and $X{IN, v.vendor_id, select_vendor}
+		and v.vendor_code = $P{vendor_code}
 		and $X{IN, f.ledger_id, ledger_name_multi}
-		and $X{IN, f.fiscal_period_id, fiscal_year_multi} 
 ), 
 items as (
 	select
