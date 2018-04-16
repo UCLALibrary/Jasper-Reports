@@ -19,10 +19,10 @@
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases"/>
-	<parameter name="ledger_name_multi" class="java.util.Collection">
-		<parameterDescription><![CDATA[Ledger filter]]></parameterDescription>
-	</parameter>
 	<parameter name="vendor_code" class="java.lang.String"/>
+	<parameter name="fiscal_year_multi" class="java.util.Collection">
+		<parameterDescription><![CDATA[FY filter]]></parameterDescription>
+	</parameter>
 	<queryString language="SQL">
 		<![CDATA[with acq as (
 	select 
@@ -59,7 +59,9 @@
 		substr(bt.bib_format, 2, 1) = 'm' -- bib level
 		and i.invoice_status = 1 --approved invoices
 		and v.vendor_code = $P{vendor_code}
-		and $X{IN, f.ledger_id, ledger_name_multi}
+		and $X{IN, f.fiscal_period_id, fiscal_year_multi}
+		-- Combination of fiscal period and ledger should be correct...
+		and (f.ledger_name like '%CRIS%' or regexp_like(f.ledger_name, '^(Contracts|CRIS|Spec\/).+', 'i'))
 ), 
 items as (
 	select
