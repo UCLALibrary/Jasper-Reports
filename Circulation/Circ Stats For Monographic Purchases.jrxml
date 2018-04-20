@@ -61,7 +61,7 @@
 		and v.vendor_code = $P{vendor_code}
 		and $X{IN, f.fiscal_period_id, fiscal_year_multi}
 		-- Combination of fiscal period and ledger should be correct...
-		and (f.ledger_name like '%CRIS%' or regexp_like(f.ledger_name, '^(Contracts|CRIS|Spec\/).+', 'i'))
+		and (f.ledger_name like '%CRIS%' or regexp_like(f.ledger_name, '^(AUL|Contracts|CRIS|Spec\/).+', 'i'))
 ), 
 items as (
 	select
