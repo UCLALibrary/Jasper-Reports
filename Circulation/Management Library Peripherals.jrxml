@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Management Library Peripherals" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="c231bb96-6920-4636-bcc7-1ee786d8bbae">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<parameter name="date_1" class="java.sql.Date">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<parameter name="date_2" class="java.sql.Date">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+	
+		Count(*) AS num,
+    bt.title
+
+   FROM ucla_BIBTEXT_vw bt
+
+INNER join BIB_MFHD bmf ON bt.BIB_ID = bmf.BIB_ID
+INNER join MFHD_MASTER mm ON bmf.MFHD_ID = mm.MFHD_ID
+left outer join LOCATION l ON mm.LOCATION_ID = l.LOCATION_ID
+left outer join MFHD_ITEM mi ON mm.MFHD_ID = mi.MFHD_ID
+left outer join ITEM i ON mi.ITEM_ID = i.ITEM_ID
+left outer join ITEM_TYPE it ON i.ITEM_TYPE_ID = it.ITEM_TYPE_ID
+left outer join CIRC_TRANS_archive ct ON i.ITEM_ID = ct.ITEM_ID
+left outer join PATRON_GROUP pg ON ct.PATRON_GROUP_ID = pg.PATRON_GROUP_ID
+left outer join PATRON p ON ct.PATRON_ID = p.PATRON_ID
+left outer join PATRON_STAT_CODE psc ON p.PATRON_ID = psc.PATRON_STAT_ID
+
+WHERE bt.author LIKE 'ACIS-STS%'
+ AND ct.charge_date BETWEEN trunc($P{date_1}) and trunc($P{date_2}) 
+
+      GROUP BY bt.title
+      ORDER BY bt.title]]>
+	</queryString>
+	<field name="NUM" class="java.math.BigDecimal"/>
+	<field name="TITLE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="278" height="61" uuid="488b2bd5-5c32-458c-8580-da78eff2f13a"/>
+				<text><![CDATA[NUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="0" width="277" height="61" uuid="0708946f-054e-4935-b1ac-02920bb82fb2"/>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="278" height="125" uuid="02f650b7-25e2-4505-a2c1-9d2c90358e80"/>
+				<textFieldExpression><![CDATA[$F{NUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="278" y="0" width="277" height="125" uuid="2c2f332b-622d-48c4-b023-96fb92261fb4"/>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
