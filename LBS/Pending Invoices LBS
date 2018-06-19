@@ -1,0 +1,46 @@
+SELECT distinct 
+  order_loc
+, sort_key
+, to_char(invoice_create_date, 'YYYY-MM-DD') || ' ' || create_opid as created
+, to_char(invoice_update_date, 'YYYY-MM-DD') || ' ' || update_opid as updated
+, invoice_number
+, vendor_code as  vendor
+, po_number
+, fau
+,	adjustments_subtotal/100 AS adj_subtotal 
+, total / 100 as total
+FROM
+(	SELECT distinct 
+    i.invoice_id
+  ,	i.invoice_number
+  ,	i.invoice_status_date
+  ,	i.invoice_date
+  ,	i.invoice_create_date
+  ,	i.create_opid
+  ,	i.invoice_update_date
+  ,	i.update_opid
+  ,	i.currency_code
+  ,	i.conversion_rate
+  ,	i.invoice_total -- total as entered by user
+  ,	i.line_item_subtotal
+  ,	i.adjustments_subtotal
+  ,	i.total -- total as calculated by Voyager
+  ,	v.vendor_code
+  ,	Coalesce(po.po_number, '** NO PO') as po_number
+  ,	Coalesce(l.location_name, '** No location') AS order_loc
+  ,	Trim(To_Char(i.invoice_create_date, 'YYYY-MM-DD') || v.vendor_code || i.invoice_number) AS sort_key
+  ,	f.institution_fund_id as fau
+  FROM invoice i
+  INNER JOIN invoice_status ist ON i.invoice_status = ist.invoice_status
+  INNER JOIN vendor v ON i.vendor_id = v.vendor_id
+  LEFT OUTER JOIN invoice_line_item ili ON i.invoice_id = ili.invoice_id
+  LEFT OUTER JOIN invoice_line_item_funds ilif ON ili.inv_line_item_id = ilif.inv_line_item_id
+  LEFT OUTER JOIN fund f ON ilif.fund_id = f.fund_id
+  LEFT OUTER JOIN line_item li ON ili.line_item_id = li.line_item_id -- link to po line item
+  LEFT OUTER JOIN purchase_order po ON li.po_id = po.po_id
+  LEFT OUTER JOIN location l ON po.order_location = l.location_id
+  WHERE ist.invoice_status_desc = 'Pending'
+        AND i.vendor_id != 0 -- these are "abandoned" rows - user started creating so sequence was used, but never saved with real content
+) Pending
+
+ORDER BY invoice_number
