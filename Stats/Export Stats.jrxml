@@ -52,10 +52,10 @@
 		when LEN('"' + replace(replace(coalesce(ri.Topic, 'N/A'), ',', ';'), '"', '''') + '"') = 2 THEN '"' + 'N/A' + '"'
 		else '"' + replace(replace(coalesce(ri.Topic, 'N/A'), ',', ';'), '"', '''') + '"'
 	end AS Topic,
-	case
-		when LEN('"' + replace(replace(replace(coalesce(rr.ReferralText, 'N/A'), ',', ';'), '"', ''''), '\n',';') + '"') = 2 THEN '"' + 'N/A' + '"'
-		else '"' + replace(replace(replace(coalesce(rr.ReferralText, 'N/A'), ',', ';'), '"', ''''), '\n',';') + '"'
-	end AS ReferralText
+	CASE
+		when exists (select * from PSS_Test.dbo.RefStatReferrals where RefStatID = rs.RecordID) then 'Yes'
+		else 'No'
+	END AS ReferralText
 from
 	PSS_Test.dbo.ReferenceStatistics rs
 	inner join PSS_Test.dbo.RefUnit ru on SUBSTRING(rs.AggregateID,1,5) = ru.UnitID
@@ -64,8 +64,6 @@ from
 	inner join PSS_Test.dbo.RefMode rm on SUBSTRING(rs.AggregateID,10,2) = rm.ModeID
 	left join PSS_Test.dbo.RefStatInteractions rsi on rs.RecordID = rsi.RefStatID
 	left join PSS_Test.dbo.RefInteractions ri on rsi.RefInteractionID = ri.InteractionID
-	left join PSS_Test.dbo.RefStatReferrals rsr on rs.RecordID = rsr.RefStatID
-	left join PSS_Test.dbo.RefReferrals rr on rsr.RefReferralID = rr.ReferralID
 	left join PSS_Test.dbo.PatronType pt on ri.PatronType = pt.PatronTypeID
 	left join SIA.dbo.DepartmentLookup dl on ri.DepartmentID = dl.DepartmentID
 where
@@ -151,7 +149,7 @@ where
 			</staticText>
 			<staticText>
 				<reportElement x="1036" y="0" width="74" height="30" uuid="469fe64a-c0da-45fe-8e5d-dfb2d0753eaa"/>
-				<text><![CDATA[Referral Text]]></text>
+				<text><![CDATA[Referral?]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
