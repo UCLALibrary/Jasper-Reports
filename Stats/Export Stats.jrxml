@@ -142,19 +142,15 @@ where
 				<text><![CDATA[Patron Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="888" y="0" width="74" height="30" uuid="78ddad65-9be3-4559-b277-6e0422d4a642"/>
-				<text><![CDATA[Patron Feedback]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="962" y="0" width="74" height="30" uuid="3db216c6-505d-41ac-818c-120e8f04c0a8"/>
+				<reportElement x="888" y="0" width="74" height="30" uuid="3db216c6-505d-41ac-818c-120e8f04c0a8"/>
 				<text><![CDATA[Staff Feedback]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1036" y="0" width="74" height="30" uuid="ff381e4b-a99b-430d-9ab8-5f716c438b53"/>
+				<reportElement x="962" y="0" width="74" height="30" uuid="ff381e4b-a99b-430d-9ab8-5f716c438b53"/>
 				<text><![CDATA[Topic]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1110" y="0" width="74" height="30" uuid="469fe64a-c0da-45fe-8e5d-dfb2d0753eaa"/>
+				<reportElement x="1036" y="0" width="74" height="30" uuid="469fe64a-c0da-45fe-8e5d-dfb2d0753eaa"/>
 				<text><![CDATA[Referral Text]]></text>
 			</staticText>
 		</band>
@@ -210,21 +206,15 @@ where
 				<textFieldExpression><![CDATA[$F{PatronCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="888" y="0" width="74" height="30" uuid="9cd38593-0c51-4a2d-95b9-442a4307246a">
-					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{PatronFeedback}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="962" y="0" width="74" height="30" uuid="3ce70b61-d5a3-4c77-8a17-b6ffd97678c2"/>
+				<reportElement x="888" y="0" width="74" height="30" uuid="3ce70b61-d5a3-4c77-8a17-b6ffd97678c2"/>
 				<textFieldExpression><![CDATA[$F{StaffFeedback}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1036" y="0" width="74" height="30" uuid="62e5ae05-46fd-4337-8368-94be1c9e36de"/>
+				<reportElement x="962" y="0" width="74" height="30" uuid="62e5ae05-46fd-4337-8368-94be1c9e36de"/>
 				<textFieldExpression><![CDATA[$F{Topic}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1110" y="0" width="74" height="30" uuid="4042f4bf-7ba7-4ed5-9944-bc7e40355d3e"/>
+				<reportElement x="1036" y="0" width="74" height="30" uuid="4042f4bf-7ba7-4ed5-9944-bc7e40355d3e"/>
 				<textFieldExpression><![CDATA[$F{ReferralText}]]></textFieldExpression>
 			</textField>
 		</band>
