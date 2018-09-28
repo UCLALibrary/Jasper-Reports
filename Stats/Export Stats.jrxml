@@ -53,18 +53,18 @@
 		else '"' + replace(replace(coalesce(ri.Topic, 'N/A'), ',', ';'), '"', '''') + '"'
 	end AS Topic,
 	CASE
-		when exists (select * from PSS_Test.dbo.RefStatReferrals where RefStatID = rs.RecordID) then 'Yes'
+		when exists (select * from dbo.RefStatReferrals where RefStatID = rs.RecordID) then 'Yes'
 		else 'No'
 	END AS ReferralText
 from
-	PSS_Test.dbo.ReferenceStatistics rs
-	inner join PSS_Test.dbo.RefUnit ru on SUBSTRING(rs.AggregateID,1,5) = ru.UnitID
-	inner join PSS_Test.dbo.RefServicePoint rsp on SUBSTRING(rs.AggregateID,6,2) = rsp.PointID
-	inner join PSS_Test.dbo.RefType rt on SUBSTRING(rs.AggregateID,8,2) = rt.TypeID
-	inner join PSS_Test.dbo.RefMode rm on SUBSTRING(rs.AggregateID,10,2) = rm.ModeID
-	left join PSS_Test.dbo.RefStatInteractions rsi on rs.RecordID = rsi.RefStatID
-	left join PSS_Test.dbo.RefInteractions ri on rsi.RefInteractionID = ri.InteractionID
-	left join PSS_Test.dbo.PatronType pt on ri.PatronType = pt.PatronTypeID
+	dbo.ReferenceStatistics rs
+	inner join dbo.RefUnit ru on SUBSTRING(rs.AggregateID,1,5) = ru.UnitID
+	inner join dbo.RefServicePoint rsp on SUBSTRING(rs.AggregateID,6,2) = rsp.PointID
+	inner join dbo.RefType rt on SUBSTRING(rs.AggregateID,8,2) = rt.TypeID
+	inner join dbo.RefMode rm on SUBSTRING(rs.AggregateID,10,2) = rm.ModeID
+	left join dbo.RefStatInteractions rsi on rs.RecordID = rsi.RefStatID
+	left join dbo.RefInteractions ri on rsi.RefInteractionID = ri.InteractionID
+	left join dbo.PatronType pt on ri.PatronType = pt.PatronTypeID
 	left join SIA.dbo.DepartmentLookup dl on ri.DepartmentID = dl.DepartmentID
 where
 	SUBSTRING(rs.AggregateID, 8, 2) <> '00' 
