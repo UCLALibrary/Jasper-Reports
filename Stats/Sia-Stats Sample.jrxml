@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sia test" pageWidth="1440" pageHeight="612" orientation="Landscape" columnWidth="1400" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="9fa1b37e-4dea-4a3f-989c-64882bb038db">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SiaDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<queryString language="SQL">
+		<![CDATA[select * from dbo."vwSiaStats"
+where SessionDateTime >= $P{startDate} and SessionDateTime < DATEADD(DAY, 1, $P{endDate})]]>
+	</queryString>
+	<field name="SessionDateTime" class="java.lang.String"/>
+	<field name="SessionType" class="java.lang.String"/>
+	<field name="Title" class="java.lang.String"/>
+	<field name="Departments" class="java.lang.String"/>
+	<field name="CourseNumber" class="java.lang.String"/>
+	<field name="CourseSection" class="java.lang.String"/>
+	<field name="GroupName" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="LearnerTypes" class="java.lang.String"/>
+	<field name="LearnerCount" class="java.lang.Integer"/>
+	<field name="SessionCount" class="java.lang.Integer"/>
+	<field name="Duration" class="java.lang.Double"/>
+	<field name="Developers" class="java.lang.String"/>
+	<field name="DeveloperUnits" class="java.lang.String"/>
+	<field name="Presenters" class="java.lang.String"/>
+	<field name="PresenterUnits" class="java.lang.String"/>
+	<field name="FacContacts" class="java.lang.String"/>
+	<field name="FacEmails" class="java.lang.String"/>
+	<field name="Initiatives" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="86" height="30" uuid="91c13aab-19d9-41bc-b277-a257f29824c1"/>
+				<text><![CDATA[Session Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="86" y="0" width="73" height="30" uuid="40c777c0-2d9e-4142-a075-1c6de3b8acfd"/>
+				<text><![CDATA[Session Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="159" y="0" width="73" height="30" uuid="0581832e-75e9-4df3-8d8e-d0bda8c969ba"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="232" y="0" width="73" height="30" uuid="27100089-83c4-4483-8a8f-4380ef033d27"/>
+				<text><![CDATA[Department(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="0" width="73" height="30" uuid="5fc0797b-1700-439d-b025-ff19d04f14eb"/>
+				<text><![CDATA[Course Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="378" y="0" width="73" height="30" uuid="0fb4c160-1e6a-4dd7-ab38-297f65d0ab25"/>
+				<text><![CDATA[Course Section]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="0" width="73" height="30" uuid="d67204cc-3e8a-4692-8ed0-78680d057c50"/>
+				<text><![CDATA[Group Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="524" y="0" width="73" height="30" uuid="fe1b2f18-b07a-4646-99d0-12785c788df5"/>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="597" y="0" width="73" height="30" uuid="6c89c226-1951-49cb-b63d-50d6e94f2e53"/>
+				<text><![CDATA[Learner Types]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="670" y="0" width="73" height="30" uuid="03362d45-987d-48ca-9d72-a2d20dca2483"/>
+				<text><![CDATA[Learner Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="743" y="0" width="73" height="30" uuid="474789c4-a1e2-41c8-bff9-116f923839d8"/>
+				<text><![CDATA[Session Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="816" y="0" width="73" height="30" uuid="a0fd069a-2f11-42a3-a136-1e381df16c83"/>
+				<text><![CDATA[Duration]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="889" y="0" width="73" height="30" uuid="59e3f97b-17cd-4f3f-8805-767b1dab8dba"/>
+				<text><![CDATA[Developers]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="962" y="0" width="73" height="30" uuid="10e24023-39fa-4810-a5d9-ecd4754caf6a"/>
+				<text><![CDATA[Developer Units]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1035" y="0" width="73" height="30" uuid="9d4e4302-2597-4e18-9652-dd5b055e7b9d"/>
+				<text><![CDATA[Presenters]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1108" y="0" width="73" height="30" uuid="ec10ebe7-9b33-4d94-a0bb-c50bb7ca3ec2"/>
+				<text><![CDATA[Presenter Units]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1181" y="0" width="73" height="30" uuid="2eaf1f90-72ac-4f7e-9f03-6d79e5ffd47f"/>
+				<text><![CDATA[Faculty Contacts]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1254" y="0" width="73" height="30" uuid="91fa0707-51c5-4795-ab71-729de482eabb"/>
+				<text><![CDATA[Faculty Emails]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1327" y="0" width="73" height="30" uuid="339b71b3-740a-4dce-9eef-ed6c2f6ea619"/>
+				<text><![CDATA[Initiatives]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="86" height="30" uuid="afd3c77a-2736-4886-a79d-c191da88a30a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SessionDateTime}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="86" y="0" width="73" height="30" uuid="f3137e93-606e-4a92-96df-7efbcc5d065d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SessionType}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="159" y="0" width="73" height="30" uuid="3aab9038-0744-4212-a5b8-4600b9e7d8c9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Title}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="232" y="0" width="73" height="30" uuid="1b47ad0b-8235-4534-9582-f64034bd62e0">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Departments}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="305" y="0" width="73" height="30" uuid="3d2c9920-4175-4447-b048-7e2a0b0fcb91">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CourseNumber}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="378" y="0" width="73" height="30" uuid="413495ab-0eee-4f1a-bd56-62bf8d8fcb3c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CourseSection}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="451" y="0" width="73" height="30" uuid="9705d155-7e8a-4e58-a3b4-ae50c1ce7ca8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{GroupName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="524" y="0" width="73" height="30" uuid="2c1af23d-7105-4257-89c3-b1827521147b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="597" y="0" width="73" height="30" uuid="4433a926-6133-42a2-99fb-2a5787aedf51">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LearnerTypes}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="670" y="0" width="73" height="30" uuid="8f32f6b1-acbb-49cb-8d6d-cddcfd784cc9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LearnerCount}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="743" y="0" width="73" height="30" uuid="ada8e2ea-d4e2-41c1-83e3-9de6e1ea6e0d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SessionCount}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="816" y="0" width="73" height="30" uuid="228fbed9-6de7-4a2f-b5fa-0181de21cfcb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Duration}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="889" y="0" width="73" height="30" uuid="b64fea94-8a5e-4180-84a5-9a5c0a176aac">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Developers}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="962" y="0" width="73" height="30" uuid="c613d113-6a8a-43ad-9a5e-74a3e1e679c4">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DeveloperUnits}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1035" y="0" width="73" height="30" uuid="a82cadb7-509b-4e59-aa72-19d7f62e285a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Presenters}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1108" y="0" width="73" height="30" uuid="10c9a73c-b7bd-4021-aae8-a2a8b7bdb6cd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PresenterUnits}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1181" y="0" width="73" height="30" uuid="aaec91d9-3337-4499-9102-aa230b63b983">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FacContacts}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1254" y="0" width="73" height="30" uuid="51bb9edc-d141-4674-84f5-81dc556deb76">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FacEmails}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1327" y="0" width="73" height="30" uuid="c9de33a7-ea3c-47fa-9011-c9356958e08b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Initiatives}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
