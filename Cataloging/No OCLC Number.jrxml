@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="No OCLC Number" pageWidth="1242" pageHeight="595" orientation="Landscape" columnWidth="1242" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="4517c1ce-70a2-4ebf-acb9-cf4adfe745ed">
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/No_OCLC_Number_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/No_OCLC_Number"/>
@@ -16,6 +16,9 @@
 	</parameter>
 	<parameter name="p_bib_level" class="java.lang.String">
 		<parameterDescription><![CDATA[Bib Level (optional)]]></parameterDescription>
+	</parameter>
+	<parameter name="record_is_suppressed" class="java.lang.String">
+		<parameterDescription><![CDATA[Bib record is suppressed]]></parameterDescription>
 	</parameter>
 	<queryString>
 		<![CDATA[select 
@@ -35,6 +38,8 @@ inner join ucladb.bib_text bt on b.bib_id = bt.bib_id
 inner join ucladb.mfhd_master mm on b.mfhd_id = mm.mfhd_id
 -- Mandatory location_code, with wildcard support
 where b.location_code like $P{p_location_code}
+--  "Mandatory" check box: bib is suppressed or not (Y/N)
+ and b.bib_suppressed = $P{record_is_suppressed}
 -- optional language
 and (b.language = $P{p_language} or $P{p_language} is null)
 -- optional bib level
