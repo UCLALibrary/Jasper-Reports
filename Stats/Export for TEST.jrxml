@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Export for TEST" pageWidth="1224" pageHeight="612" orientation="Landscape" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a2f3e347-3594-493e-915c-594b92f90412">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="StatsDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.5F"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Pub_Serv_Stats/Export_for_TEST_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Pub_Serv_Stats/Export_for_TEST"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<queryString language="SQL">
+		<![CDATA[select
+	ru.Descrpt AS Unit,
+	rsp.Descrpt AS ServicePoint,
+	rt.Descrpt AS QuestionType,
+	rm.Descrpt AS InteractionMode,
+	convert(varchar,rs.Created_DT,101) AS EventDate,
+	convert(varchar,rs.Created_DT,108) AS EventTime,
+	case
+		WHEN rs.LogonID is null then '"' + 'N/A'  + '"'
+		WHEN LEN(ltrim(rtrim(rs.LogonID))) = 0 then '"' + 'N/A'  + '"'
+		else rs.LogonID
+	end AS UserName,
+	rs.TimeSpent,
+	case
+		when dl.Department IS null then '"' + 'N/A'  + '"'
+		else replace(dl.Department, ',', ';')
+	end AS Department,
+	case
+		when LEN('"' + replace(replace(coalesce(ri.Course, 'N/A'), ',', ';'), '"', '''') + '"') = 2 THEN '"' + 'N/A' + '"'
+		else '"' + replace(replace(coalesce(ri.Course, 'N/A'), ',', ';'), '"', '''') + '"'
+	end AS Course,
+	case
+		when pt.PatronType IS null then '"' + 'N/A'  + '"'
+		else pt.PatronType
+	end AS PatronType,
+	rs.PatronCount,
+	case
+		when LEN('"' + replace(replace(coalesce(ri.PatronFeedback, 'N/A'), ',', ';'), '"', '''') + '"') = 2 THEN '"' + 'N/A' + '"'
+		else '"' + replace(replace(coalesce(ri.PatronFeedback, 'N/A'), ',', ';'), '"', '''') + '"'
+	end AS PatronFeedback,
+	case
+		when LEN('"' + replace(replace(coalesce(ri.StaffFeedback, 'N/A'), ',', ';'), '"', '''') + '"') = 2 THEN '"' + 'N/A' + '"'
+		else '"' + replace(replace(coalesce(ri.StaffFeedback, 'N/A'), ',', ';'), '"', '''') + '"'
+	end AS StaffFeedback,
+	case
+		when LEN('"' + replace(replace(coalesce(ri.Topic, 'N/A'), ',', ';'), '"', '''') + '"') = 2 THEN '"' + 'N/A' + '"'
+		else '"' + replace(replace(coalesce(ri.Topic, 'N/A'), ',', ';'), '"', '''') + '"'
+	end AS Topic,
+	CASE
+		when exists (select * from dbo.RefStatReferrals where RefStatID = rs.RecordID) then 'Yes'
+		else 'No'
+	END AS ReferralText
+from
+	dbo.ReferenceStatistics rs
+	inner join dbo.RefUnit ru on SUBSTRING(rs.AggregateID,1,5) = ru.UnitID
+	inner join dbo.RefServicePoint rsp on SUBSTRING(rs.AggregateID,6,2) = rsp.PointID
+	inner join dbo.RefType rt on SUBSTRING(rs.AggregateID,8,2) = rt.TypeID
+	inner join dbo.RefMode rm on SUBSTRING(rs.AggregateID,10,2) = rm.ModeID
+	left join dbo.RefStatInteractions rsi on rs.RecordID = rsi.RefStatID
+	left join dbo.RefInteractions ri on rsi.RefInteractionID = ri.InteractionID
+	left join dbo.PatronType pt on ri.PatronType = pt.PatronTypeID
+	left join SIA.dbo.DepartmentLookup dl on ri.DepartmentID = dl.DepartmentID
+where
+	SUBSTRING(rs.AggregateID, 8, 2) <> '00' 
+	AND (rs.Created_DT >= $P{startDate} and rs.Created_DT < DATEADD(DAY, 1, $P{endDate}))]]>
+	</queryString>
+	<field name="Unit" class="java.lang.String"/>
+	<field name="ServicePoint" class="java.lang.String"/>
+	<field name="QuestionType" class="java.lang.String"/>
+	<field name="InteractionMode" class="java.lang.String"/>
+	<field name="EventDate" class="java.lang.String"/>
+	<field name="EventTime" class="java.lang.String"/>
+	<field name="UserName" class="java.lang.String"/>
+	<field name="TimeSpent" class="java.lang.Double"/>
+	<field name="Department" class="java.lang.String"/>
+	<field name="Course" class="java.lang.String"/>
+	<field name="PatronType" class="java.lang.String"/>
+	<field name="PatronCount" class="java.lang.Integer"/>
+	<field name="PatronFeedback" class="java.lang.String"/>
+	<field name="StaffFeedback" class="java.lang.String"/>
+	<field name="Topic" class="java.lang.String"/>
+	<field name="ReferralText" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="74" height="30" uuid="ae4449e9-4357-4c5b-b3ad-910fa0caf96f"/>
+				<text><![CDATA[Unit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="74" y="0" width="74" height="30" uuid="e425b7e6-939e-4187-bfc5-6849ec58e9d1"/>
+				<text><![CDATA[ServicePoint]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="148" y="0" width="74" height="30" uuid="197f2ea4-1b68-4385-b93f-511bc3751ad1"/>
+				<text><![CDATA[QuestionType]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="0" width="74" height="30" uuid="26e8feec-5c13-464a-b926-9176bed2d4ff"/>
+				<text><![CDATA[InteractionMode]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="296" y="0" width="74" height="30" uuid="2094805e-0fb4-4679-89d6-022f6c633096"/>
+				<text><![CDATA[EventDate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="0" width="74" height="30" uuid="94167eb8-eadc-4740-b922-d54f2fd883e8"/>
+				<text><![CDATA[EventTime]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="444" y="0" width="74" height="30" uuid="e474fd65-a6cb-44c5-83fe-a94bb31fa27c"/>
+				<text><![CDATA[UserName]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="518" y="0" width="74" height="30" uuid="65f5cca8-1946-42b9-9bfd-303ed2378be3"/>
+				<text><![CDATA[TimeSpent]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="592" y="0" width="74" height="30" uuid="c4d04a69-544d-49e3-a764-88508d860777"/>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="666" y="0" width="74" height="30" uuid="f0a132b1-5df4-4ffa-8a8d-bd0d1d17084a"/>
+				<text><![CDATA[Course]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="740" y="0" width="74" height="30" uuid="8b1c5ffb-b8e9-4a03-82a0-97af315eb4d9"/>
+				<text><![CDATA[PatronType]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="814" y="0" width="74" height="30" uuid="3b1ab6f8-6fc5-4b99-a5a5-f15a838b2de5"/>
+				<text><![CDATA[PatronCount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="888" y="0" width="74" height="30" uuid="06975003-ae46-4da3-9322-fa8ff47317cb"/>
+				<text><![CDATA[PatronFeedback]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="962" y="0" width="74" height="30" uuid="a925295d-c4a2-4156-8409-5b7651ee6f6d"/>
+				<text><![CDATA[StaffFeedback]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1036" y="0" width="74" height="30" uuid="bfa2772c-78b5-4f67-a6d8-94c0a212d929"/>
+				<text><![CDATA[Topic]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1110" y="0" width="74" height="30" uuid="0b9f3f18-19a7-43b2-8f3a-325fd4c756bc"/>
+				<text><![CDATA[ReferralText]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="74" height="30" uuid="75243ac4-2f93-4724-9a8d-52825502204d"/>
+				<textFieldExpression><![CDATA[$F{Unit}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="74" y="0" width="74" height="30" uuid="acebc768-4fd8-4c54-844b-eba6a8e7cc1e"/>
+				<textFieldExpression><![CDATA[$F{ServicePoint}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="148" y="0" width="74" height="30" uuid="2d6890b7-74c0-45ed-9238-64ede1f7ad83">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{QuestionType}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="222" y="0" width="74" height="30" uuid="d6661cd5-4b90-488d-bda6-f1c90846c4ed"/>
+				<textFieldExpression><![CDATA[$F{InteractionMode}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="296" y="0" width="74" height="30" uuid="5e6a2d18-44b1-41cb-ba46-8aeca83f7a6c"/>
+				<textFieldExpression><![CDATA[$F{EventDate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="370" y="0" width="74" height="30" uuid="d58a647b-9da8-48dd-90be-a73cd9c0774c"/>
+				<textFieldExpression><![CDATA[$F{EventTime}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="444" y="0" width="74" height="30" uuid="bb89bc5f-5344-428a-a053-9cf4bb749799"/>
+				<textFieldExpression><![CDATA[$F{UserName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="518" y="0" width="74" height="30" uuid="b6a8d8fb-ae01-4018-be46-e4e42dbc8176"/>
+				<textFieldExpression><![CDATA[$F{TimeSpent}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="592" y="0" width="74" height="30" uuid="87597e76-ec20-4336-8b90-00f9ee0321ad"/>
+				<textFieldExpression><![CDATA[$F{Department}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="666" y="0" width="74" height="30" uuid="817a1e5d-3bde-45eb-98ed-b998bbf511a8"/>
+				<textFieldExpression><![CDATA[$F{Course}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="740" y="0" width="74" height="30" uuid="566d7f3a-0562-428d-a84c-db05f7a3be64"/>
+				<textFieldExpression><![CDATA[$F{PatronType}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="814" y="0" width="74" height="30" uuid="b0389169-72c7-4f0d-a752-e13925079707"/>
+				<textFieldExpression><![CDATA[$F{PatronCount}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="888" y="0" width="74" height="30" uuid="bb2ea2f1-1620-4982-b187-e3a9b74ce58e"/>
+				<textFieldExpression><![CDATA[$F{PatronFeedback}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="962" y="0" width="74" height="30" uuid="c982115e-36f1-4f4c-8deb-4b1ede2bce93"/>
+				<textFieldExpression><![CDATA[$F{StaffFeedback}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1036" y="0" width="74" height="30" uuid="8f682981-9490-4532-9d60-47d66dd7f387"/>
+				<textFieldExpression><![CDATA[$F{Topic}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1110" y="0" width="74" height="30" uuid="aa88df03-6dc9-49ab-9c20-00aeeec18785"/>
+				<textFieldExpression><![CDATA[$F{ReferralText}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
