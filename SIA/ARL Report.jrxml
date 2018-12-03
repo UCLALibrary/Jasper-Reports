@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ARL Report" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2124c1a0-2f45-4ea6-b6fd-abf0846467f6">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SiaDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/SIA/ARL_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/SIA/ARL_Report"/>
+	<parameter name="SIA_Fiscal_year" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+	Coalesce(dbo.count_attendees_by_fy($P{SIA_Fiscal_year}), 0) AS People, 
+	Coalesce(dbo.total_sessions_by_fy($P{SIA_Fiscal_year}), 0) AS Sessions]]>
+	</queryString>
+	<field name="People" class="java.lang.Integer"/>
+	<field name="Sessions" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="376" height="30" uuid="faea0f50-a1e0-4c94-9095-da9ed8569835"/>
+				<text><![CDATA[People]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="0" width="376" height="30" uuid="97c12198-5bfe-4786-892a-a57d5c997742"/>
+				<text><![CDATA[Sessions]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField pattern="#,###.###" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="376" height="30" uuid="7222ef16-d88f-4c55-a053-cff456a67367">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{People}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.###" isBlankWhenNull="true">
+				<reportElement x="376" y="0" width="376" height="30" uuid="734f220b-3ffa-4b2f-9f56-3d86a4bcce45">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Sessions}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

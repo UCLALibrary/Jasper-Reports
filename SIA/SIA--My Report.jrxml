@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SIA--My Report" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="00bb3112-fbcc-43f1-8bbc-98ffbb67246f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SiaDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+	atl.ActivityType AS SessionType,
+	dbo.build_session_title(S.SessionID) AS Title,
+	cast(a.Description AS varchar(max)) AS Description,
+	s.QuarterID,
+	Coalesce(ql.Quarter, '&nbsp;') AS Quarter,
+	s.SessionDateTime,
+	dbo.get_developers_by_session(a.ActivityID) AS Developers,
+	dbo.get_presenters_by_session(s.SessionID) AS Presenters,
+	s.FeedbackText,
+	dbo.total_sessions(s.SessionID) AS Sessions,
+	dbo.count_attendees_by_session(s.SessionID) AS People,
+	Coalesce(dbo.total_duration(s.SessionID), 0) AS Duration,
+	dbo.get_display_time((Coalesce(dbo.total_duration(s.SessionID), 0))) AS display_dur,
+	Coalesce(dbo.total_prep_time(s.SessionID), 0) AS PrepTime,
+	dbo.get_display_time((Coalesce(dbo.total_prep_time(s.SessionID), 0))) AS display_prep
+FROM
+	dbo.Activity a
+	JOIN dbo.ActivityTypeLookup atl ON a.ActivityTypeID = atl.ActivityTypeID AND atl.Active = 1
+	JOIN dbo.SessionActivity sa ON a.ActivityID = sa.ActivityID
+	JOIN dbo.Session s ON sa.SessionID = s.SessionID
+	LEFT JOIN dbo.QuarterLookup ql ON s.QuarterID = ql.QuarterID
+	LEFT JOIN dbo.SessionLibrarian sl ON s.SessionID = sl.SessionID-- AND s.CreatedBy = sl.LibrarianID
+	LEFT JOIN dbo.ActivityLibrarian al ON a.ActivityID = al.ActivityID
+	LEFT JOIN dbo.vSession vs ON s.SessionID = vs.SessionID
+	LEFT JOIN dbo.Librarian l ON s.CreatedBy = l.LibrarianID
+	LEFT JOIN dbo.UnitLookup u ON l.UnitID = u.UnitID
+	LEFT JOIN dbo.SessionContact sco ON s.SessionID = sco.SessionID
+	LEFT JOIN dbo.SessionClassroom scl ON s.SessionID = scl.SessionID
+	LEFT JOIN dbo.ActivityMaterial am ON a.ActivityID = am.ActivityID
+	LEFT JOIN dbo.Material m ON am.MaterialID = m.MaterialID
+	LEFT JOIN dbo.Contact c ON sco.ContactID = c.ContactID
+	LEFT JOIN dbo.SessionLearner slR ON s.SessionID = slR.SessionID
+	LEFT JOIN dbo.SessionDepartment sd ON s.SessionID = sd.SessionID
+WHERE
+	(sl.LibrarianID = 65 OR al.LibrarianID = 65)
+ORDER BY
+	atl.ActivityType,
+	s.SessionDateTime,
+	s.QuarterID,
+	a.Title]]>
+	</queryString>
+	<field name="SessionType" class="java.lang.String"/>
+	<field name="Title" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="QuarterID" class="java.lang.Integer"/>
+	<field name="Quarter" class="java.lang.String"/>
+	<field name="SessionDateTime" class="java.sql.Timestamp"/>
+	<field name="Developers" class="java.lang.String"/>
+	<field name="Presenters" class="java.lang.String"/>
+	<field name="FeedbackText" class="java.lang.String"/>
+	<field name="Sessions" class="java.lang.Integer"/>
+	<field name="People" class="java.lang.Integer"/>
+	<field name="Duration" class="java.lang.Integer"/>
+	<field name="display_dur" class="java.lang.String"/>
+	<field name="PrepTime" class="java.lang.Integer"/>
+	<field name="display_prep" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="68" height="30" uuid="f6b90b34-0276-4e13-888e-67f1ad96d3ae"/>
+				<text><![CDATA[Session Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="68" y="0" width="57" height="30" uuid="d9366d05-d5f5-4692-acb2-2051c13a2793"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="0" width="57" height="30" uuid="f7be76ee-7c2f-4e67-9df0-73c2394da3ae"/>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="182" y="0" width="57" height="30" uuid="671621c5-161b-4d3b-b00d-d09eaff5a756"/>
+				<text><![CDATA[Quarter]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="239" y="0" width="57" height="30" uuid="b4d407c3-b8aa-422f-a687-5b6e596c69ad"/>
+				<text><![CDATA[Date/Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="296" y="0" width="57" height="30" uuid="eaf55922-ad07-419d-871d-dfeaedd28c85"/>
+				<text><![CDATA[Developers]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="353" y="0" width="57" height="30" uuid="89813c9a-eca6-4578-88ce-d71aa7adead9"/>
+				<text><![CDATA[Presenters]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="410" y="0" width="57" height="30" uuid="58731989-e02c-4358-933e-223b49cd06ea"/>
+				<text><![CDATA[Feedback Text]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="467" y="0" width="57" height="30" uuid="f7356fa6-739b-451f-ab13-4e4fd9fb800c"/>
+				<text><![CDATA[Sessions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="524" y="0" width="57" height="30" uuid="2f1f89eb-40c5-4376-8f22-e4e5c07dfae8"/>
+				<text><![CDATA[People]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="581" y="0" width="57" height="30" uuid="6b7e6b08-c881-476a-a429-afafa983052d"/>
+				<text><![CDATA[Duration]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="638" y="0" width="57" height="30" uuid="4da03059-2cba-4f54-98dc-ef7170394c35"/>
+				<text><![CDATA[Prep Time]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="68" height="30" uuid="2855ff0e-51c3-4559-bf7f-67352dfc9ead">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SessionType}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="68" y="0" width="57" height="30" uuid="a362dec4-9f5d-446f-b8fc-c8db726e6846">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Title}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="125" y="0" width="57" height="30" uuid="e0ead3d1-6a3d-46be-8b83-90306c24e49e">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="182" y="0" width="57" height="30" uuid="8aee02d3-f51a-4424-8a19-9632e9449438">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Quarter}]]></textFieldExpression>
+			</textField>
+			<textField pattern="YYYY-MM-dd h:mm" isBlankWhenNull="true">
+				<reportElement x="239" y="0" width="57" height="30" uuid="9eff023d-1037-4471-8901-7fba545b636f">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SessionDateTime}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="296" y="0" width="57" height="30" uuid="b1c89366-aa1a-40e4-80c5-21fbb6bed232">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Developers}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="353" y="0" width="57" height="30" uuid="9e311980-23ca-4ebc-ac5c-a33e37050076">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Presenters}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="410" y="0" width="57" height="30" uuid="9d82c687-2124-4ceb-9c8f-54f6fe6caf22">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FeedbackText}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="467" y="0" width="57" height="30" uuid="a5d602a0-d6ae-4dc4-b27e-89fcadb545e1">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Sessions}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="524" y="0" width="57" height="30" uuid="075209b7-8b1b-4bb2-ae21-5d82fc04b2b1">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{People}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="581" y="0" width="57" height="30" uuid="37ad5711-e1b9-4b20-a51b-5e2cc788f1fa">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{display_dur}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="638" y="0" width="57" height="30" uuid="feae8524-c5bb-4f8b-9a8e-af5ca1ac6b8c">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{display_prep}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
