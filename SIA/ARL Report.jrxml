@@ -7,7 +7,9 @@
 	<property name="ireport.jasperserver.user" value="drickard"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/SIA/ARL_Report_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/SIA/ARL_Report"/>
-	<parameter name="SIA_Fiscal_year" class="java.lang.Integer"/>
+	<parameter name="SIA_Fiscal_year" class="java.lang.Integer">
+		<parameterDescription><![CDATA[Provide the start year of desired fiscal period (e.g., 2016 for FY 2016-17)]]></parameterDescription>
+	</parameter>
 	<queryString language="SQL">
 		<![CDATA[SELECT 
 	Coalesce(dbo.count_attendees_by_fy($P{SIA_Fiscal_year}), 0) AS People, 

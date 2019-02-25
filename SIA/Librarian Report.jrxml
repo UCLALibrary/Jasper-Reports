@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Librarian Report" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="7f93fc9d-563d-498b-8624-63e440c174bb">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SiaDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.75F"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="librarianID" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+	dbo.build_session_title(S.SessionID) AS Title,
+	atl.ActivityType AS SessionType,
+	dbo.build_sess_dept_title(S.SessionID) AS Departments,
+	s.SessionDateTime,
+	Convert(varchar, s.SessionDateTime, 101) AS StyledSessionDate,
+	Convert(varchar, s.SessionDateTime, 108) AS StyledSessionTime,
+	dbo.count_attendees_by_session(s.SessionID) AS People,
+	dbo.get_display_time((Coalesce(dbo.total_duration(s.SessionID), 0))) AS Duration
+FROM
+	dbo.Activity a
+	JOIN dbo.ActivityTypeLookup atl ON a.ActivityTypeID = atl.ActivityTypeID
+	JOIN dbo.SessionActivity sa ON a.ActivityID = sa.ActivityID
+	JOIN dbo.Session s ON sa.SessionID = s.SessionID
+	LEFT JOIN dbo.SessionLibrarian sl ON s.SessionID = sl.SessionID
+	LEFT JOIN dbo.ActivityLibrarian al ON a.ActivityID = al.ActivityID
+WHERE
+	(sl.LibrarianID = $P{librarianID} OR al.LibrarianID = $P{librarianID})
+	AND s.SessionDateTime between $P{startDate} and $P{endDate}
+ORDER BY
+	SessionType,
+	SessionDateTime,
+	Title]]>
+	</queryString>
+	<field name="Title" class="java.lang.String"/>
+	<field name="SessionType" class="java.lang.String"/>
+	<field name="Departments" class="java.lang.String"/>
+	<field name="SessionDateTime" class="java.sql.Timestamp"/>
+	<field name="StyledSessionDate" class="java.lang.String"/>
+	<field name="StyledSessionTime" class="java.lang.String"/>
+	<field name="People" class="java.lang.Integer"/>
+	<field name="Duration" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="792" height="30" uuid="b737a4cc-de3b-4f2e-9937-6d9a9227d9dc">
+					<property name="com.jaspersoft.studio.unit.x" value="inch"/>
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="com.jaspersoft.studio.unit.width" value="inch"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Librarian Report]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="110" height="30" uuid="705dbcac-7477-44c0-ae09-6bc81b816022"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="0" width="107" height="30" uuid="c1a0cd64-f3f5-4add-a3e0-3686a561441f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Session Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="217" y="0" width="107" height="30" uuid="7715b119-46d1-4404-998d-95ee83f6b0e0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Departments]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="324" y="0" width="107" height="30" uuid="b524f98b-0a53-4d69-968d-1686402919de"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Session Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="0" width="107" height="30" uuid="f1007b08-edee-4f24-bf00-9710060f2d88"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Session Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="538" y="0" width="107" height="30" uuid="d3b631f6-779e-479c-88f9-3b3311b8b07a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Learner Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="645" y="0" width="107" height="30" uuid="d13bb912-a66c-4a71-9283-d2c5f8a805d5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Duration]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="110" height="30" uuid="255667da-32f9-45a4-8c86-b909cbfa1eb2">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Title}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="0" width="107" height="30" uuid="8b43b92d-2db9-46ea-bcad-a31dfd9acebd">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SessionType}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="0" width="107" height="30" uuid="c2cbbd00-2243-4531-9c81-b355da3823ea">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Departments}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="324" y="0" width="107" height="30" uuid="0106a02b-0490-4cf2-b781-87bf916e6d1f">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{StyledSessionDate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="431" y="0" width="107" height="30" uuid="c2eaf24a-5d26-4d68-8062-c89f32caf22b">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{StyledSessionTime}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="538" y="0" width="107" height="30" uuid="5200ac2c-8c28-4364-ad61-818971412343">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{People}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="645" y="0" width="107" height="30" uuid="3c9e28cd-4b71-4f1e-81bb-cfa5b90eacc4">
+					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Duration}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
