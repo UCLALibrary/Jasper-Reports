@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CLICC Circulation Transactions" pageWidth="1296" pageHeight="595" orientation="Landscape" columnWidth="1296" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" isIgnorePagination="true" uuid="c273a570-e8a3-48ae-96ff-8fda2d128e1d">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<parameter name="startDate" class="java.sql.Date"/>
+	<parameter name="endDate" class="java.sql.Date"/>
+	<parameter name="select_item_type" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+it.item_type_name,
+p.INSTITUTION_ID,
+pg.PATRON_GROUP_DISPLAY,
+psc.PATRON_STAT_code,
+mi.ITEM_ENUM,
+to_char(ct.charge_date, 'fmMM/DD/YYYY HH:fmMI AM') AS charge_date,
+--To_Char (ct.charge_date,'fmMM/ DD/ YYYY') AS charge_date,
+l.location_name AS CHARGE_PLACE,
+to_char(ct.discharge_date, 'fmMM/DD/YYYY HH:fmMI AM') AS discharge_date,
+--To_Char (ct.discharge_date,'fmMM/ DD/ YYYY') AS discharge_date,
+l.location_name AS DISCHARGE_PLACE
+
+FROM ucla_BIBTEXT_vw bt
+
+INNER join BIB_MFHD bmf ON bt.BIB_ID = bmf.BIB_ID
+INNER join MFHD_MASTER mm ON bmf.MFHD_ID = mm.MFHD_ID
+left outer join LOCATION l ON mm.LOCATION_ID = l.LOCATION_ID
+left outer join MFHD_ITEM mi ON mm.MFHD_ID = mi.MFHD_ID
+left outer join ITEM i ON mi.ITEM_ID = i.ITEM_ID
+left outer join ITEM_TYPE it ON i.ITEM_TYPE_ID = it.ITEM_TYPE_ID
+left outer join CIRC_TRANS_archive ct ON i.ITEM_ID = ct.ITEM_ID
+left outer join PATRON_GROUP pg ON ct.PATRON_GROUP_ID = pg.PATRON_GROUP_ID
+left outer join PATRON p ON ct.PATRON_ID = p.PATRON_ID
+left outer join PATRON_STAT_CODE psc ON p.PATRON_ID = psc.PATRON_STAT_ID
+
+WHERE   ct.charge_date BETWEEN trunc($P{startDate}) and trunc($P{endDate})
+                 AND
+                 it.item_type_name = $P{select_item_type}   
+
+ORDER BY it.item_type_name]]>
+	</queryString>
+	<field name="ITEM_TYPE_NAME" class="java.lang.String"/>
+	<field name="INSTITUTION_ID" class="java.lang.String"/>
+	<field name="PATRON_GROUP_DISPLAY" class="java.lang.String"/>
+	<field name="PATRON_STAT_CODE" class="java.lang.String"/>
+	<field name="ITEM_ENUM" class="java.lang.String"/>
+	<field name="CHARGE_DATE" class="java.lang.String"/>
+	<field name="CHARGE_PLACE" class="java.lang.String"/>
+	<field name="DISCHARGE_DATE" class="java.lang.String"/>
+	<field name="DISCHARGE_PLACE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="144" height="30" uuid="5cb3aac9-b54b-4a60-bb13-ce7164726e61">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[ITEM_TYPE_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="144" y="0" width="144" height="30" uuid="19357cb5-fe0e-4ab0-b902-5492df166147">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[INSTITUTION_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="0" width="144" height="30" uuid="8c8bf455-c705-4a66-9175-d248e574f514">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[PATRON_GROUP_DISPLAY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="432" y="0" width="144" height="30" uuid="25dde0e7-bfdc-4fd6-b6f9-259872d13c0c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[PATRON_STAT_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="576" y="0" width="144" height="30" uuid="9ceb8f1f-11d4-47da-ab58-4c4e0ad77e94">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[ITEM_ENUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="720" y="0" width="144" height="30" uuid="d95e9848-1c33-41e1-a5e1-ae23b8594ca8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[CHARGE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="864" y="0" width="144" height="30" uuid="6cd17711-f5cb-416e-a322-0458dbc16702">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[CHARGE_PLACE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1008" y="0" width="144" height="30" uuid="9696b693-4724-4902-93b4-243be7e21c82">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[DISCHARGE_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1152" y="0" width="144" height="30" uuid="84da5f62-b1e7-4442-b65a-879aab4e5273">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[DISCHARGE_PLACE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="144" height="34" uuid="cd715c04-735d-41e6-80de-12eef7bfce8e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_TYPE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="144" y="0" width="144" height="34" uuid="01e4e540-e3b0-4bb1-bcee-f3481c9be0f8">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{INSTITUTION_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="288" y="0" width="144" height="34" uuid="f5946255-37dc-4248-8903-7b7c72936e33">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP_DISPLAY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="432" y="0" width="144" height="34" uuid="25f4f44b-4844-419d-b8f7-c479eb3ed7b5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PATRON_STAT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="576" y="0" width="144" height="34" uuid="d864c5f7-9301-4d9f-a3c5-f8b2d6c874c2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ITEM_ENUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="720" y="0" width="144" height="34" uuid="eff1413d-16ab-4bd3-8abf-df67dbf278d1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CHARGE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="864" y="0" width="144" height="34" uuid="d437b088-f22c-456d-82ca-8e031e6af56d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CHARGE_PLACE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1008" y="0" width="144" height="34" uuid="bcabe77e-5cfb-47bd-bfee-82621110a5fb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DISCHARGE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1152" y="0" width="144" height="34" uuid="2c73db07-735a-40ab-9864-93345b2c5f32">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column " value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DISCHARGE_PLACE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
