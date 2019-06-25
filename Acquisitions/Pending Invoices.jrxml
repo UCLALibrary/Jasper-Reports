@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Pending Invoices" pageWidth="1008" pageHeight="595" orientation="Landscape" whenNoDataType="BlankPage" columnWidth="1008" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="79daaaec-f94b-4c69-a39a-6b37c29a820b">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.unit." value="inch"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
@@ -12,6 +12,10 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Pending_Invoices_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Pending_Invoices"/>
 	<parameter name="p_order_loc" class="java.lang.String"/>
 	<parameter name="p_start_date" class="java.sql.Date"/>
 	<parameter name="p_end_date" class="java.sql.Date"/>
@@ -60,7 +64,8 @@ FROM
   AND i.vendor_id != 0 -- these are "abandoned" rows - user started creating so sequence was used, but never saved with real content
 ) Pending
 WHERE invoice_create_date BETWEEN $P{p_start_date} AND $P{p_end_date}
-AND    order_loc = $P{p_order_loc}]]>
+AND    order_loc = $P{p_order_loc}
+ORDER BY sort_key, po_number, fau]]>
 	</queryString>
 	<field name="ORDER_LOC" class="java.lang.String"/>
 	<field name="SORT_KEY" class="java.lang.String"/>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CLICC Items Clean-up Report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2f2cd4cf-36b8-48b6-9a84-da5ebf6fa328">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<queryString language="SQL">
+		<![CDATA[select distinct 
+ 
+    ib.item_barcode
+  , mi.item_enum
+  , mi.year
+  , it.item_type_name
+ -- , it.item_type_display
+  , l.location_name
+ -- , i.perm_location
+  , ct.charge_date
+  , ct.discharge_date
+  
+   FROM ucla_BIBTEXT_vw bt
+
+INNER join BIB_MFHD bmf ON bt.BIB_ID = bmf.BIB_ID
+INNER join MFHD_MASTER mm ON bmf.MFHD_ID = mm.MFHD_ID
+--left outer join LOCATION l ON mm.LOCATION_ID = l.LOCATION_ID
+left outer join MFHD_ITEM mi ON mm.MFHD_ID = mi.MFHD_ID
+left outer join ITEM i ON mi.ITEM_ID = i.ITEM_ID
+
+left outer join location l on i.perm_location = l.location_id
+
+left outer join ITEM_TYPE it ON i.ITEM_TYPE_ID = it.ITEM_TYPE_ID
+left join item_barcode ib on i.item_id = ib.item_id
+left outer join CIRC_TRANS_archive ct ON i.ITEM_ID = ct.ITEM_ID
+
+where (it.item_type_name not like 'CLICC%' 
+        and it.item_type_name <> 'Withdrawn')
+      --it.item_type_name = 'Projector'
+and l.location_name = 'CLICC Biomed'
+--and ct.charge_date = '10/JAN/14'
+and ct.charge_date between to_date('20180119', 'YYYYMMDD') and to_date('20190718', 'YYYYMMDD')
+
+
+    order by l.location_name, it.item_type_name
+  
+
+
+ ]]>
+	</queryString>
+	<field name="ITEM_BARCODE" class="java.lang.String"/>
+	<field name="ITEM_ENUM" class="java.lang.String"/>
+	<field name="YEAR" class="java.lang.String"/>
+	<field name="ITEM_TYPE_NAME" class="java.lang.String"/>
+	<field name="LOCATION_NAME" class="java.lang.String"/>
+	<field name="CHARGE_DATE" class="java.sql.Timestamp"/>
+	<field name="DISCHARGE_DATE" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
