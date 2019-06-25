@@ -32,7 +32,11 @@ FROM
 WHERE
   charge_date_only BETWEEN trunc($P{startDate}) and trunc($P{endDate})
   AND $X{IN, perm_location_code, multiLocale}
-  AND normalized_call_no BETWEEN vger_support.NormalizeCallNumber($P{startCall}) AND vger_support.NormalizeCallNumber($P{endCall})
+  AND ( 
+  				normalized_call_no BETWEEN vger_support.NormalizeCallNumber($P{startCall}) AND vger_support.NormalizeCallNumber($P{endCall})
+  				OR
+  				normalized_call_no like '%%'
+  			)
 GROUP BY
   perm_location,
   substr(normalized_call_no, 1, 3)
