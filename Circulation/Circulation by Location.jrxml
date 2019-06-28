@@ -35,7 +35,7 @@ WHERE
   AND ( 
   				normalized_call_no BETWEEN vger_support.NormalizeCallNumber($P{startCall}) AND vger_support.NormalizeCallNumber($P{endCall})
   				OR
-  				normalized_call_no like '%%'
+  				($P{startCall} is null and $P{endCall} is null)
   			)
 GROUP BY
   perm_location,
