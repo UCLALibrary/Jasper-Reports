@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Casalini Imported Records" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a970b86a-0a53-46b9-a88e-25db4a9c3730">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Casalini_Imported_Records_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Casalini_Imported_Records"/>
+	<parameter name="p_start_date" class="java.util.Date">
+		<parameterDescription><![CDATA[Starting date]]></parameterDescription>
+	</parameter>
+	<parameter name="p_end_date" class="java.util.Date">
+		<parameterDescription><![CDATA[Ending date]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[with casalini as (
+  select record_id as bib_id
+  from vger_subfields.ucladb_bib_subfield
+  where tag = '984c'
+  and upper(subfield) = 'CAS'
+)
+, bib_info as (
+  select 
+    to_char(bm.create_date, 'YYYY-MM') as mnth
+  , trunc(bm.create_date) as create_date -- not sure whether I'll use this or the month, above
+  , vger_support.get_oclc_number(c.bib_id) as oclc
+  , c.bib_id
+  , (select normal_heading from bib_index where bib_id = c.bib_id and index_code = 'ISB3' and rownum < 2) as isbn
+  , vger_support.unifix(bt.title_brief) as title_brief
+  from casalini c
+  inner join bib_master bm on c.bib_id = bm.bib_id
+  inner join bib_text bt on c.bib_id = bt.bib_id
+)
+select 
+--  mnth
+--, create_date
+  case when oclc = 'n/a' then null else oclc end as oclc
+, bib_id
+, isbn
+, title_brief
+from bib_info
+where $P{p_start_date} <= create_date
+and create_date <= $P{p_end_date}
+--and oclc != 'n/a' -- Include records without OCLC as well, for now
+order by create_date]]>
+	</queryString>
+	<field name="OCLC" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
+	<field name="ISBN" class="java.lang.String"/>
+	<field name="TITLE_BRIEF" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="120" height="30" uuid="4c2cc337-21bb-41dd-8920-b11648b586ec"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[OCLC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="0" width="92" height="30" uuid="31f182ff-42c8-42f2-8d13-b6d1f3e058f9"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="232" y="0" width="188" height="30" uuid="7e2500b5-cb2f-45cd-af93-79d8236e3dd4"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ISBN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="430" y="0" width="322" height="30" uuid="8509448a-a0f7-46cd-a249-9bd884b80322"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[TITLE_BRIEF]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="120" height="30" uuid="67c7f358-a168-4d90-8af0-272648ca8225">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OCLC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="130" y="0" width="92" height="30" uuid="ca922778-e566-4fd3-ad72-dde6c6e134f3">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="232" y="0" width="188" height="30" uuid="e9efd730-0585-4b4b-9c4c-13fe0cb60c39">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ISBN}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="430" y="0" width="322" height="30" uuid="d7239b70-f686-4d20-bbf0-e3f9281e3ed7">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE_BRIEF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
