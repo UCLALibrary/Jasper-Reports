@@ -25,6 +25,7 @@
   b.bib_id
 , vger_support.unifix(bt.author) as author
 , vger_support.unifix(bt.title_brief) as title_brief
+, b.language
 , b.location_code as loc_code
 , mm.display_call_no as call_number
 , mm.normalized_call_no 
@@ -49,6 +50,7 @@ order by b.location_code, mm.normalized_call_no]]>
 	<field name="BIB_ID" class="java.math.BigDecimal"/>
 	<field name="AUTHOR" class="java.lang.String"/>
 	<field name="TITLE_BRIEF" class="java.lang.String"/>
+	<field name="LANGUAGE" class="java.lang.String"/>
 	<field name="LOC_CODE" class="java.lang.String"/>
 	<field name="CALL_NUMBER" class="java.lang.String"/>
 	<field name="NORMALIZED_CALL_NO" class="java.lang.String"/>
@@ -83,7 +85,7 @@ order by b.location_code, mm.normalized_call_no]]>
 				<text><![CDATA[CALL_NUMBER]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="288" y="0" width="221" height="30" uuid="1b8d75d4-1323-49fd-8f39-398c6b824826"/>
+				<reportElement x="320" y="0" width="189" height="30" uuid="1b8d75d4-1323-49fd-8f39-398c6b824826"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
@@ -103,10 +105,17 @@ order by b.location_code, mm.normalized_call_no]]>
 				</textElement>
 				<text><![CDATA[FIRST_910A]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="288" y="0" width="32" height="30" uuid="5702e282-dc3b-4bef-af68-9f9774c6bff7"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LNG]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="30" splitType="Stretch">
+		<band height="52" splitType="Stretch">
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="70" height="30" uuid="e12f017d-d233-490e-a999-94d5510d5f8b">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
@@ -129,7 +138,7 @@ order by b.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{CALL_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="288" y="0" width="221" height="30" uuid="1fb3f123-70fa-4cad-ad08-9bd84b8a50ea">
+				<reportElement x="320" y="0" width="189" height="30" uuid="1fb3f123-70fa-4cad-ad08-9bd84b8a50ea">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
@@ -148,6 +157,13 @@ order by b.location_code, mm.normalized_call_no]]>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{FIRST_910A}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="288" y="0" width="32" height="30" uuid="ba372502-d96d-4adb-9f90-d7c5b44c6c3d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LANGUAGE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
