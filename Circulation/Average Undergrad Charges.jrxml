@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Average Undergrad Charges" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e699c605-a1ad-4f79-8d91-286b1d97ce9e">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Production UCLADB"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Average_Undergrad_Charges_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Average_Undergrad_Charges"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+	<parameter name="startDate" class="java.util.Date">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<parameter name="endDate" class="java.util.Date"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+	trunc($P{startDate}) as startDate, 
+	trunc($P{endDate}) as endDate,
+	vger_support.average_undergrad_charges(
+		$P{startDate}
+		,$P{endDate}
+	)  as charges
+from 
+	dual]]>
+	</queryString>
+	<field name="STARTDATE" class="java.sql.Timestamp"/>
+	<field name="ENDDATE" class="java.sql.Timestamp"/>
+	<field name="CHARGES" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="750" height="30" uuid="34656a9e-d50a-4938-8602-a1d3f4c03dd9">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Average Undergrad Charges]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="252" height="30" uuid="fb69848c-9984-453a-a14b-3cc9afc0125e"/>
+				<text><![CDATA[STARTDATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="250" height="30" uuid="3134d26c-fffb-4a39-90b6-2ad8b5e7d332"/>
+				<text><![CDATA[ENDDATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="250" height="30" uuid="0761ed80-ff02-43c0-9773-91f4285214c8"/>
+				<text><![CDATA[CHARGES]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="252" height="30" uuid="7f9fc63e-6168-4835-ab40-4a0e3a9d72c0"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{STARTDATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="252" y="0" width="250" height="30" uuid="3222ed7d-2754-4870-8ffe-4d65eeec86ab"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{ENDDATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="502" y="0" width="250" height="30" uuid="2bd4ecad-9418-4309-8b27-f41c982e952c">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{CHARGES}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
