@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Inventory Report" pageWidth="1200" pageHeight="595" orientation="Landscape" columnWidth="1200" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="79b3719e-1f58-4d15-a3c1-3ffad69cf29c">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Inventory Report" pageWidth="1400" pageHeight="595" orientation="Landscape" columnWidth="1400" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Error" isIgnorePagination="true" uuid="79b3719e-1f58-4d15-a3c1-3ffad69cf29c">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Inventory_Report_files/main_jrxml"/>
@@ -25,6 +17,7 @@
   l.location_code
 , l.location_name
 , mm.display_call_no
+, bt.bib_id
 , vger_support.unifix(bt.author) as author
 , vger_support.unifix(title_brief) as title_brief
 , vger_support.unifix(edition) as edition
@@ -35,6 +28,7 @@
     and tag = '866a'
     and rownum < 2
 ) as f866a
+, 'https://catalog.library.ucla.edu/vwebv/holdingsInfo?bibId=' || bt.bib_id as permalink
 from location l
 inner join mfhd_master mm on l.location_id = mm.location_id
 inner join bib_mfhd bm on mm.mfhd_id = bm.mfhd_id
@@ -45,17 +39,19 @@ order by l.location_code, mm.normalized_call_no]]>
 	<field name="LOCATION_CODE" class="java.lang.String"/>
 	<field name="LOCATION_NAME" class="java.lang.String"/>
 	<field name="DISPLAY_CALL_NO" class="java.lang.String"/>
+	<field name="BIB_ID" class="java.math.BigDecimal"/>
 	<field name="AUTHOR" class="java.lang.String"/>
 	<field name="TITLE_BRIEF" class="java.lang.String"/>
 	<field name="EDITION" class="java.lang.String"/>
 	<field name="IMPRINT" class="java.lang.String"/>
 	<field name="ITEMS" class="java.math.BigDecimal"/>
 	<field name="F866A" class="java.lang.String"/>
+	<field name="PERMALINK" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<columnHeader>
-		<band height="32" splitType="Stretch">
+		<band height="30" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="50" height="30" uuid="2995e3da-ebf7-4d93-97d8-d217727afb85"/>
 				<textElement>
@@ -118,6 +114,20 @@ order by l.location_code, mm.normalized_call_no]]>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[HOLDINGS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1189" y="0" width="50" height="30" uuid="3270d9e8-59ea-420d-80c5-010e5334703a"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[BIB ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1240" y="0" width="140" height="30" uuid="4e00b170-84c7-487b-9733-9185f03339a4"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LINK TO CATALOG]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -208,6 +218,24 @@ order by l.location_code, mm.normalized_call_no]]>
 					<font fontName="DejaVu Sans"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{F866A}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1189" y="0" width="50" height="60" uuid="61d4412f-d1b1-4ebd-9ee4-cccddda7ce7a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+				<reportElement x="1239" y="0" width="140" height="60" uuid="6d38bf7e-b325-402f-98ea-482802c1e202">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<font isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERMALINK}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{PERMALINK}]]></hyperlinkReferenceExpression>
 			</textField>
 		</band>
 	</detail>
