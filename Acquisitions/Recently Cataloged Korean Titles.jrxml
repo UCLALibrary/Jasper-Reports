@@ -1,43 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Recently Cataloged Chinese Titles" pageWidth="2016" pageHeight="595" orientation="Landscape" columnWidth="1976" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="861d02ef-c7bf-4362-b3ab-66126127f6bf">
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Recently Cataloged Chinese Titles" pageWidth="2016" pageHeight="595" orientation="Landscape" columnWidth="1976" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="861d02ef-c7bf-4362-b3ab-66126127f6bf">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Voyager Data Adapter.xml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.unit." value="inch"/>
-	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
-	<property name="ireport.jasperserver.user" value="law"/>
-	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Recently_Cataloged_Japanese_Titles_files/main_jrxml"/>
-	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Recently_Cataloged_Japanese_Titles"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/Recently_Cataloged_Korean_Titles_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/Recently_Cataloged_Korean_Titles"/>
 	<queryString language="SQL">
-		<![CDATA[SELECT DISTINCT
-vger_support.unifix(title) as title,
-vger_subfields.Get880Field(bib_text.bib_id, '245') as title_880,
-vger_support.unifix(author) as author,
-vger_subfields.Get880Field(bib_text.bib_id, '100') as author_880,
-Mfhd_Master.normalized_call_no AS call_number,
-BIB_TEXT.bib_id,
-vger_support.unifix(publisher) AS publisher,
-vger_support.unifix(publisher_date) as publisher_date,
-vger_support.unifix(series) AS series,
-vger_report.cat_948_base_rpt.S948C AS cataloging_date,
-ucladb.getbibsubfield(bib_text.bib_id, '901', 'b') as f901b
-
-FROM vger_report.cat_948_base_rpt
-
-INNER JOIN BIB_TEXT ON vger_report.cat_948_base_rpt.bib_id = bib_text.bib_id
-INNER JOIN BIB_MFHD ON BIB_TEXT.BIB_ID = BIB_MFHD.BIB_ID
-INNER JOIN BIB_MASTER ON BIB_TEXT.BIB_ID = BIB_MASTER.BIB_ID
-INNER JOIN MFHD_MASTER ON MFHD_MASTER.MFHD_ID = BIB_MFHD.MFHD_ID
-inner join location on mfhd_master.location_id = location.location_id
-
-
-WHERE LOCATION.LOCATION_CODE like 'ea%'
-      AND LOCATION.LOCATION_CODE <> 'eaacq'
-      AND BIB_TEXT.LANGUAGE= 'kor'
-      AND Mfhd_Master.SUPPRESS_IN_OPAC <> 'Y'
-      AND s948c between to_char(trunc(sysdate-30), 'YYYYMMDD') and to_char(trunc(sysdate), 'YYYYMMDD')
-
-ORDER BY  Mfhd_Master.normalized_call_no]]>
+		<![CDATA[-- Include both records cataloged via 948 $c
+-- and acquired via OPES shelf-ready project (no 948, use 910 $a).
+-- Intended to run automatically every month, so look at previous month.
+-- last_month: returns string with prev month as YYYYMM
+with last_month as (
+  select to_char( (trunc(sysdate, 'month') - 1), 'YYYYMM') as last_month from dual
+)
+, bibs as (
+  select
+    bib_id
+  , s948c as cataloging_date
+  from vger_report.cat_948_base_rpt
+  where s948c like (select last_month from last_month) || '%'
+  union -- de-dup
+  select
+    record_id as bib_id
+    -- Convert this Unicode data (which is really ASCII) to ASCII for compatibility with s948c above
+  , asciistr(subfield) as cataloging_date
+  from vger_subfields.ucladb_bib_subfield
+  where tag = '910a'
+  and subfield like 'opes ' || (select last_month from last_month) || '%'
+)
+select
+  vger_support.unifix(bt.title) as title
+, vger_subfields.Get880Field(b.bib_id, '245') as title_880
+, vger_support.unifix(author) as author
+, vger_subfields.Get880Field(b.bib_id, '100') as author_880
+, mm.display_call_no as call_number
+, b.bib_id
+, vger_support.unifix(publisher) as publisher
+, vger_support.unifix(publisher_date) as publisher_date
+, vger_support.unifix(series) as series
+, b.cataloging_date
+, (select subfield from vger_subfields.ucladb_bib_subfield where record_id = b.bib_id and tag = '901b' and rownum < 2) as f901b
+from bibs b
+inner join bib_text bt on b.bib_id = bt.bib_id
+inner join bib_mfhd bm on bt.bib_id = bm.bib_id
+inner join mfhd_master mm on bm.mfhd_id = mm.mfhd_id
+inner join location l on mm.location_id = l.location_id
+where l.location_code like 'ea%'
+and l.location_code != 'eaacq'
+and bt.language = 'kor'
+and mm.suppress_in_opac = 'N'
+order by mm.normalized_call_no
+]]>
 	</queryString>
 	<field name="TITLE" class="java.lang.String"/>
 	<field name="TITLE_880" class="java.lang.String"/>
@@ -54,127 +70,130 @@ ORDER BY  Mfhd_Master.normalized_call_no]]>
 		<band splitType="Stretch"/>
 	</background>
 	<columnHeader>
-		<band height="61" splitType="Stretch">
+		<band height="30" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="82" height="30" uuid="fb088109-0bf5-4a5c-b063-b9d83f548e31"/>
+				<reportElement x="0" y="0" width="108" height="30" uuid="fb088109-0bf5-4a5c-b063-b9d83f548e31"/>
 				<text><![CDATA[TITLE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="82" y="0" width="72" height="30" uuid="9048f463-4cf6-419f-9acc-efbe17c58268"/>
+				<reportElement x="108" y="0" width="108" height="30" uuid="9048f463-4cf6-419f-9acc-efbe17c58268"/>
 				<text><![CDATA[TITLE_880]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="154" y="0" width="72" height="30" uuid="ad0f014f-e0f4-4152-ba64-d9c9ea84fdb1"/>
+				<reportElement x="216" y="0" width="108" height="30" uuid="ad0f014f-e0f4-4152-ba64-d9c9ea84fdb1"/>
 				<text><![CDATA[AUTHOR]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="226" y="0" width="72" height="30" uuid="4adaa537-f18d-4939-9a76-b336eb5d2794"/>
+				<reportElement x="324" y="0" width="108" height="30" uuid="4adaa537-f18d-4939-9a76-b336eb5d2794"/>
 				<text><![CDATA[AUTHOR_880]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="298" y="0" width="72" height="30" uuid="f7e55894-6669-4a85-9d5c-38a2bc210d54"/>
+				<reportElement x="432" y="0" width="108" height="30" uuid="f7e55894-6669-4a85-9d5c-38a2bc210d54"/>
 				<text><![CDATA[CALL_NUMBER]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="370" y="0" width="72" height="30" uuid="35a5e30f-cd3c-46c8-be6d-f0344f5fce5a"/>
+				<reportElement x="540" y="0" width="108" height="30" uuid="35a5e30f-cd3c-46c8-be6d-f0344f5fce5a"/>
 				<text><![CDATA[BIB_ID]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="442" y="0" width="72" height="30" uuid="88506af0-1c50-4685-bf8c-5e1e38d1be86"/>
+				<reportElement x="648" y="0" width="108" height="30" uuid="88506af0-1c50-4685-bf8c-5e1e38d1be86"/>
 				<text><![CDATA[PUBLISHER]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="514" y="0" width="72" height="30" uuid="28b56c35-698c-4273-bdd7-ed2550a4a0b2"/>
+				<reportElement x="756" y="0" width="108" height="30" uuid="28b56c35-698c-4273-bdd7-ed2550a4a0b2"/>
 				<text><![CDATA[PUBLISHER_DATE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="586" y="0" width="72" height="30" uuid="9aad2bcc-f249-4d0f-b73c-46b274fc271b"/>
+				<reportElement x="864" y="0" width="108" height="30" uuid="9aad2bcc-f249-4d0f-b73c-46b274fc271b">
+					<property name="com.jaspersoft.studio.unit.width" value="inch"/>
+				</reportElement>
 				<text><![CDATA[SERIES]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="658" y="0" width="72" height="30" uuid="795f14ce-051e-40f4-881d-0057d1f1f293"/>
+				<reportElement x="972" y="0" width="108" height="30" uuid="795f14ce-051e-40f4-881d-0057d1f1f293"/>
 				<text><![CDATA[CATALOGING_DATE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="730" y="0" width="72" height="30" uuid="01e51f85-a6a8-410e-9f8c-65ecdc958180"/>
+				<reportElement x="1080" y="0" width="108" height="30" uuid="01e51f85-a6a8-410e-9f8c-65ecdc958180"/>
 				<text><![CDATA[F901B]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch">
+		<band height="90" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="6" width="82" height="30" uuid="1d2d2511-6896-4ef0-846e-aae4f9878d05">
+				<reportElement x="0" y="0" width="108" height="90" uuid="1d2d2511-6896-4ef0-846e-aae4f9878d05">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="82" y="6" width="72" height="30" uuid="8f2d51af-4493-4585-b589-31ec358733f6">
+				<reportElement x="108" y="0" width="108" height="90" uuid="8f2d51af-4493-4585-b589-31ec358733f6">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{TITLE_880}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="154" y="6" width="72" height="30" uuid="39a34507-449a-4709-bb16-766ab57ac500">
+				<reportElement x="216" y="0" width="108" height="90" uuid="39a34507-449a-4709-bb16-766ab57ac500">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="com.jaspersoft.studio.unit.width" value="inch"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="226" y="6" width="72" height="30" uuid="e8eee883-91e8-4017-81f4-4106fa03cdcb">
+				<reportElement x="324" y="0" width="108" height="90" uuid="e8eee883-91e8-4017-81f4-4106fa03cdcb">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{AUTHOR_880}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="298" y="6" width="72" height="30" uuid="9ffc94b7-bbb8-4357-b9ea-53148d4f61df">
+				<reportElement x="432" y="0" width="108" height="90" uuid="9ffc94b7-bbb8-4357-b9ea-53148d4f61df">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{CALL_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="370" y="6" width="72" height="30" uuid="a98e6dc1-4fb4-4469-89e3-c992baa7744e">
+				<reportElement x="540" y="0" width="108" height="90" uuid="a98e6dc1-4fb4-4469-89e3-c992baa7744e">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="442" y="6" width="72" height="30" uuid="a8b7e441-495e-4971-9ed8-979f40eb8f7c">
+				<reportElement x="648" y="0" width="108" height="90" uuid="a8b7e441-495e-4971-9ed8-979f40eb8f7c">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{PUBLISHER}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="514" y="6" width="72" height="30" uuid="6d66fcef-002a-4437-a2a4-b4cf064d49d9">
+				<reportElement x="756" y="0" width="108" height="90" uuid="6d66fcef-002a-4437-a2a4-b4cf064d49d9">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{PUBLISHER_DATE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="586" y="6" width="72" height="30" uuid="14bc36f3-85dd-48bf-920e-477f13af52de">
+				<reportElement x="864" y="0" width="108" height="90" uuid="14bc36f3-85dd-48bf-920e-477f13af52de">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{SERIES}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="658" y="6" width="72" height="30" uuid="af45881d-f1ef-455c-81e7-eaa532914043">
+				<reportElement x="972" y="0" width="108" height="90" uuid="af45881d-f1ef-455c-81e7-eaa532914043">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{CATALOGING_DATE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="730" y="6" width="72" height="30" uuid="b7e25b9f-2a50-4d9d-8cd7-143964410aa8">
+				<reportElement x="1080" y="0" width="108" height="90" uuid="b7e25b9f-2a50-4d9d-8cd7-143964410aa8">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
