@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Inventory Report" pageWidth="1400" pageHeight="595" orientation="Landscape" columnWidth="1400" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Error" isIgnorePagination="true" uuid="79b3719e-1f58-4d15-a3c1-3ffad69cf29c">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Inventory Report" pageWidth="1472" pageHeight="595" orientation="Landscape" columnWidth="1472" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Error" isIgnorePagination="true" uuid="79b3719e-1f58-4d15-a3c1-3ffad69cf29c">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Inventory_Report_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Cataloging/Inventory_Report"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<parameter name="Location_code" class="java.lang.String">
 		<parameterDescription><![CDATA[Location code: use % for wildcard]]></parameterDescription>
 		<defaultValueExpression><![CDATA["Use % for wildcard"]]></defaultValueExpression>
@@ -17,6 +25,13 @@
   l.location_code
 , l.location_name
 , mm.display_call_no
+, ( select replace(normal_heading, 'UCOCLC', '')
+    from bib_index
+    where bib_id = bt.bib_id
+    and index_code = '0350'
+    and normal_heading like 'UCOCLC%'
+    and rownum < 2
+) as oclc
 , bt.bib_id
 , vger_support.unifix(bt.author) as author
 , vger_support.unifix(title_brief) as title_brief
@@ -39,6 +54,7 @@ order by l.location_code, mm.normalized_call_no]]>
 	<field name="LOCATION_CODE" class="java.lang.String"/>
 	<field name="LOCATION_NAME" class="java.lang.String"/>
 	<field name="DISPLAY_CALL_NO" class="java.lang.String"/>
+	<field name="OCLC" class="java.lang.String"/>
 	<field name="BIB_ID" class="java.math.BigDecimal"/>
 	<field name="AUTHOR" class="java.lang.String"/>
 	<field name="TITLE_BRIEF" class="java.lang.String"/>
@@ -74,60 +90,67 @@ order by l.location_code, mm.normalized_call_no]]>
 				<text><![CDATA[CALL NUMBER]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="250" y="0" width="170" height="30" uuid="cfca9a2f-ab35-4ec6-904a-b16b814e8ae0"/>
+				<reportElement x="340" y="0" width="170" height="30" uuid="cfca9a2f-ab35-4ec6-904a-b16b814e8ae0"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[AUTHOR]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="420" y="0" width="230" height="30" uuid="9d568666-0b6a-47b3-b9ec-3cb1fa90b4bc"/>
+				<reportElement x="510" y="0" width="230" height="30" uuid="9d568666-0b6a-47b3-b9ec-3cb1fa90b4bc"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[TITLE_BRIEF]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="650" y="0" width="100" height="30" uuid="c3ad1672-0ac5-4ab8-a256-72c68f2ae962"/>
+				<reportElement x="740" y="0" width="100" height="30" uuid="c3ad1672-0ac5-4ab8-a256-72c68f2ae962"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[EDITION]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="750" y="0" width="230" height="30" uuid="342462da-eac9-4454-8703-7d4fa76d9a07"/>
+				<reportElement x="840" y="0" width="230" height="30" uuid="342462da-eac9-4454-8703-7d4fa76d9a07"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[IMPRINT]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="980" y="0" width="50" height="30" uuid="1cd194a3-03f2-4b76-9f1e-b26a0d094b60"/>
+				<reportElement x="1070" y="0" width="50" height="30" uuid="1cd194a3-03f2-4b76-9f1e-b26a0d094b60"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[ITEMS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1030" y="0" width="159" height="30" uuid="623df21e-9a3b-4ad2-a60a-4e13d63a0709"/>
+				<reportElement x="1120" y="0" width="159" height="30" uuid="623df21e-9a3b-4ad2-a60a-4e13d63a0709"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[HOLDINGS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1189" y="0" width="50" height="30" uuid="3270d9e8-59ea-420d-80c5-010e5334703a"/>
+				<reportElement x="1279" y="0" width="50" height="30" uuid="3270d9e8-59ea-420d-80c5-010e5334703a"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[BIB ID]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1240" y="0" width="140" height="30" uuid="4e00b170-84c7-487b-9733-9185f03339a4"/>
+				<reportElement x="1330" y="0" width="140" height="30" uuid="4e00b170-84c7-487b-9733-9185f03339a4"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[LINK TO CATALOG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="0" width="90" height="30" uuid="72aef41e-9036-4a58-82be-97856655abd5"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[OCLC]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -159,7 +182,7 @@ order by l.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{DISPLAY_CALL_NO}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="250" y="0" width="170" height="60" uuid="9e64a65d-7970-4e12-ab19-e02cffb83dc0">
+				<reportElement x="340" y="0" width="170" height="60" uuid="9e64a65d-7970-4e12-ab19-e02cffb83dc0">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
@@ -169,7 +192,7 @@ order by l.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{AUTHOR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="420" y="0" width="230" height="60" uuid="4edebcf8-6167-4a94-b8a2-0f2d435fbc98">
+				<reportElement x="510" y="0" width="230" height="60" uuid="4edebcf8-6167-4a94-b8a2-0f2d435fbc98">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
@@ -179,7 +202,7 @@ order by l.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{TITLE_BRIEF}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="650" y="0" width="100" height="60" uuid="8faca2b0-a8ab-40ba-a87e-50cf25fe1093">
+				<reportElement x="740" y="0" width="100" height="60" uuid="8faca2b0-a8ab-40ba-a87e-50cf25fe1093">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
@@ -190,7 +213,7 @@ order by l.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{EDITION}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="750" y="0" width="230" height="60" uuid="18fa43a2-08af-4c52-a6c6-6298fa8cd151">
+				<reportElement x="840" y="0" width="230" height="60" uuid="18fa43a2-08af-4c52-a6c6-6298fa8cd151">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
@@ -200,7 +223,7 @@ order by l.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{IMPRINT}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="980" y="0" width="50" height="60" uuid="bab30540-c033-4340-86d2-dc6b73ff3563">
+				<reportElement x="1070" y="0" width="50" height="60" uuid="bab30540-c033-4340-86d2-dc6b73ff3563">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
@@ -210,7 +233,7 @@ order by l.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{ITEMS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1030" y="0" width="159" height="60" uuid="72f5fd5c-459c-4748-a9e3-556db158fa69">
+				<reportElement x="1120" y="0" width="159" height="60" uuid="72f5fd5c-459c-4748-a9e3-556db158fa69">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
@@ -220,14 +243,14 @@ order by l.location_code, mm.normalized_call_no]]>
 				<textFieldExpression><![CDATA[$F{F866A}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1189" y="0" width="50" height="60" uuid="61d4412f-d1b1-4ebd-9ee4-cccddda7ce7a">
+				<reportElement x="1279" y="0" width="50" height="60" uuid="61d4412f-d1b1-4ebd-9ee4-cccddda7ce7a">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{BIB_ID}]]></textFieldExpression>
 			</textField>
 			<textField hyperlinkType="Reference" hyperlinkTarget="Blank">
-				<reportElement x="1239" y="0" width="140" height="60" uuid="6d38bf7e-b325-402f-98ea-482802c1e202">
+				<reportElement x="1329" y="0" width="140" height="60" uuid="6d38bf7e-b325-402f-98ea-482802c1e202">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
@@ -236,6 +259,17 @@ order by l.location_code, mm.normalized_call_no]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PERMALINK}]]></textFieldExpression>
 				<hyperlinkReferenceExpression><![CDATA[$F{PERMALINK}]]></hyperlinkReferenceExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="250" y="0" width="90" height="60" uuid="d043913a-cb0d-4659-aa8b-41db8e775bfd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="Double"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCLC}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
