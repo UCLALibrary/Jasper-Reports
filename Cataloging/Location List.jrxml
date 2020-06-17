@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Location List" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="83f0f038-9052-40ec-86d6-20dcb2619c23">
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Location List" pageWidth="667" pageHeight="842" columnWidth="667" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="83f0f038-9052-40ec-86d6-20dcb2619c23">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
 	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Location_List_files/main_jrxml"/>
@@ -24,6 +17,7 @@
 ,	location_display_name as opac_name
 ,	location_spine_label as spine_label
 ,	suppress_in_opac as suppressed
+,	mfhd_count as mfhds
 from location
 order by location_code]]>
 	</queryString>
@@ -33,6 +27,7 @@ order by location_code]]>
 	<field name="OPAC_NAME" class="java.lang.String"/>
 	<field name="SPINE_LABEL" class="java.lang.String"/>
 	<field name="SUPPRESSED" class="java.lang.String"/>
+	<field name="MFHDS" class="java.math.BigDecimal"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -72,6 +67,13 @@ order by location_code]]>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[SUPPRESS?]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="595" y="0" width="72" height="30" uuid="f8fdd61e-7b1e-4e66-bcbc-16536a065ba0"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MFHDS]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -146,6 +148,14 @@ order by location_code]]>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textFieldExpression><![CDATA[$F{SUPPRESSED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="595" y="0" width="72" height="30" uuid="8286b6d9-545e-424e-8124-153adf5d0fad">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{MFHDS}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
