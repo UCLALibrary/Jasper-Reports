@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sia test" pageWidth="1584" pageHeight="612" orientation="Landscape" columnWidth="1544" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9fa1b37e-4dea-4a3f-989c-64882bb038db">
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sia test" pageWidth="1656" pageHeight="612" orientation="Landscape" columnWidth="1656" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Error" isIgnorePagination="true" uuid="9fa1b37e-4dea-4a3f-989c-64882bb038db">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SiaDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.unit." value="inch"/>
 	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
-	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
-	<property name="ireport.jasperserver.user" value="drickard"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Pub_Serv_Stats/Sia_Stats_Sample_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Pub_Serv_Stats/Sia_Stats_Sample"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<queryString language="SQL">
 		<![CDATA[select * from dbo."vwSiaStats"
 where SessionDateTime >= $P{startDate} and SessionDateTime < DATEADD(DAY, 1, $P{endDate})]]>
 	</queryString>
+	<field name="RawDateTime" class="java.sql.Timestamp"/>
 	<field name="SessionDateTime" class="java.lang.String"/>
 	<field name="SessionDate" class="java.lang.String"/>
 	<field name="SessionTime" class="java.lang.String"/>
@@ -36,6 +45,7 @@ where SessionDateTime >= $P{startDate} and SessionDateTime < DATEADD(DAY, 1, $P{
 	<field name="FacContacts" class="java.lang.String"/>
 	<field name="FacEmails" class="java.lang.String"/>
 	<field name="Initiatives" class="java.lang.String"/>
+	<field name="Source" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -121,10 +131,14 @@ where SessionDateTime >= $P{startDate} and SessionDateTime < DATEADD(DAY, 1, $P{
 				<reportElement x="1467" y="0" width="77" height="30" uuid="a4ea4e13-3273-441d-a710-39521048783d"/>
 				<text><![CDATA[Initiatives]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="1544" y="0" width="100" height="30" uuid="c068f734-9698-4f79-b232-cf3e3e8dc597"/>
+				<text><![CDATA[Source]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="30" splitType="Stretch">
+		<band height="41" splitType="Stretch">
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="81" height="30" uuid="8c8a10b7-1d8b-440e-a003-241294b24b2a">
 					<property name="com.jaspersoft.studio.unit.y" value="inch"/>
@@ -282,6 +296,13 @@ where SessionDateTime >= $P{startDate} and SessionDateTime < DATEADD(DAY, 1, $P{
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{Initiatives}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1544" y="0" width="100" height="30" uuid="87e0065b-df63-42d9-a214-0c7796df3220">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Source}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
