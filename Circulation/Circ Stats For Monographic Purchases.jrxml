@@ -15,7 +15,7 @@
 	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 	<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="2F"/>
-	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Circ_Stats_For_Monographic_Purchases"/>
@@ -60,8 +60,6 @@
 		and i.invoice_status = 1 --approved invoices
 		and v.vendor_code = $P{vendor_code}
 		and $X{IN, f.fiscal_period_id, fiscal_year_multi}
-		-- Combination of fiscal period and ledger should be correct...
-		and (f.ledger_name like '%CRIS%' or regexp_like(f.ledger_name, '^(AUL|Contracts|CRIS|Spec\/).+', 'i'))
 ), 
 items as (
 	select
