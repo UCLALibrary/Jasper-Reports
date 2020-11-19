@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Item Location Mismatches" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="6c29fa7f-e231-4737-b562-5ed3e1717e29">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Item Location Mismatches" pageWidth="650" pageHeight="892" columnWidth="650" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="6c29fa7f-e231-4737-b562-5ed3e1717e29">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
 	<property name="ireport.jasperserver.user" value="akohler"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Cataloging/Item_Location_Mismatches_files/main_jrxml"/>
@@ -25,7 +17,10 @@
 , mi.item_id
 , ib.item_barcode
 , mi.item_enum
+, substr(bt.bib_format, 2, 1) as bib_lvl
 from mfhd_master mm
+inner join bib_mfhd bm on mm.mfhd_id = bm.mfhd_id
+inner join bib_text bt on bm.bib_id = bt.bib_id
 inner join mfhd_item mi on mm.mfhd_id = mi.mfhd_id
 inner join item i on mi.item_id = i.item_id
 inner join location l1 on mm.location_id = l1.location_id
@@ -42,6 +37,7 @@ order by mfhd_loc, mfhd_id, item_enum, item_id]]>
 	<field name="ITEM_ID" class="java.math.BigDecimal"/>
 	<field name="ITEM_BARCODE" class="java.lang.String"/>
 	<field name="ITEM_ENUM" class="java.lang.String"/>
+	<field name="BIB_LVL" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -102,6 +98,13 @@ order by mfhd_loc, mfhd_id, item_enum, item_id]]>
 				</reportElement>
 				<text><![CDATA[ITEM_ENUM]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="585" y="0" width="65" height="30" uuid="9d16907e-893b-476b-85a8-906d4127a007">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[BIB_LVL]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
@@ -161,6 +164,13 @@ order by mfhd_loc, mfhd_id, item_enum, item_id]]>
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{ITEM_ENUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="585" y="0" width="65" height="30" uuid="1fbb158a-bcd4-4826-86cb-9e1c92d27ddb">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{BIB_LVL}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
