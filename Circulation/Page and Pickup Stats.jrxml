@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Page and Pickup Stats" pageWidth="1152" pageHeight="595" orientation="Landscape" columnWidth="1152" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="c59c7ec6-cd5b-4174-9d7d-7b4fc63ecbb7">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Circulation/Page_and_Pickup_Stats_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Circulation/Page_and_Pickup_Stats"/>
+	<queryString>
+		<![CDATA[with requests as (
+  select
+    archive_id as call_slip_id
+  , item_id
+  , location_id
+  , patron_id
+  , patron_group_id
+  , date_requested
+  , status
+  , status_date
+  , no_fill_reason
+  from call_slip_archive
+  where date_requested >= to_date('20201012', 'YYYYMMDD')
+  and print_group_id = 2 -- PANDP
+  union all
+  select
+    call_slip_id
+  , item_id
+  , location_id
+  , patron_id
+  , patron_group_id
+  , date_requested
+  , status
+  , status_date
+  , no_fill_reason
+  from call_slip
+  where date_requested >= to_date('20201012', 'YYYYMMDD')
+  and print_group_id = 2 -- PANDP
+)
+, charges as (
+  select
+    item_id
+  , patron_id
+  , charge_date
+  from circ_transactions
+  where item_id in (select distinct item_id from requests)
+  union all
+  select
+    item_id
+  , patron_id
+  , charge_date
+  from circ_trans_archive
+  where item_id in (select distinct item_id from requests)
+)
+select
+  r.call_slip_id
+, r.item_id
+, substr(l.location_code, 1, 2) as unit
+, l.location_name
+, r.patron_id
+, pg.patron_group_name
+, r.date_requested
+, r.status_date
+, st.status_desc as status
+, nf.reason_desc as nf_reason
+, case
+    when exists (
+      select * from charges
+      where item_id = r.item_id
+      and patron_id = r.patron_id
+      and charge_date > r.date_requested
+    )
+    then 'Y'
+    else null
+end as borrowed
+from requests r
+inner join patron_group pg on r.patron_group_id = pg.patron_group_id
+inner join call_slip_status_type st on r.status = st.status_type
+inner join location l on r.location_id = l.location_id
+left outer join no_fill_reason nf on r.no_fill_reason = nf.reason_id
+where patron_id not in (8946, 8949) -- LSC and YRL ILL internal requests
+order by call_slip_id]]>
+	</queryString>
+	<field name="CALL_SLIP_ID" class="java.math.BigDecimal"/>
+	<field name="ITEM_ID" class="java.math.BigDecimal"/>
+	<field name="UNIT" class="java.lang.String"/>
+	<field name="LOCATION_NAME" class="java.lang.String"/>
+	<field name="PATRON_ID" class="java.math.BigDecimal"/>
+	<field name="PATRON_GROUP_NAME" class="java.lang.String"/>
+	<field name="DATE_REQUESTED" class="java.sql.Timestamp"/>
+	<field name="STATUS_DATE" class="java.sql.Timestamp"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="NF_REASON" class="java.lang.String"/>
+	<field name="BORROWED" class="java.lang.String"/>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="112" height="30" uuid="43cbbc7a-2e45-40f1-a5f7-aee0ce14b9f5">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[CALL_SLIP_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="112" y="0" width="104" height="30" uuid="abf3819e-cf85-4dc1-a291-77c9347f0fef">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[ITEM_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="0" width="104" height="30" uuid="21b3b7e9-445e-4a63-836b-e6592c262d49">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[UNIT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="0" width="104" height="30" uuid="26d7ed22-f09a-433b-8648-4b40bf4e1e0b">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[LOCATION_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="424" y="0" width="104" height="30" uuid="9a55c69c-d2e8-40b3-acd9-c1cf821ac893">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PATRON_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="528" y="0" width="104" height="30" uuid="a4710f1c-4ba4-4d4a-8d78-ce3e5df324ca">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[PATRON_GROUP_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="632" y="0" width="104" height="30" uuid="63f1e7fc-ef7b-4360-9ae7-32d10d1c82c1">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[DATE_REQUESTED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="736" y="0" width="104" height="30" uuid="7076c1eb-fbf7-431d-b221-cf86a3d76076">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[STATUS_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="840" y="0" width="104" height="30" uuid="5c7ccc4e-607c-462d-87e7-c5187e2b47bd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="944" y="0" width="104" height="30" uuid="4441c6dd-d384-465b-9a03-7dd96907bf3c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[NF_REASON]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1048" y="0" width="104" height="30" uuid="47e0ffe8-85ed-49e8-80f8-79c42db67d6d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<text><![CDATA[BORROWED]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="112" height="30" uuid="8bf2339b-db36-4c00-a964-79d660ab28ef">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CALL_SLIP_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="0" width="104" height="30" uuid="13a07c14-3cd6-4db8-ac85-484a2005a061">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="216" y="0" width="104" height="30" uuid="e09fb4d3-c254-4a5c-a83e-f71823d12faa">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UNIT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="320" y="0" width="104" height="30" uuid="b4545b37-7df1-417a-bb23-e0877d5e5c2f">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="424" y="0" width="104" height="30" uuid="abc2204a-beb1-4076-b231-a365aba3e4c9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PATRON_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="528" y="0" width="104" height="30" uuid="38f6df98-0558-488b-a3a7-f7938b69932a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PATRON_GROUP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="632" y="0" width="104" height="30" uuid="a960fefe-0f79-4203-9251-45f575b3f48f">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_REQUESTED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="736" y="0" width="104" height="30" uuid="efb4b672-2e0f-45b7-8732-bedb509d1155">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="840" y="0" width="104" height="30" uuid="2ad8e1ae-02db-4a4a-a06c-80f35f6452ad">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="944" y="0" width="104" height="30" uuid="e51dee6e-b364-4ae1-9340-2e04c39f3526">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NF_REASON}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1048" y="0" width="104" height="30" uuid="57fcc212-f4c6-469c-b898-e35f6f983194">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<textElement>
+					<paragraph lineSpacing="AtLeast"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BORROWED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
