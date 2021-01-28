@@ -1,0 +1,80 @@
+WITH active_subs as (
+select
+bt.bib_id
+, po.po_id
+
+from bib_text bt
+
+INNER JOIN LINE_ITEM li ON bt.BIB_ID = li.BIB_ID
+INNER JOIN PURCHASE_ORDER po ON li.PO_ID = po.PO_ID
+INNER JOIN PO_TYPE pot ON po.PO_TYPE = pot.PO_TYPE
+INNER JOIN PO_STATUS pos ON po.PO_STATUS = pos.PO_STATUS
+
+WHERE  bt.bib_format = 'as' 
+       and pot.po_type_desc = 'Continuation'
+       and pos.po_status_desc like 'Approved%Sent'
+       --and li.create_date > to_date('20200301', 'YYYYMMDD') 
+       
+           )
+    , new_subs as (
+    
+    select
+  bt.bib_id
+, po.po_id
+
+from bib_text bt
+
+INNER JOIN LINE_ITEM li ON bt.BIB_ID = li.BIB_ID
+INNER JOIN PURCHASE_ORDER po ON li.PO_ID = po.PO_ID
+INNER JOIN PO_TYPE pot ON po.PO_TYPE = pot.PO_TYPE
+INNER JOIN PO_STATUS pos ON po.PO_STATUS = pos.PO_STATUS
+
+WHERE  bt.bib_format = 'as' 
+       and pot.po_type_desc = 'Continuation'
+       and pos.po_status_desc like 'Approved%Sent'
+       and li.create_date between trunc($P{date_1}) and trunc($P{date_2})
+        
+       
+       
+    )
+    
+    
+    -- Main query starts here, after (virtual) tables are defined
+
+  Select
+  
+  vger_support.unifix(title) as title
+, ucladb.getbibsubfield(bt.bib_id, '022', 'a') AS F022a
+, ucladb.getbibsubfield(bt.bib_id, '022', 'y') AS F022y
+--, new_subs.bib_id
+--, po.po_number
+--, new_subs.po_id
+--, li.create_date
+  
+  
+From new_subs
+
+inner join bib_text bt on new_subs.bib_id = bt.bib_id
+INNER JOIN LINE_ITEM li ON bt.BIB_ID = li.BIB_ID
+INNER JOIN PURCHASE_ORDER po ON li.PO_ID = po.PO_ID
+INNER JOIN PO_TYPE pot ON po.PO_TYPE = pot.PO_TYPE
+INNER JOIN PO_STATUS pos ON po.PO_STATUS = pos.PO_STATUS
+
+
+Where not exists (
+
+        Select * from active_subs
+        Where bib_id = new_subs.bib_id
+        And po_id != new_subs.po_id
+
+)
+
+        And 
+       bt.bib_format = 'as' 
+       and pot.po_type_desc = 'Continuation'
+       and pos.po_status_desc like 'Approved%Sent'
+       and li.create_date between trunc($P{date_1}) and trunc($P{date_2})
+       
+--)
+
+Order by bt.title
