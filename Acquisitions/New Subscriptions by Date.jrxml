@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="New Subscriptions by Date" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d3277cc0-6623-4634-a1f0-0014123ac361">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu:8443/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="law"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/UCLA/Acquisitions/New_Subscriptions_by_Date_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/Acquisitions/New_Subscriptions_by_Date"/>
+	<parameter name="date_1" class="java.sql.Date"/>
+	<parameter name="date_2" class="java.sql.Date"/>
+	<queryString language="SQL">
+		<![CDATA[WITH active_subs as (
+select
+bt.bib_id
+, po.po_id
+
+from bib_text bt
+
+INNER JOIN LINE_ITEM li ON bt.BIB_ID = li.BIB_ID
+INNER JOIN PURCHASE_ORDER po ON li.PO_ID = po.PO_ID
+INNER JOIN PO_TYPE pot ON po.PO_TYPE = pot.PO_TYPE
+INNER JOIN PO_STATUS pos ON po.PO_STATUS = pos.PO_STATUS
+
+WHERE  bt.bib_format = 'as' 
+       and pot.po_type_desc = 'Continuation'
+       and pos.po_status_desc like 'Approved%Sent'
+       --and li.create_date > to_date('20200301', 'YYYYMMDD') 
+       
+           )
+    , new_subs as (
+    
+    select
+  bt.bib_id
+, po.po_id
+
+from bib_text bt
+
+INNER JOIN LINE_ITEM li ON bt.BIB_ID = li.BIB_ID
+INNER JOIN PURCHASE_ORDER po ON li.PO_ID = po.PO_ID
+INNER JOIN PO_TYPE pot ON po.PO_TYPE = pot.PO_TYPE
+INNER JOIN PO_STATUS pos ON po.PO_STATUS = pos.PO_STATUS
+
+WHERE  bt.bib_format = 'as' 
+       and pot.po_type_desc = 'Continuation'
+       and pos.po_status_desc like 'Approved%Sent'
+       and li.create_date between trunc($P{date_1}) and trunc($P{date_2})
+        
+       
+       
+    )
+    
+    
+    -- Main query starts here, after (virtual) tables are defined
+
+  Select
+  
+  vger_support.unifix(title) as title
+, ucladb.getbibsubfield(bt.bib_id, '022', 'a') AS F022a
+, ucladb.getbibsubfield(bt.bib_id, '022', 'y') AS F022y
+--, new_subs.bib_id
+--, po.po_number
+--, new_subs.po_id
+--, li.create_date
+  
+  
+From new_subs
+
+inner join bib_text bt on new_subs.bib_id = bt.bib_id
+INNER JOIN LINE_ITEM li ON bt.BIB_ID = li.BIB_ID
+INNER JOIN PURCHASE_ORDER po ON li.PO_ID = po.PO_ID
+INNER JOIN PO_TYPE pot ON po.PO_TYPE = pot.PO_TYPE
+INNER JOIN PO_STATUS pos ON po.PO_STATUS = pos.PO_STATUS
+
+
+Where not exists (
+
+        Select * from active_subs
+        Where bib_id = new_subs.bib_id
+        And po_id != new_subs.po_id
+
+)
+
+        And 
+       bt.bib_format = 'as' 
+       and pot.po_type_desc = 'Continuation'
+       and pos.po_status_desc like 'Approved%Sent'
+       and li.create_date between trunc($P{date_1}) and trunc($P{date_2})
+       
+--)
+
+Order by bt.title]]>
+	</queryString>
+	<field name="TITLE" class="java.lang.String"/>
+	<field name="F022A" class="java.lang.String"/>
+	<field name="F022Y" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="268" height="30" uuid="ad578ce4-3364-4e0f-be39-5ff2b418890c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="268" y="0" width="267" height="30" uuid="d56d9cc4-2166-429e-8b76-7147aa59f50c">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[F022A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="535" y="0" width="267" height="30" uuid="c9b1f66d-bc50-4b93-a84c-ebfeefbe2abd">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<text><![CDATA[F022Y]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="27" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="268" height="27" uuid="638f156f-224c-490f-8628-8c601eb0209e">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="268" y="0" width="267" height="27" uuid="4d337629-2772-4c26-a1c3-d4a963e9433a">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{F022A}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="535" y="0" width="267" height="27" uuid="dc653c6c-00b5-4797-81d2-7181c0262a26">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="TRUE"/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="TRUE"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{F022Y}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
