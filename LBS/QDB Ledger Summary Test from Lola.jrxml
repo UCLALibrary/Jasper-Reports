@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.2.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Jasper 7" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="240f1f93-462c-4d36-8c38-1d4c77be8add">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="VoyagerDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="ireport.jasperserver.url" value="https://jasper.library.ucla.edu/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="akohler"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/UCLA/LBS/QDB_General_Ledger_Summary_Test_Consales_Medina_no_page_break"/>
+	<queryString language="SQL">
+		<![CDATA[--Access
+--Query: qryDeptReport 
+--Report: rptDepartment
+
+select distinct 
+rdl.aul,
+rdl.department,
+rdl.department_head,
+glb.account_number || ' ' || glb.cost_center_code || ' ' || fun.fund_number || ' ' || acc.account_title || ' ' || fun.fund_title as FAU,
+glb.sub_code,
+sub.sub_code_name,
+sum (-glb.ytd_appropriation) as ytd_approp,
+sum (glb.ytd_financial) as ytd_expense,
+sum (glb.encumbrance) as encumbrance,
+sum (glb.memo_lien) as memo_lien,
+Sum (-glb.bal_operating) AS operating_bal_amt
+
+--operating_bal / ytd_approp as pc_remain
+--(-glb.ytd_appropriation) / (-glb.ytd_appropriation) as pc_remain
+
+                                             
+ from VGER_SUPPORT.qdb_report_distribution_list rdl
+ inner join VGER_SUPPORT.qdb_gl_balances glb on rdl.account_number = glb.account_number and rdl.cost_center_code = glb.cost_center_code
+ inner join VGER_SUPPORT.qdb_fund_names fun on glb.fund_number = fun.fund_number 
+ inner join vger_support.qdb_account_names acc on glb.account_number = acc.account_number
+ inner join VGER_SUPPORT.qdb_sub_codes sub on glb.sub_code = sub.sub_code
+ 
+  where 
+  (glb.ytd_appropriation + glb.encumbrance + glb.ytd_financial + glb.memo_lien <> '0')
+  and glb.location_code = '4' AND sub.sub_code <> '05'
+  --and glb.cost_center_code = 'CF'
+  and glb.fiscal_year = '2021'
+  --and glb.ledger_year_month = '201910'
+  and rdl.aul = 'CONSALES'
+  and rdl.department_head = 'Medina'
+  and acc.account_title like 'LIB:%'
+  --and sub.sub_code = '02'
+  --and fun.fund_title like '%ART%'
+        
+group by
+rdl.aul,
+rdl.department,
+rdl.department_head,
+glb.account_number,
+fun.fund_number,
+acc.account_title,
+fun.fund_title,
+glb.cost_center_code,
+glb.sub_code, 
+sub.sub_code_name,
+glb.account_number
+
+
+ORDER BY fau, glb.sub_code]]>
+	</queryString>
+	<field name="AUL" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="DEPARTMENT_HEAD" class="java.lang.String"/>
+	<field name="FAU" class="java.lang.String"/>
+	<field name="SUB_CODE" class="java.lang.String"/>
+	<field name="SUB_CODE_NAME" class="java.lang.String"/>
+	<field name="YTD_APPROP" class="java.math.BigDecimal"/>
+	<field name="YTD_EXPENSE" class="java.math.BigDecimal"/>
+	<field name="ENCUMBRANCE" class="java.math.BigDecimal"/>
+	<field name="MEMO_LIEN" class="java.math.BigDecimal"/>
+	<field name="OPERATING_BAL_AMT" class="java.math.BigDecimal"/>
+	<variable name="YTD_APPROP1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{YTD_APPROP}]]></variableExpression>
+	</variable>
+	<variable name="YTD_EXPENSE1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{YTD_EXPENSE}]]></variableExpression>
+	</variable>
+	<variable name="ENCUMBRANCE1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{ENCUMBRANCE}]]></variableExpression>
+	</variable>
+	<variable name="MEMO_LIEN1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{MEMO_LIEN}]]></variableExpression>
+	</variable>
+	<variable name="OPERATING_BAL_AMT1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{OPERATING_BAL_AMT}]]></variableExpression>
+	</variable>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{FAU}]]></groupExpression>
+		<groupHeader>
+			<band height="39">
+				<textField>
+					<reportElement x="13" y="7" width="577" height="30" uuid="b29c2be9-d3b1-4284-b680-cc13f44aebe4"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FAU}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="40">
+				<textField pattern="#,##0.00">
+					<reportElement x="217" y="6" width="107" height="30" uuid="b2716a46-6d4a-481c-86eb-9b630653784d"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{YTD_APPROP1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="324" y="6" width="107" height="30" uuid="0a14daf6-6b26-4ab7-9d60-0db20bf18744"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{YTD_EXPENSE1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="431" y="6" width="107" height="30" uuid="7d93d86d-6d0f-40cc-8de4-8b8a3515553f"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ENCUMBRANCE1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="538" y="6" width="107" height="30" uuid="977b05a8-8156-4555-a57d-466319e6d746"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{MEMO_LIEN1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="645" y="6" width="107" height="30" uuid="b7eb4cc2-71de-4317-a456-e8cb2b26c91f"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{OPERATING_BAL_AMT1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="752" height="40" uuid="92b688ae-056d-4bd9-85d0-0eaed1f464c8"/>
+				<box>
+					<topPen lineWidth="5.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="5.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["University Library and Associated Departments: General Ledger Summary - YTD Financial Results"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="41" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="6" width="462" height="30" uuid="386032ee-1526-4483-b2c3-c4a3b39dfed9"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{AUL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="6" width="462" height="30" uuid="6b9d75f2-129e-4acb-a0a9-effcd31257c8"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="6" width="382" height="30" uuid="3399aa96-5d6a-4537-8cf0-02537dcb79c4"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT_HEAD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="49" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="110" height="30" uuid="17c462b3-cb3a-4e88-9477-690a6b087b8e"/>
+				<box>
+					<pen lineWidth="2.0" lineColor="#3399FF"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SUB_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="0" width="107" height="30" uuid="ef42230f-86dc-4a28-9388-2ba61c1e6a02"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SUB_TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="217" y="0" width="107" height="30" uuid="e7e7239f-1e29-45e2-81cc-de120051b54e"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[YTD_APPROP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="324" y="0" width="107" height="30" uuid="27ac0c83-c3c6-4970-8e47-56f193d9e9dd"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[YTD_EXPENSE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="0" width="107" height="30" uuid="77f3ce09-89fd-4837-82f6-e10130374f0a"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ENCUMBRANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="538" y="0" width="107" height="30" uuid="06f2ffa3-441b-4e2a-b94d-6d78dcd4aa32"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MEMO_LIEN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="645" y="0" width="107" height="30" uuid="d2bc35a2-758b-4811-9543-5f476b92d23a"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#3399FF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[OPERATING_BAL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="41" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="5" width="110" height="30" uuid="d2dd7cc5-9372-491e-a6e4-5084adb8442f"/>
+				<textFieldExpression><![CDATA[$F{SUB_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="5" width="107" height="30" uuid="725907cf-8d54-46c9-bb4c-632515179a45"/>
+				<textFieldExpression><![CDATA[$F{SUB_CODE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="217" y="5" width="107" height="30" uuid="24c5e7ce-1226-4026-afe5-5103236b67ca"/>
+				<textFieldExpression><![CDATA[$F{YTD_APPROP}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="324" y="5" width="107" height="30" uuid="cc898c34-0f23-4761-ac7f-3b0596154587"/>
+				<textFieldExpression><![CDATA[$F{YTD_EXPENSE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="431" y="5" width="107" height="30" uuid="0eb7da9f-3f6b-4840-8599-5e5a4e5ded68"/>
+				<textFieldExpression><![CDATA[$F{ENCUMBRANCE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="538" y="5" width="107" height="30" uuid="c24f1227-af20-4ced-8b41-79494bcf41c8"/>
+				<textFieldExpression><![CDATA[$F{MEMO_LIEN}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="645" y="5" width="107" height="30" uuid="04d8cb0b-2ba0-4d14-92ce-b113e9343f23"/>
+				<textFieldExpression><![CDATA[$F{OPERATING_BAL_AMT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="70" splitType="Stretch">
+			<textField>
+				<reportElement x="670" y="30" width="100" height="30" uuid="b77f22c2-e838-405b-9ad5-7c925acd2f44"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="-9" y="40" width="100" height="30" uuid="2be22676-a371-417c-aaae-527e823f9082"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm">
+				<reportElement x="80" y="40" width="120" height="30" uuid="6e1b47cc-6919-4b86-b309-af1f036eacdb"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
